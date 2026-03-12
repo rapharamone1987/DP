@@ -8,11 +8,25 @@ import os
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Checklist IA - Recebimento", layout="wide")
 
-# --- 1. CONFIGURAÇÃO DA IA ---
-CHAVE_PADRAO = "AIzaSyBEaSvGFjrICM70M8IRD-X9i7n6C15IWdc" 
+import streamlit as st
+import google.generativeai as genai
 
-st.sidebar.title("Configuração")
-chave_usuario = st.sidebar.text_input("Chave API Google Gemini", value=CHAVE_PADRAO, type="password")
+# --- 1. CONFIGURAÇÃO DA IA SEGURA ---
+# Tenta pegar a chave do segredo do Streamlit, senão tenta do código (local)
+if "GOOGLE_API_KEY" in st.secrets:
+    CHAVE_API = st.secrets["GOOGLE_API_KEY"]
+else:
+    # Caso você esteja rodando no seu PC localmente
+    CHAVE_API = "COLE_A_CHAVE_AQUI_APENAS_PARA_TESTE_LOCAL"
+
+try:
+    genai.configure(api_key=CHAVE_API)
+    model = genai.GenerativeModel(
+        model_name='gemini-1.5-flash',
+        system_instruction="Você é um Engenheiro Especialista em Recebimento Técnico..."
+    )
+except Exception as e:
+    st.error(f"Erro na configuração da IA: {e}")
 
 @st.cache_resource
 def configurar_ia(chave):
@@ -145,4 +159,5 @@ if st.session_state.checklist_items:
 if st.sidebar.button("Limpar Tudo"):
     st.session_state.checklist_items = []
     st.session_state.fotos = {}
+
     st.rerun()
