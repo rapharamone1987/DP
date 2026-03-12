@@ -104,7 +104,7 @@ if st.session_state.checklist_items:
             c_text.write(f"**{item}**")
             
             # CÂMERA TRASEIRA (Aparece para o usuário preencher)
-            foto = st.camera_input(f"Capturar Foto - Item {i+1}", key=f"f_{i}", facing_mode="environment")
+           foto = st.camera_input(f"Capturar Foto - Item {i+1}", key=f"f_{i}")
             if foto: st.session_state.fotos[i] = foto
 
     obs_geral = ""
@@ -180,6 +180,7 @@ if st.session_state.checklist_items:
 
 if st.sidebar.button("Nova Inspeção"):
     st.session_state.clear(); st.rerun()
+
 
 
 
