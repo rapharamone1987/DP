@@ -165,13 +165,13 @@ if st.session_state.checklist_items:
                 if todos_ok:
                     pdf.set_fill_color(245, 245, 245); pdf.set_font("Arial", 'B', 10)
                     t = "ATESTO O RECEBIMENTO DEFINITIVO" if natureza == "Consumo" else "ATESTO O RECEBIMENTO PROVISORIO"
-                    pdf.multi_cell(170, 10, f"{t} do objeto por estar em conformidade.", border=1, align='C', fill=True)
+                    pdf.multi_cell(170, 10, f"{t} do objeto por estar em conformidade com as especificações conferidas.", border=1, align='C', fill=True)
                 else:
                     pdf.set_font("Arial", 'B', 10); pdf.set_text_color(200, 0, 0)
                     pdf.multi_cell(170, 8, f"PENDENCIAS:\n{obs_geral}", border=1, align='L')
                     pdf.set_text_color(0, 0, 0)
 
-                pdf.ln(25); pdf.set_font("Arial", 'B', 10); pdf.cell(170, 8, "________________________________________________", ln=True, align='C')
+                pdf.ln(25); pdf.set_font("Arial", 'B', 10); pdf.cell(170, 8, ln=True, align='C')
                 pdf.cell(170, 6, f"SERVIDOR: {serv_nome.upper()}", ln=True, align='C')
                 
                 pdf_bytes = pdf.output(dest='S').encode('latin-1', errors='replace')
@@ -181,6 +181,7 @@ if st.session_state.checklist_items:
 
 if st.sidebar.button("Nova Inspeção"):
     st.session_state.clear(); st.rerun()
+
 
 
 
