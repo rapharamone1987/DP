@@ -150,7 +150,11 @@ if st.session_state.checklist_items:
                     pdf.set_font("Arial", 'B', 10)
                     pdf.set_x(28) # Empurra o texto para não ficar em cima do ícone
                     pdf.multi_cell(160, 7, item_txt.encode('latin-1','replace').decode('latin-1'))
-                    
+
+                    # ADICIONADO facing_mode="environment"
+        foto = st.camera_input(f"Foto {i+1}", key=f"f_{i}", facing_mode="environment")
+        
+        if foto: st.session_state.fotos[i] = foto
                     if idx in st.session_state.fotos:
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
                             tmp.write(st.session_state.fotos[idx].getvalue())
@@ -181,6 +185,7 @@ if st.session_state.checklist_items:
 
 if st.sidebar.button("Nova Inspeção"):
     st.session_state.clear(); st.rerun()
+
 
 
 
