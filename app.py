@@ -104,7 +104,7 @@ if st.session_state.checklist_items:
             c_text.write(f"**{item}**")
             
             # CÂMERA TRASEIRA (Aparece para o usuário preencher)
-            foto = st.camera_input(f"Foto Item {i+1}", key=f"f_{i}", facing_mode="environment")
+            foto = st.camera_input(f"Capturar Foto - Item {i+1}", key=f"f_{i}", facing_mode="environment")
             if foto: st.session_state.fotos[i] = foto
 
     obs_geral = ""
@@ -171,7 +171,6 @@ if st.session_state.checklist_items:
                     pdf.multi_cell(170, 8, f"PENDENCIAS:\n{obs_geral}", border=1, align='L')
                 
                 pdf.ln(25); pdf.set_text_color(0, 0, 0)
-                pdf.cell(170, 8, "________________________________________________", ln=True, align='C')
                 pdf.cell(170, 6, f"SERVIDOR: {serv_nome.upper()}", ln=True, align='C')
                 
                 pdf_bytes = pdf.output(dest='S').encode('latin-1', errors='replace')
@@ -181,6 +180,7 @@ if st.session_state.checklist_items:
 
 if st.sidebar.button("Nova Inspeção"):
     st.session_state.clear(); st.rerun()
+
 
 
 
