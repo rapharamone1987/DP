@@ -98,24 +98,44 @@ if st.session_state.checklist_items:
     st.markdown('<div class="barra-secao">1. CONFERÊNCIA TÉCNICA</div>', unsafe_allow_html=True)
     
     todos_ok = True
+    # Inicializa a variável de controle da câmera se não existir
+    if "item_da_foto" not in st.session_state:
+        st.session_state.item_da_foto = None
+
     for i, item in enumerate(st.session_state.checklist_items):
         with st.container(border=True):
             c_check, c_text = st.columns([0.15, 0.85])
             
-            # Checkbox de conferência
+            # 1. Checkbox
             st.session_state.conferidos[i] = c_check.checkbox("OK", key=f"c_{i}")
             if not st.session_state.conferidos[i]: 
                 todos_ok = False
             
+            # 2. Texto do Item
             c_text.write(f"**{item}**")
             
-            # --- ESSA É A MUDANÇA PARA O CELULAR (Linhas 111-115 +/-) ---
-            with st.expander(f"📸 Tirar/Ver Foto do Item {i+1}"):
-                foto = st.camera_input(f"Clique para abrir a câmera", key=f"f_{i}")
-                if foto: 
+            # 3. Lógica da Câmera Única (O SEGREDO PARA FUNCIONAR NO CELULAR)
+            if st.session_state.item_da_foto == i:
+                # Se este for o item selecionado, mostra a câmera
+                st.info(f"📸 Câmera ativa para o Item {i+1}")
+                foto = st.camera_input(f"Tirar foto do item {i+1}", key=f"f_{i}", facing_mode="environment")
+                
+                if foto:
                     st.session_state.fotos[i] = foto
-                    st.image(foto, width=200, caption="Foto capturada")
-
+                
+                if st.button(f"✅ Salvar e Fechar Câmera {i+1}", key=f"close_{i}"):
+                    st.session_state.item_da_foto = None
+                    st.rerun()
+            else:
+                # Se não for o item da vez, mostra apenas o botão ou a foto já tirada
+                col_btn, col_preview = st.columns([0.4, 0.6])
+                
+                if col_btn.button(f"📸 Abrir Câmera Traseira", key=f"btn_cam_{i}"):
+                    st.session_state.item_da_foto = i
+                    st.rerun()
+                
+                if i in st.session_state.fotos:
+                    col_preview.image(st.session_state.fotos[i], width=100, caption="Foto salva")
     # Observação Única no Final
     obs_geral = ""
     if not todos_ok:
