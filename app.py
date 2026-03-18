@@ -118,7 +118,7 @@ if st.session_state.checklist_items:
             if st.session_state.item_da_foto == i:
                 # Se este for o item selecionado, mostra a câmera
                 st.info(f"📸 Câmera ativa para o Item {i+1}")
-                foto = st.camera_input(f"Tirar foto do item {i+1}", key=f"f_{i}", facing_mode="environment")
+                foto = st.camera_input(f"Tirar foto do item {i+1}", key=f"f_{i}")
                 
                 if foto:
                     st.session_state.fotos[i] = foto
