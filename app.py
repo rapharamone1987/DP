@@ -101,11 +101,20 @@ if st.session_state.checklist_items:
     for i, item in enumerate(st.session_state.checklist_items):
         with st.container(border=True):
             c_check, c_text = st.columns([0.15, 0.85])
+            
+            # Checkbox de conferência
             st.session_state.conferidos[i] = c_check.checkbox("OK", key=f"c_{i}")
-            if not st.session_state.conferidos[i]: todos_ok = False
+            if not st.session_state.conferidos[i]: 
+                todos_ok = False
+            
             c_text.write(f"**{item}**")
-            foto = st.camera_input(f"Foto {i+1}", key=f"f_{i}")
-            if foto: st.session_state.fotos[i] = foto
+            
+            # --- ESSA É A MUDANÇA PARA O CELULAR (Linhas 111-115 +/-) ---
+            with st.expander(f"📸 Tirar/Ver Foto do Item {i+1}"):
+                foto = st.camera_input(f"Clique para abrir a câmera", key=f"f_{i}")
+                if foto: 
+                    st.session_state.fotos[i] = foto
+                    st.image(foto, width=200, caption="Foto capturada")
 
     # Observação Única no Final
     obs_geral = ""
