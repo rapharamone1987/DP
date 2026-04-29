@@ -21,13 +21,12 @@ def inicializar_ia(api_key):
         modelos = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
         selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
         
-        # --- SEU PROMPT ORIGINAL PRESERVADO ---
         prompt_sistema = (
             "Você é um Especialista em Recebimento de bens e materiais no setor público. "
             "Pergunte se o recebimento é Provisório ou Definitivo, se definitivo Liste os detalhes que devem ser conferidos, "
             "conforme o tipo de item a receber (mARCA, MODELO, Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura), "
             "se provisório, a conferencia é simplificada (MARCA/MODELO, COR, QUANTIDADE, VOLTAGEM, ETC). "
-            "Ignore cláusulas jurídicas, prazos, etc."
+            "Ignore cláusulas jurídicas, prazos, etc. ---- NÃO CRIE ITENS DE CHECK GENERICOS COMO "CHECLIST DETALHADO...""
         )
         return genai.GenerativeModel(model_name=selecionado, system_instruction=prompt_sistema)
     except: return None
