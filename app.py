@@ -6,8 +6,9 @@ import tempfile
 import os
 import json
 import time
+import re
 
-# --- 1. CONFIGURAÇÃO DA IA COM DESCOBERTA AUTOMÁTICA ---
+# --- 1. CONFIGURAÇÃO DA IA ---
 if "GOOGLE_API_KEY" in st.secrets:
     CHAVE_API = st.secrets["GOOGLE_API_KEY"]
 else:
@@ -17,25 +18,38 @@ else:
 def inicializar_ia(api_key):
     try:
         genai.configure(api_key=api_key.strip())
-        modelos_disponiveis = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos_disponiveis else modelos_disponiveis[0]
+        modelos = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+        selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
         
-        # --- SEU PROMPT ORIGINAL ---
-        seu_prompt_original = (
+        # --- SEU PROMPT ORIGINAL PRESERVADO ---
+        prompt_sistema = (
             "Você é um Especialista em Recebimento de bens e materiais no setor público. "
             "Pergunte se o recebimento é Provisório ou Definitivo, se definitivo Liste os detalhes que devem ser conferidos, "
             "conforme o tipo de item a receber (mARCA, MODELO, Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura), "
             "se provisório, a conferencia é simplificada (MARCA/MODELO, COR, QUANTIDADE, VOLTAGEM, ETC). "
             "Ignore cláusulas jurídicas, prazos, etc."
         )
-        
-        return genai.GenerativeModel(model_name=selecionado, system_instruction=seu_prompt_original), selecionado
-    except Exception as e:
-        return None, str(e)
+        return genai.GenerativeModel(model_name=selecionado, system_instruction=prompt_sistema)
+    except: return None
 
-model, modelo_nome = inicializar_ia(CHAVE_API)
+model = inicializar_ia(CHAVE_API)
 
-# --- 2. FUNÇÕES DO PDF (ÍCONES CHECK/X) ---
+# --- 2. FUNÇÕES DE SUPORTE (TEXTO E PDF) ---
+def extrair_texto_flexivel(texto):
+    """Transforma texto do Gemini/Copilot em dados do app"""
+    dados = {"fornecedor": "", "edital": "", "objeto": "", "checklist": []}
+    linhas = texto.split('\n')
+    for linha in linhas:
+        l = linha.strip()
+        if not l: continue
+        if "FORNECEDOR:" in l.upper(): dados["fornecedor"] = l.split(":", 1)[1].strip()
+        elif "EDITAL:" in l.upper() or "ARP:" in l.upper(): dados["edital"] = l.split(":", 1)[1].strip()
+        elif "OBJETO:" in l.upper(): dados["objeto"] = l.split(":", 1)[1].strip()
+        elif l.startswith(("-", "*", "•")) or (l[0].isdigit() and "." in l[:3]):
+            item = re.sub(r'^[-*•0-9.\s]+', '', l)
+            if len(item) > 3: dados["checklist"].append(item)
+    return dados
+
 def desenhar_check(pdf, x, y, status):
     if status:
         pdf.set_fill_color(0, 154, 68); pdf.ellipse(x, y, 5, 5, 'F')
@@ -47,23 +61,9 @@ def desenhar_check(pdf, x, y, status):
         pdf.line(x+1.5, y+1.5, x+3.5, y+3.5); pdf.line(x+3.5, y+1.5, x+1.5, y+3.5)
     pdf.set_line_width(0.2); pdf.set_draw_color(0, 0, 0)
 
-@st.cache_data(show_spinner=False)
-def analisar_documento(pdf_bytes):
-    prompt_json = """Retorne um JSON estrito:
-    {"fornecedor": "string", "edital": "string", "objeto": "string", "checklist": ["item1", "item2"]}"""
-    try:
-        response = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_bytes}, prompt_json])
-        return json.loads(response.text.replace("```json", "").replace("```", "").strip())
-    except Exception as e:
-        return str(e)
-
-# --- 3. INTERFACE STREAMLIT ---
-st.set_page_config(page_title="Checklist Técnico IA", layout="centered")
-st.markdown("""<style>
-    .titulo-verde { color: #009A44; font-weight: bold; font-size: 24px; text-transform: uppercase; text-align: center; }
-    .caixa-info { background-color: #F8F9FA; padding: 15px; border-radius: 10px; border: 1px solid #DDD; }
-    .barra { background-color: #009A44; color: white; padding: 10px; font-weight: bold; border-radius: 5px; }
-</style>""", unsafe_allow_html=True)
+# --- 3. INTERFACE ---
+st.set_page_config(page_title="Checklist IA", layout="centered")
+st.markdown("<style>.titulo-verde { color: #009A44; font-weight: bold; font-size: 22px; text-transform: uppercase; text-align: center; } .caixa { background-color: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #ddd; } .barra { background-color: #009A44; color: white; padding: 8px; font-weight: bold; border-radius: 5px; }</style>", unsafe_allow_html=True)
 
 if "checklist_items" not in st.session_state: st.session_state.checklist_items = []
 if "fotos" not in st.session_state: st.session_state.fotos = {}
@@ -73,30 +73,48 @@ if "item_da_foto" not in st.session_state: st.session_state.item_da_foto = None
 
 st.markdown('<p class="titulo-verde">📋 Recebimento Técnico Inteligente</p>', unsafe_allow_html=True)
 
-pdf_file = st.file_uploader("Upload do TR ou Empenho (PDF)", type="pdf")
+# --- 4. CARGA DE DADOS (COM FALLBACK) ---
+if not st.session_state.checklist_items:
+    pdf_file = st.file_uploader("1. Suba o PDF do TR ou Empenho", type="pdf")
+    
+    if pdf_file:
+        col1, col2 = st.columns(2)
+        if col1.button("🔍 ANALISAR COM IA"):
+            with st.spinner("IA processando..."):
+                try:
+                    prompt = "Extraia Fornecedor, Edital, Objeto e crie um CHECKLIST (use - para itens)."
+                    res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt])
+                    dados = extrair_texto_flexivel(res.text)
+                    st.session_state.dados_auto = dados
+                    st.session_state.checklist_items = dados["checklist"]
+                    st.rerun()
+                except Exception as e:
+                    st.error("⚠️ Cota Excedida no Google. Use a opção 'Colar Texto' abaixo.")
+        
+        if col2.button("📝 USAR MODO MANUAL"):
+            st.session_state.modo_manual = True
 
-if pdf_file and not st.session_state.checklist_items:
-    if st.button("🔍 ANALISAR AUTOMATICAMENTE", use_container_width=True):
-        with st.spinner("IA extraindo dados..."):
-            res = analisar_documento(pdf_file.read())
-            if isinstance(res, dict):
-                st.session_state.dados_auto = res
-                st.session_state.checklist_items = res.get("checklist", [])
-                st.rerun()
-            else: st.error(f"Erro: {res}")
+    if st.session_state.get("modo_manual"):
+        st.info("💡 Vá no Gemini ou Copilot, anexe o PDF e peça os dados. Depois cole aqui:")
+        texto_manual = st.text_area("Cole o texto da IA aqui:")
+        if st.button("Carregar Dados"):
+            dados = extrair_texto_flexivel(texto_manual)
+            st.session_state.dados_auto = dados
+            st.session_state.checklist_items = dados["checklist"]
+            st.rerun()
 
-# --- 4. FORMULÁRIO E ITENS ---
+# --- 5. CHECKLIST ---
 if st.session_state.checklist_items:
-    obj_original = st.session_state.dados_auto.get("objeto", "RECEBIMENTO")
-    obj_curto = " ".join(obj_original.split()[:5]).upper()
+    obj_nome = st.session_state.dados_auto.get("objeto", "RECEBIMENTO")
+    obj_curto = " ".join(obj_nome.split()[:5]).upper()
     st.markdown(f'<p class="titulo-verde">CONFERÊNCIA: {obj_curto}</p>', unsafe_allow_html=True)
 
     with st.container():
-        st.markdown('<div class="caixa-info">', unsafe_allow_html=True)
+        st.markdown('<div class="caixa">', unsafe_allow_html=True)
         c1, c2 = st.columns(2)
         edital = c1.text_input("Edital/ARP:", value=st.session_state.dados_auto.get("edital", ""))
         fornecedor = c2.text_input("Fornecedor:", value=st.session_state.dados_auto.get("fornecedor", ""))
-        placa = c1.text_input("Placa / Identificação:")
+        placa = c1.text_input("Placa / ID:")
         natureza = c2.radio("Recebimento:", ["Consumo (Definitivo)", "Permanente (Provisório)"], horizontal=True)
         centro_custo = st.text_input("Centro de Custo:") if "Permanente" in natureza else ""
         st.markdown('</div>', unsafe_allow_html=True)
@@ -112,7 +130,7 @@ if st.session_state.checklist_items:
             col_tx.write(f"**{item}**")
             
             if st.session_state.item_da_foto == i:
-                foto = st.camera_input(f"Capturar Foto {i+1}", key=f"f_{i}")
+                foto = st.camera_input(f"Foto {i+1}", key=f"f_{i}")
                 if foto:
                     st.session_state.fotos[i] = foto
                     if st.button(f"✅ Salvar Foto {i+1}", key=f"s_{i}"):
@@ -123,11 +141,10 @@ if st.session_state.checklist_items:
                     st.session_state.item_da_foto = i; st.rerun()
                 if i in st.session_state.fotos: c_pv.image(st.session_state.fotos[i], width=100)
 
-    obs_geral = st.text_area("⚠️ Descreva as Pendências Encontradas:") if not todos_ok else ""
+    obs_geral = st.text_area("⚠️ Observações de Pendências:") if not todos_ok else ""
     servidor = st.text_input("Servidor Responsável pelo Atesto:")
 
-    # --- 5. GERAÇÃO DO PDF ---
-    if st.button("🚀 GERAR RELATÓRIO FINAL"):
+    if st.button("🚀 GERAR PDF FINAL"):
         if not servidor: st.error("Informe o servidor.")
         else:
             try:
