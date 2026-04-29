@@ -7,7 +7,7 @@ import os
 import json
 import time
 
-# --- 1. CONFIGURAÇÃO DA IA COM DESCOBERTA AUTOMÁTICA (EVITA 404) ---
+# --- 1. CONFIGURAÇÃO DA IA COM DESCOBERTA AUTOMÁTICA ---
 if "GOOGLE_API_KEY" in st.secrets:
     CHAVE_API = st.secrets["GOOGLE_API_KEY"]
 else:
@@ -17,11 +17,10 @@ else:
 def inicializar_ia(api_key):
     try:
         genai.configure(api_key=api_key.strip())
-        # Busca automática do modelo disponível para evitar o erro 404
         modelos_disponiveis = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
         selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos_disponiveis else modelos_disponiveis[0]
         
-        # --- SEU PROMPT EXATO E ORIGINAL ---
+        # --- SEU PROMPT ORIGINAL ---
         seu_prompt_original = (
             "Você é um Especialista em Recebimento de bens e materiais no setor público. "
             "Pergunte se o recebimento é Provisório ou Definitivo, se definitivo Liste os detalhes que devem ser conferidos, "
@@ -86,9 +85,8 @@ if pdf_file and not st.session_state.checklist_items:
                 st.rerun()
             else: st.error(f"Erro: {res}")
 
-# --- 4. FORMULÁRIO E CHECKLIST ---
+# --- 4. FORMULÁRIO E ITENS ---
 if st.session_state.checklist_items:
-    # Título Encurtado (5 palavras)
     obj_original = st.session_state.dados_auto.get("objeto", "RECEBIMENTO")
     obj_curto = " ".join(obj_original.split()[:5]).upper()
     st.markdown(f'<p class="titulo-verde">CONFERÊNCIA: {obj_curto}</p>', unsafe_allow_html=True)
@@ -113,9 +111,8 @@ if st.session_state.checklist_items:
             if not st.session_state.conferidos[i]: todos_ok = False
             col_tx.write(f"**{item}**")
             
-            # Câmera Inteligente (Uma por vez para não travar o celular)
             if st.session_state.item_da_foto == i:
-                foto = st.camera_input(f"Foto {i+1}", key=f"f_{i}")
+                foto = st.camera_input(f"Capturar Foto {i+1}", key=f"f_{i}")
                 if foto:
                     st.session_state.fotos[i] = foto
                     if st.button(f"✅ Salvar Foto {i+1}", key=f"s_{i}"):
@@ -126,11 +123,7 @@ if st.session_state.checklist_items:
                     st.session_state.item_da_foto = i; st.rerun()
                 if i in st.session_state.fotos: c_pv.image(st.session_state.fotos[i], width=100)
 
-    # Observação Única no final (Se houver pendência)
-    obs_geral = ""
-    if not todos_ok:
-        obs_geral = st.text_area("⚠️ Descreva as Pendências Encontradas:")
-
+    obs_geral = st.text_area("⚠️ Descreva as Pendências Encontradas:") if not todos_ok else ""
     servidor = st.text_input("Servidor Responsável pelo Atesto:")
 
     # --- 5. GERAÇÃO DO PDF ---
@@ -140,8 +133,41 @@ if st.session_state.checklist_items:
             try:
                 pdf = FPDF(); pdf.set_margins(20, 20, 20); pdf.add_page()
                 pdf.set_font("Arial", 'B', 14); pdf.set_text_color(0, 154, 68)
-                pdf.multi_cell(170, 10, f"CHECKLIST - {obj_curto}", align='C')
+                pdf.multi_cell(170, 10, f"RELATORIO - {obj_curto}", align='C')
                 pdf.ln(5); pdf.set_font("Arial", 'B', 10); pdf.set_text_color(0, 0, 0)
                 pdf.cell(170, 8, f"EDITAL: {edital}", ln=True, border='B')
                 pdf.write(8, "FORNECEDOR: "); pdf.multi_cell(140, 8, fornecedor.upper())
-                pdf.set_font("Arial", 'B', 10); pdf.
+                pdf.set_font("Arial", 'B', 10); pdf.cell(170, 8, f"PLACA: {placa.upper()}", ln=True)
+                if centro_custo: pdf.write(8, "C. CUSTO: "); pdf.multi_cell(140, 8, centro_custo.upper())
+                
+                pdf.ln(5); pdf.set_fill_color(0, 154, 68); pdf.set_text_color(255, 255, 255)
+                pdf.cell(170, 10, " 1. CONFERENCIA REALIZADA", ln=True, fill=True)
+                pdf.set_text_color(0, 0, 0); pdf.ln(3)
+
+                for idx, item_txt in enumerate(st.session_state.checklist_items):
+                    desenhar_check(pdf, 22, pdf.get_y()+1, st.session_state.conferidos.get(idx))
+                    pdf.set_x(28); pdf.set_font("Arial", 'B', 10)
+                    pdf.multi_cell(160, 7, item_txt.encode('latin-1','replace').decode('latin-1'))
+                    if idx in st.session_state.fotos:
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+                            tmp.write(st.session_state.fotos[idx].getvalue()); tmp_path = tmp.name
+                        if pdf.get_y() > 180: pdf.add_page()
+                        pdf.image(tmp_path, x=35, w=130); pdf.ln(5); os.unlink(tmp_path)
+                    pdf.ln(2)
+
+                pdf.ln(10)
+                if todos_ok:
+                    pdf.set_fill_color(245, 245, 245); pdf.set_font("Arial", 'B', 10)
+                    t = "RECEBIMENTO DEFINITIVO" if "Consumo" in natureza else "RECEBIMENTO PROVISORIO"
+                    pdf.multi_cell(170, 10, f"ATESTO O {t} DO OBJETO POR ESTAR EM CONFORMIDADE TECNICA.", border=1, align='C', fill=True)
+                else:
+                    pdf.set_font("Arial", 'B', 10); pdf.set_text_color(200, 0, 0)
+                    pdf.multi_cell(170, 8, f"PENDENCIAS DETECTADAS:\n{obs_geral}", border=1)
+
+                pdf.ln(20); pdf.set_text_color(0, 0, 0)
+                pdf.cell(170, 8, "________________________________________", ln=True, align='C')
+                pdf.cell(170, 6, f"SERVIDOR: {servidor.upper()}", ln=True, align='C')
+                st.download_button("📥 Baixar PDF", data=pdf.output(dest='S').encode('latin-1','replace'), file_name="Checklist.pdf")
+            except Exception as e: st.error(f"Erro no PDF: {e}")
+
+if st.sidebar.button("Reiniciar"): st.session_state.clear(); st.rerun()
