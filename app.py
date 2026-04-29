@@ -21,7 +21,7 @@ def carregar_modelo_seguro(api_key):
         selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
         return genai.GenerativeModel(
             model_name=selecionado,
-            system_instruction="Você é um Especialista em Recebimento de bens e materiais no setor público. Liste os detalhes que devem ser conferidos, conforme o tipo de item a receber (mARCA, MODELO, Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura). Ignore cláusulas jurídicas, prazos, etc."
+            system_instruction="Você é um Especialista em Recebimento de bens e materiais no setor público. Pergunte se o recebimento é Provisório ou Definitivo, se definitivo Liste os detalhes que devem ser conferidos, conforme o tipo de item a receber (mARCA, MODELO, Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura), se provisório, a conferencia é simplificada (MARCA/MODELO, COR, QUANTIDADE, VOLTAGEM, ETC).Ignore cláusulas jurídicas, prazos, etc."
         ), selecionado
     except Exception as e:
         return None, str(e)
