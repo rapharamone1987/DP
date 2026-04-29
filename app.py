@@ -21,18 +21,14 @@ def inicializar_ia(api_key):
         modelos = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
         selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
         
-        # --- SEU PROMPT ORIGINAL (SINTAXE CORRIGIDA) ---
+        # --- SEU PROMPT ORIGINAL COMO BASE DE CONHECIMENTO ---
         prompt_sistema = (
             "Você é um Especialista em Recebimento de bens e materiais no setor público. "
-            "Pergunte se o recebimento é Provisório ou Definitivo, se definitivo Liste os detalhes que devem ser conferidos, "
-            "conforme o tipo de item a receber (mARCA, MODELO, Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura), "
-            "se provisório, a conferencia é simplificada (MARCA/MODELO, COR, QUANTIDADE, VOLTAGEM, ETC). "
-            "Ignore cláusulas jurídicas, prazos, etc, NÃO CRIE ITENS DE CHECK GENERICOS" 
+            "Sua tarefa é extrair itens técnicos do PDF para um checklist de conferência física. "
+            "Ignore cláusulas jurídicas, prazos, etc. Foque em Marca, Modelo, Peças, Cores, Medidas, Hardware, Pintura."
         )
-        
         return genai.GenerativeModel(model_name=selecionado, system_instruction=prompt_sistema)
-    except:
-        return None
+    except: return None
 
 model = inicializar_ia(CHAVE_API)
 
@@ -42,13 +38,15 @@ def extrair_texto_flexivel(texto):
     linhas = texto.split('\n')
     for linha in linhas:
         l = linha.strip()
-        if not l: continue
+        if not l or len(l) < 3: continue
         if "FORNECEDOR:" in l.upper(): dados["fornecedor"] = l.split(":", 1)[1].strip()
         elif "EDITAL:" in l.upper() or "ARP:" in l.upper(): dados["edital"] = l.split(":", 1)[1].strip()
         elif "OBJETO:" in l.upper(): dados["objeto"] = l.split(":", 1)[1].strip()
-        elif l.startswith(("-", "*", "•")) or (len(l) > 5 and l[0].isdigit() and "." in l[:3]):
+        elif l.startswith(("-", "*", "•")) or (l[0].isdigit() and "." in l[:3]):
             item = re.sub(r'^[-*•0-9.\s]+', '', l)
-            if len(item) > 3: dados["checklist"].append(item)
+            # Filtro para evitar que títulos entrem como itens
+            if len(item) > 5 and not item.isupper() and "CHECKLIST" not in item.upper():
+                dados["checklist"].append(item)
     return dados
 
 def desenhar_check(pdf, x, y, status):
@@ -74,34 +72,33 @@ if "item_da_foto" not in st.session_state: st.session_state.item_da_foto = None
 
 st.markdown('<p class="titulo-verde">📋 Recebimento Técnico Inteligente</p>', unsafe_allow_html=True)
 
+# Escolha da natureza ANTES da análise para a IA saber o que fazer
+natureza = st.radio("Natureza do Recebimento:", ["Consumo (Definitivo)", "Permanente (Provisório)"], horizontal=True)
+
 # --- 4. CARGA DE DADOS ---
 if not st.session_state.checklist_items:
     pdf_file = st.file_uploader("Suba o PDF do TR ou Empenho", type="pdf")
     if pdf_file:
-        col1, col2 = st.columns(2)
-        if col1.button("🔍 ANALISAR COM IA"):
-            with st.spinner("IA processando..."):
+        if st.button("🔍 ANALISAR DOCUMENTO", use_container_width=True):
+            with st.spinner("IA extraindo itens técnicos específicos..."):
                 try:
-                    prompt = "Extraia Fornecedor, Edital, Objeto e crie um CHECKLIST (use - para itens)."
-                    res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt])
+                    # Ajusta o prompt com base na sua regra de Provisório/Definitivo
+                    tipo_req = "detalhada e completa" if "Consumo" in natureza else "simplificada e básica"
+                    prompt_acao = f"""
+                    Analise o documento anexo. O recebimento é {natureza}. 
+                    Liste os detalhes que devem ser conferidos especificamente para este item, conforme o tipo de item a receber.
+                    Extraia: FORNECEDOR, EDITAL, OBJETO.
+                    Crie um CHECKLIST com a conferência {tipo_req}. Use '-' para cada item.
+                    NÃO inclua títulos como 'Dados da Entrega' ou 'Itens do Checklist'. Liste apenas os requisitos técnicos encontrados no PDF.
+                    """
+                    
+                    res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt_acao])
                     dados = extrair_texto_flexivel(res.text)
                     st.session_state.dados_auto = dados
                     st.session_state.checklist_items = dados["checklist"]
                     st.rerun()
                 except Exception as e:
-                    if "429" in str(e): st.error("Cota diária atingida. Use o Modo Manual abaixo.")
-                    else: st.error(f"Erro: {e}")
-        
-        if col2.button("📝 MODO MANUAL"):
-            st.session_state.modo_manual = True
-
-    if st.session_state.get("modo_manual"):
-        texto_manual = st.text_area("Cole o texto da IA aqui:")
-        if st.button("Carregar Dados"):
-            dados = extrair_texto_flexivel(texto_manual)
-            st.session_state.dados_auto = dados
-            st.session_state.checklist_items = dados["checklist"]
-            st.rerun()
+                    st.error(f"Erro: {e}")
 
 # --- 5. FORMULÁRIO E ITENS ---
 if st.session_state.checklist_items:
@@ -115,11 +112,10 @@ if st.session_state.checklist_items:
         edital = c1.text_input("Edital/ARP:", value=st.session_state.dados_auto.get("edital", ""))
         fornecedor = c2.text_input("Fornecedor:", value=st.session_state.dados_auto.get("fornecedor", ""))
         placa = c1.text_input("Placa / ID:")
-        natureza = c2.radio("Recebimento:", ["Consumo (Definitivo)", "Permanente (Provisório)"], horizontal=True)
         centro_custo = st.text_input("Centro de Custo:") if "Permanente" in natureza else ""
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="barra">1. ITENS TÉCNICOS</div>', unsafe_allow_html=True)
+    st.markdown('<div class="barra">1. ITENS TÉCNICOS EXTRAÍDOS DO PDF</div>', unsafe_allow_html=True)
     
     todos_ok = True
     for i, item in enumerate(st.session_state.checklist_items):
@@ -130,19 +126,20 @@ if st.session_state.checklist_items:
             col_tx.write(f"**{item}**")
             
             if st.session_state.item_da_foto == i:
-                foto = st.camera_input(f"Foto {i+1}", key=f"f_{i}")
+                foto = st.camera_input(f"Capturar Foto {i+1}", key=f"f_{i}")
                 if foto:
                     st.session_state.fotos[i] = foto
                     if st.button(f"✅ Salvar Foto {i+1}", key=f"s_{i}"):
                         st.session_state.item_da_foto = None; st.rerun()
             else:
                 c_bt, c_pv = st.columns([0.4, 0.6])
-                if c_bt.button("📸 Câmera", key=f"btn_{i}"):
+                label_cam = "📸 Abrir Câmera" if i not in st.session_state.fotos else "🔄 Trocar Foto"
+                if c_bt.button(label_cam, key=f"btn_{i}"):
                     st.session_state.item_da_foto = i; st.rerun()
                 if i in st.session_state.fotos: c_pv.image(st.session_state.fotos[i], width=100)
 
     obs_geral = st.text_area("⚠️ Descreva as Pendências:") if not todos_ok else ""
-    servidor = st.text_input("Servidor Responsável pelo Atesto:")
+    servidor = st.text_input("Servidor Responsável:")
 
     if st.button("🚀 GERAR PDF FINAL"):
         if not servidor: st.error("Informe o servidor.")
@@ -187,6 +184,5 @@ if st.session_state.checklist_items:
                 st.download_button("📥 Baixar PDF", data=pdf.output(dest='S').encode('latin-1','replace'), file_name="Checklist.pdf")
             except Exception as e: st.error(f"Erro no PDF: {e}")
 
-if st.sidebar.button("Reiniciar"):
-    st.session_state.clear()
-    st.rerun()
+if st.sidebar.button("Nova Inspeção"):
+    st.session_state.clear(); st.rerun()
