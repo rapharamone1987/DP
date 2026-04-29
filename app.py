@@ -27,7 +27,7 @@ def inicializar_ia(api_key):
             "Pergunte se o recebimento é Provisório ou Definitivo, se definitivo Liste os detalhes que devem ser conferidos, "
             "conforme o tipo de item a receber (mARCA, MODELO, Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura), "
             "se provisório, a conferencia é simplificada (MARCA/MODELO, COR, QUANTIDADE, VOLTAGEM, ETC). "
-            "Ignore cláusulas jurídicas, prazos, etc. ---- NÃO CRIE ITENS DE CHECK GENERICOS COMO "CHECKLIST DETALHADO... " 
+            "Ignore cláusulas jurídicas, prazos, etc, NÃO CRIE ITENS DE CHECK GENERICOS" 
         )
         
         return genai.GenerativeModel(model_name=selecionado, system_instruction=prompt_sistema)
