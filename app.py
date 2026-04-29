@@ -1,7 +1,5 @@
-if "processado" not in st.session_state:
-    st.session_state.processado = False
+import streamlit as st  # IMPORT NO TOPO PARA EVITAR NAMEERROR
 import time
-import streamlit as st
 import google.generativeai as genai
 from fpdf import FPDF
 from datetime import datetime
@@ -9,7 +7,21 @@ import tempfile
 import os
 import json
 
-# --- 1. CONFIGURAÇÃO DA IA ---
+# --- 1. INICIALIZAÇÃO DO ESTADO (SESSION STATE) ---
+if "processado" not in st.session_state:
+    st.session_state.processado = False
+if "checklist_items" not in st.session_state: 
+    st.session_state.checklist_items = []
+if "fotos" not in st.session_state: 
+    st.session_state.fotos = {}
+if "conferidos" not in st.session_state: 
+    st.session_state.conferidos = {}
+if "dados_auto" not in st.session_state: 
+    st.session_state.dados_auto = {"fornecedor": "", "edital": "", "objeto": "", "centro_custo": ""}
+if "item_da_foto" not in st.session_state:
+    st.session_state.item_da_foto = None
+
+# --- 2. CONFIGURAÇÃO DA IA ---
 if "GOOGLE_API_KEY" in st.secrets:
     CHAVE_API = st.secrets["GOOGLE_API_KEY"]
 else:
@@ -21,44 +33,55 @@ def carregar_modelo_seguro(api_key):
         genai.configure(api_key=api_key.strip())
         modelos = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
         selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
+        
+        # --- TEU PROMPT DE SISTEMA RESTAURADO ---
+        instrucao_sistema = (
+            "Você é um Especialista em Recebimento de bens e materiais no setor público. "
+            "Se o recebimento for Definitivo, liste os detalhes técnicos que devem ser conferidos "
+            "(MARCA, MODELO, peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura). "
+            "Se for Provisório, a conferência é simplificada (MARCA/MODELO, COR, QUANTIDADE, VOLTAGEM, ETC). "
+            "Ignore cláusulas jurídicas, prazos, etc."
+        )
+        
         return genai.GenerativeModel(
             model_name=selecionado,
-            system_instruction="Você é um Especialista em Recebimento de bens e materiais no setor público. Pergunte se o recebimento é Provisório ou Definitivo, se definitivo Liste os detalhes que devem ser conferidos, conforme o tipo de item a receber (mARCA, MODELO, Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura), se provisório, a conferencia é simplificada (MARCA/MODELO, COR, QUANTIDADE, VOLTAGEM, ETC).Ignore cláusulas jurídicas, prazos, etc."
-        ), selecionado
+            system_instruction=instrucao_sistema
+        )
     except Exception as e:
-        return None, str(e)
+        return None
 
-# --- 2. FUNÇÃO PARA DESENHAR O ÍCONE NO PDF ---
-def desenhar_icone_check(pdf, x, y, status):
-    if status: # CHECK VERDE
-        pdf.set_fill_color(0, 154, 68) # Verde
-        pdf.set_draw_color(0, 154, 68)
-        pdf.ellipse(x, y, 5, 5, 'F')
-        # Desenha o 'v' branco
-        pdf.set_draw_color(255, 255, 255)
-        pdf.set_line_width(0.4)
-        pdf.line(x+1.2, y+2.5, x+2.2, y+3.8)
-        pdf.line(x+2.2, y+3.8, x+3.8, y+1.5)
-    else: # X VERMELHO
-        pdf.set_fill_color(200, 0, 0) # Vermelho
-        pdf.set_draw_color(200, 0, 0)
-        pdf.ellipse(x, y, 5, 5, 'F')
-        # Desenha o 'x' branco
-        pdf.set_draw_color(255, 255, 255)
-        pdf.set_line_width(0.4)
-        pdf.line(x+1.5, y+1.5, x+3.5, y+3.5)
-        pdf.line(x+3.5, y+1.5, x+1.5, y+3.5)
-    pdf.set_line_width(0.2) # Reseta linha
+model = carregar_modelo_seguro(CHAVE_API)
 
+# --- 3. FUNÇÕES DE SUPORTE ---
 @st.cache_data(show_spinner=False)
 def extrair_dados_com_ia(pdf_bytes):
-    time.sleep(1) # Respiro para a API
+    time.sleep(1) # Respiro para a cota da API
     prompt = """Retorne um JSON estrito:
     {"fornecedor": "string", "edital": "string", "objeto": "string", "centro_custo": "string", "checklist": ["item1", "item2"]}"""
     response = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_bytes}, prompt])
     return json.loads(response.text.replace("```json", "").replace("```", "").strip())
 
-# --- 3. INTERFACE STREAMLIT ---
+def desenhar_icone_check(pdf, x, y, status):
+    if status: # CIRCULO VERDE COM CHECK
+        pdf.set_fill_color(0, 154, 68)
+        pdf.set_draw_color(0, 154, 68)
+        pdf.ellipse(x, y, 5, 5, 'F')
+        pdf.set_draw_color(255, 255, 255)
+        pdf.set_line_width(0.4)
+        pdf.line(x+1.2, y+2.5, x+2.2, y+3.8)
+        pdf.line(x+2.2, y+3.8, x+3.8, y+1.5)
+    else: # CIRCULO VERMELHO COM X
+        pdf.set_fill_color(200, 0, 0)
+        pdf.set_draw_color(200, 0, 0)
+        pdf.ellipse(x, y, 5, 5, 'F')
+        pdf.set_draw_color(255, 255, 255)
+        pdf.set_line_width(0.4)
+        pdf.line(x+1.5, y+1.5, x+3.5, y+3.5)
+        pdf.line(x+3.5, y+1.5, x+1.5, y+3.5)
+    pdf.set_line_width(0.2)
+    pdf.set_draw_color(0, 0, 0)
+
+# --- 4. INTERFACE STREAMLIT ---
 st.set_page_config(page_title="Checklist Técnico", layout="centered")
 st.markdown("""<style>
     .titulo-verde { color: #009A44; font-weight: bold; font-size: 22px; text-transform: uppercase; text-align: center; }
@@ -66,41 +89,30 @@ st.markdown("""<style>
     .barra-secao { background-color: #009A44; color: white; padding: 8px 15px; font-weight: bold; border-radius: 4px; margin: 20px 0; }
 </style>""", unsafe_allow_html=True)
 
-if "checklist_items" not in st.session_state: st.session_state.checklist_items = []
-if "fotos" not in st.session_state: st.session_state.fotos = {}
-if "conferidos" not in st.session_state: st.session_state.conferidos = {}
-if "dados_auto" not in st.session_state: 
-    st.session_state.dados_auto = {"fornecedor": "", "edital": "", "objeto": "", "centro_custo": ""}
-
-model, _ = carregar_modelo_seguro(CHAVE_API)
-
 st.markdown('<p class="titulo-verde">📋 Recebimento Técnico</p>', unsafe_allow_html=True)
-pdf_file = st.file_uploader("Suba o Termo de Referência (PDF)", type="pdf")
 
-# --- LOGICA DE UPLOAD COM ECONOMIA DE COTA ---
+# Upload do arquivo
 pdf_file = st.file_uploader("Suba o Termo de Referência (PDF)", type="pdf")
 
 if pdf_file and not st.session_state.processado:
-    # Adicionamos um botão para disparar a IA apenas 1 vez
     if st.button("🔍 CLIQUE AQUI PARA ANALISAR O PDF"):
         with st.spinner("IA extraindo itens técnicos... Aguarde."):
             try:
                 pdf_bytes = pdf_file.read()
-                # Chama a função de extração (aquela com @st.cache_data)
                 data = extrair_dados_com_ia(pdf_bytes)
-                
                 st.session_state.dados_auto = {k: str(v) for k, v in data.items() if k != 'checklist'}
                 st.session_state.checklist_items = data.get("checklist", [])
-                st.session_state.processado = True  # TRAVA O APP PARA NÃO CHAMAR A IA DE NOVO
+                st.session_state.processado = True
                 st.rerun()
             except Exception as e:
                 if "429" in str(e):
-                    st.error("⚠️ Cota excedida! O Google permite poucas consultas por minuto. Aguarde 60 segundos e tente o botão novamente.")
+                    st.error("⚠️ Cota da IA atingida. Aguarde 60 segundos.")
                 else:
                     st.error(f"Erro na extração: {e}")
 
+# --- 5. FORMULÁRIO E ITENS ---
 if st.session_state.checklist_items:
-    # Título Encurtado
+    # Título Encurtado (5 palavras)
     obj_curto = " ".join(st.session_state.dados_auto["objeto"].split()[:5])
     st.markdown(f'<p class="titulo-verde">CHECKLIST: {obj_curto.upper()}</p>', unsafe_allow_html=True)
     
@@ -110,60 +122,45 @@ if st.session_state.checklist_items:
         edital = c1.text_input("Edital/ARP:", value=st.session_state.dados_auto["edital"])
         fornecedor = c2.text_input("Fornecedor:", value=st.session_state.dados_auto["fornecedor"])
         placa = c1.text_input("Placa / ID:")
-        natureza = c2.radio("Natureza:", ["Consumo", "Permanente"], horizontal=True)
-        centro_custo = st.text_input("Centro de Custo:", value=st.session_state.dados_auto["centro_custo"]) if natureza == "Permanente" else ""
+        natureza = c2.radio("Natureza do Recebimento:", ["Consumo (Definitivo)", "Permanente (Provisório)"], horizontal=True)
+        centro_custo = st.text_input("Centro de Custo:", value=st.session_state.dados_auto["centro_custo"]) if "Permanente" in natureza else ""
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="barra-secao">1. CONFERÊNCIA TÉCNICA</div>', unsafe_allow_html=True)
     
     todos_ok = True
-    # Inicializa a variável de controle da câmera se não existir
-    if "item_da_foto" not in st.session_state:
-        st.session_state.item_da_foto = None
-
     for i, item in enumerate(st.session_state.checklist_items):
         with st.container(border=True):
             c_check, c_text = st.columns([0.15, 0.85])
-            
-            # 1. Checkbox
             st.session_state.conferidos[i] = c_check.checkbox("OK", key=f"c_{i}")
-            if not st.session_state.conferidos[i]: 
-                todos_ok = False
-            
-            # 2. Texto do Item
+            if not st.session_state.conferidos[i]: todos_ok = False
             c_text.write(f"**{item}**")
             
-            # 3. Lógica da Câmera Única (O SEGREDO PARA FUNCIONAR NO CELULAR)
+            # Lógica de Câmera Única
             if st.session_state.item_da_foto == i:
-                # Se este for o item selecionado, mostra a câmera
                 st.info(f"📸 Câmera ativa para o Item {i+1}")
-                foto = st.camera_input(f"Tirar foto do item {i+1}", key=f"f_{i}")
-                
-                if foto:
-                    st.session_state.fotos[i] = foto
-                
-                if st.button(f"✅ Salvar e Fechar Câmera {i+1}", key=f"close_{i}"):
+                foto = st.camera_input(f"Tirar foto {i+1}", key=f"f_{i}")
+                if foto: st.session_state.fotos[i] = foto
+                if st.button(f"✅ Salvar e Fechar Câmera {i+1}"):
                     st.session_state.item_da_foto = None
                     st.rerun()
             else:
-                # Se não for o item da vez, mostra apenas o botão ou a foto já tirada
                 col_btn, col_preview = st.columns([0.4, 0.6])
-                
-                if col_btn.button(f"📸 Abrir Câmera Traseira", key=f"btn_cam_{i}"):
+                if col_btn.button(f"📸 Abrir Câmera", key=f"btn_cam_{i}"):
                     st.session_state.item_da_foto = i
                     st.rerun()
-                
                 if i in st.session_state.fotos:
-                    col_preview.image(st.session_state.fotos[i], width=100, caption="Foto salva")
-    # Observação Única no Final
+                    col_preview.image(st.session_state.fotos[i], width=100)
+
+    # Observação se houver pendência
     obs_geral = ""
     if not todos_ok:
-        st.warning("⚠️ Descreva as pendências abaixo:")
-        obs_geral = st.text_area("Observações / Pendências Detectadas:")
+        st.warning("⚠️ Pendências detectadas:")
+        obs_geral = st.text_area("Descreva as pendências:")
 
-    serv_nome = st.text_input("Servidor Responsável:")
+    serv_nome = st.text_input("Servidor Responsável pelo Atesto:")
 
-    # --- GERAÇÃO DO PDF ---
+    # --- 6. GERAÇÃO DO PDF ---
     if st.button("🚀 GERAR RELATÓRIO PDF"):
         if not serv_nome: st.error("Informe o servidor.")
         else:
@@ -178,7 +175,8 @@ if st.session_state.checklist_items:
                 
                 pdf.set_font("Arial", 'B', 10); pdf.set_text_color(0, 0, 0)
                 pdf.cell(170, 8, f"EDITAL/ARP: {edital}", ln=True, border='B')
-                pdf.write(8, "FORNECEDOR: "); pdf.set_font("Arial", '', 10); pdf.multi_cell(140, 8, fornecedor.upper())
+                pdf.write(8, "FORNECEDOR: "); pdf.set_font("Arial", '', 10)
+                pdf.multi_cell(140, 8, fornecedor.upper())
                 pdf.set_font("Arial", 'B', 10); pdf.cell(170, 8, f"PLACA / ID: {placa.upper()}", ln=True)
                 if centro_custo:
                     pdf.write(8, "C. CUSTO: "); pdf.set_font("Arial", '', 10); pdf.multi_cell(140, 8, centro_custo.upper())
@@ -186,17 +184,13 @@ if st.session_state.checklist_items:
                 pdf.ln(5)
                 pdf.set_fill_color(0, 154, 68); pdf.set_text_color(255, 255, 255)
                 pdf.cell(170, 10, " 1. ITENS CONFERIDOS", ln=True, fill=True)
-                pdf.set_text_color(0, 0, 0)
-                pdf.ln(3)
+                pdf.set_text_color(0, 0, 0); pdf.ln(3)
 
                 for idx, item_txt in enumerate(st.session_state.checklist_items):
                     status = st.session_state.conferidos.get(idx, False)
-                    # Desenha o ícone Check ou X
-                    y_atual = pdf.get_y()
-                    desenhar_icone_check(pdf, 22, y_atual + 1, status)
-                    
-                    pdf.set_font("Arial", 'B', 10)
-                    pdf.set_x(28) # Empurra o texto para não ficar em cima do ícone
+                    y_at = pdf.get_y()
+                    desenhar_icone_check(pdf, 22, y_at + 1, status)
+                    pdf.set_font("Arial", 'B', 10); pdf.set_x(28)
                     pdf.multi_cell(160, 7, item_txt.encode('latin-1','replace').decode('latin-1'))
                     
                     if idx in st.session_state.fotos:
@@ -208,27 +202,26 @@ if st.session_state.checklist_items:
                         os.unlink(tmp_path)
                     pdf.ln(2)
 
-                # Finalização
                 pdf.ln(10)
                 if todos_ok:
                     pdf.set_fill_color(245, 245, 245); pdf.set_font("Arial", 'B', 10)
-                    t = "ATESTO O RECEBIMENTO DEFINITIVO" if natureza == "Consumo" else "ATESTO O RECEBIMENTO PROVISORIO"
-                    pdf.multi_cell(170, 10, f"{t} UMA VEZ QUE NÃO FORAM ENCONTRADAS DIVERGÊNCIAS NESSE ESTÁGIO DE CONFERÊNCIA.", border=1, align='C', fill=True)
+                    tipo_atesto = "RECEBIMENTO DEFINITIVO" if "Consumo" in natureza else "RECEBIMENTO PROVISORIO"
+                    pdf.multi_cell(170, 10, f"ATESTO O {tipo_atesto} DO OBJETO POR ESTAR EM CONFORMIDADE TECNICA.", border=1, align='C', fill=True)
                 else:
                     pdf.set_font("Arial", 'B', 10); pdf.set_text_color(200, 0, 0)
                     pdf.multi_cell(170, 8, f"PENDENCIAS:\n{obs_geral}", border=1, align='L')
-                    pdf.set_text_color(0, 0, 0)
-
+                
+                pdf.ln(20); pdf.set_text_color(0, 0, 0)
+                pdf.cell(170, 8, "________________________________________________", ln=True, align='C')
                 pdf.cell(170, 6, f"SERVIDOR: {serv_nome.upper()}", ln=True, align='C')
                 
                 pdf_bytes = pdf.output(dest='S').encode('latin-1', errors='replace')
                 st.download_button("📥 Baixar PDF", data=pdf_bytes, file_name="Checklist.pdf")
             except Exception as e:
-                st.error(f"Erro: {e}")
+                st.error(f"Erro no PDF: {e}")
 
 if st.sidebar.button("Nova Inspeção"):
     st.session_state.clear()
-    st.session_state.processado = False # LIBERA A TRAVA
     st.rerun()
 
 
