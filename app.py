@@ -1,3 +1,5 @@
+if "processado" not in st.session_state:
+    st.session_state.processado = False
 import time
 import streamlit as st
 import google.generativeai as genai
@@ -75,20 +77,27 @@ model, _ = carregar_modelo_seguro(CHAVE_API)
 st.markdown('<p class="titulo-verde">📋 Recebimento Técnico</p>', unsafe_allow_html=True)
 pdf_file = st.file_uploader("Suba o Termo de Referência (PDF)", type="pdf")
 
-if pdf_file and not st.session_state.checklist_items:
-    with st.spinner("IA extraindo dados... Aguarde."):
-        try:
-            pdf_bytes = pdf_file.read()
-            data = extrair_dados_com_ia(pdf_bytes)
-            
-            st.session_state.dados_auto = {k: str(v) for k, v in data.items() if k != 'checklist'}
-            st.session_state.checklist_items = data.get("checklist", [])
-            st.rerun()
-        except Exception as e:
-            if "429" in str(e):
-                st.error("⚠️ Limite de velocidade do Google atingido. Aguarde 30 segundos e tente carregar o arquivo novamente.")
-            else:
-                st.error(f"Erro na extração: {e}")
+# --- LOGICA DE UPLOAD COM ECONOMIA DE COTA ---
+pdf_file = st.file_uploader("Suba o Termo de Referência (PDF)", type="pdf")
+
+if pdf_file and not st.session_state.processado:
+    # Adicionamos um botão para disparar a IA apenas 1 vez
+    if st.button("🔍 CLIQUE AQUI PARA ANALISAR O PDF"):
+        with st.spinner("IA extraindo itens técnicos... Aguarde."):
+            try:
+                pdf_bytes = pdf_file.read()
+                # Chama a função de extração (aquela com @st.cache_data)
+                data = extrair_dados_com_ia(pdf_bytes)
+                
+                st.session_state.dados_auto = {k: str(v) for k, v in data.items() if k != 'checklist'}
+                st.session_state.checklist_items = data.get("checklist", [])
+                st.session_state.processado = True  # TRAVA O APP PARA NÃO CHAMAR A IA DE NOVO
+                st.rerun()
+            except Exception as e:
+                if "429" in str(e):
+                    st.error("⚠️ Cota excedida! O Google permite poucas consultas por minuto. Aguarde 60 segundos e tente o botão novamente.")
+                else:
+                    st.error(f"Erro na extração: {e}")
 
 if st.session_state.checklist_items:
     # Título Encurtado
@@ -218,9 +227,9 @@ if st.session_state.checklist_items:
                 st.error(f"Erro: {e}")
 
 if st.sidebar.button("Nova Inspeção"):
-    st.session_state.clear(); st.rerun()
-
-
+    st.session_state.clear()
+    st.session_state.processado = False # LIBERA A TRAVA
+    st.rerun()
 
 
 
