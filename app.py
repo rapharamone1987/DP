@@ -20,7 +20,7 @@ def carregar_modelo_seguro(api_key):
         selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
         return genai.GenerativeModel(
             model_name=selecionado,
-            system_instruction="Você é um Engenheiro de Recebimento. Liste apenas componentes físicos (Peças, Hardware, Pintura). Delete cláusulas jurídicas e regras."
+            system_instruction="Você é um Especialista em Recebimento de bens e materiais no setor público. Liste os detalhes que devem ser conferidos, conforme o tipo de item a receber (Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura). Ignore cláusulas jurídicas, prazos, etc."
         ), selecionado
     except Exception as e:
         return None, str(e)
@@ -194,7 +194,7 @@ if st.session_state.checklist_items:
                 if todos_ok:
                     pdf.set_fill_color(245, 245, 245); pdf.set_font("Arial", 'B', 10)
                     t = "ATESTO O RECEBIMENTO DEFINITIVO" if natureza == "Consumo" else "ATESTO O RECEBIMENTO PROVISORIO"
-                    pdf.multi_cell(170, 10, f"{t} o objeto por estar em conformidade com as especificações conferidas.", border=1, align='C', fill=True)
+                    pdf.multi_cell(170, 10, f"{t} UMA VEZ QUE NÃO FORAM ENCONTRADAS DIVERGÊNCIAS NESSE ESTÁGIO DE CONFERÊNCIA.", border=1, align='C', fill=True)
                 else:
                     pdf.set_font("Arial", 'B', 10); pdf.set_text_color(200, 0, 0)
                     pdf.multi_cell(170, 8, f"PENDENCIAS:\n{obs_geral}", border=1, align='L')
