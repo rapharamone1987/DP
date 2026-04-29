@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 import google.generativeai as genai
 from fpdf import FPDF
@@ -20,7 +21,7 @@ def carregar_modelo_seguro(api_key):
         selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
         return genai.GenerativeModel(
             model_name=selecionado,
-            system_instruction="Você é um Especialista em Recebimento de bens e materiais no setor público. Liste os detalhes que devem ser conferidos, conforme o tipo de item a receber (Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura). Ignore cláusulas jurídicas, prazos, etc."
+            system_instruction="Você é um Especialista em Recebimento de bens e materiais no setor público. Liste os detalhes que devem ser conferidos, conforme o tipo de item a receber (mARCA, MODELO, Peças, cores, medidas, se está ligando, nível de óleo, Hardware, Pintura). Ignore cláusulas jurídicas, prazos, etc."
         ), selecionado
     except Exception as e:
         return None, str(e)
@@ -47,6 +48,14 @@ def desenhar_icone_check(pdf, x, y, status):
         pdf.line(x+3.5, y+1.5, x+1.5, y+3.5)
     pdf.set_line_width(0.2) # Reseta linha
 
+@st.cache_data(show_spinner=False)
+def extrair_dados_com_ia(pdf_bytes):
+    time.sleep(1) # Respiro para a API
+    prompt = """Retorne um JSON estrito:
+    {"fornecedor": "string", "edital": "string", "objeto": "string", "centro_custo": "string", "checklist": ["item1", "item2"]}"""
+    response = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_bytes}, prompt])
+    return json.loads(response.text.replace("```json", "").replace("```", "").strip())
+
 # --- 3. INTERFACE STREAMLIT ---
 st.set_page_config(page_title="Checklist Técnico", layout="centered")
 st.markdown("""<style>
@@ -67,18 +76,19 @@ st.markdown('<p class="titulo-verde">📋 Recebimento Técnico</p>', unsafe_allo
 pdf_file = st.file_uploader("Suba o Termo de Referência (PDF)", type="pdf")
 
 if pdf_file and not st.session_state.checklist_items:
-    with st.spinner("IA extraindo itens técnicos..."):
+    with st.spinner("IA extraindo dados... Aguarde."):
         try:
-            pdf_data = pdf_file.read()
-            prompt = """Retorne um JSON estrito. No checklist, apenas itens físicos. 
-            {"fornecedor": "string", "edital": "string", "objeto": "string", "centro_custo": "string", "checklist": ["item1", "item2"]}"""
-            response = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_data}, prompt])
-            data = json.loads(response.text.replace("```json", "").replace("```", "").strip())
+            pdf_bytes = pdf_file.read()
+            data = extrair_dados_com_ia(pdf_bytes)
+            
             st.session_state.dados_auto = {k: str(v) for k, v in data.items() if k != 'checklist'}
             st.session_state.checklist_items = data.get("checklist", [])
             st.rerun()
         except Exception as e:
-            st.error(f"Erro: {e}")
+            if "429" in str(e):
+                st.error("⚠️ Limite de velocidade do Google atingido. Aguarde 30 segundos e tente carregar o arquivo novamente.")
+            else:
+                st.error(f"Erro na extração: {e}")
 
 if st.session_state.checklist_items:
     # Título Encurtado
