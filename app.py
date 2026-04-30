@@ -21,16 +21,13 @@ def inicializar_ia(api_key):
         modelos = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
         selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
         
-        # --- PROMPT REFINADO PARA EXTRAÇÃO DE DADOS REAIS ---
-        instrucao_rigida = (
-            "Você é um robô extrator de dados técnicos. Sua missão é ler o PDF e encontrar os nomes reais das marcas, modelos e especificações. "
-            "REGRAS TOTAIS: "
-            "1. NÃO use frases como 'Conforme nota fiscal', 'A definir' ou 'Verificar no pedido'. "
-            "2. Se no PDF está escrito 'Midea', você deve escrever 'Marca: Midea'. "
-            "3. Extraia detalhes físicos reais: Voltagem, Cor, Medidas, Potência, Chassi, etc. "
-            "4. Se for Recebimento Provisório, extraia Marca, Modelo e Cor. Se Definitivo, extraia todas as peças e detalhes técnicos."
+        prompt_base = (
+            "Você é um Especialista em Recebimento de bens e materiais no setor público. "
+            "Se o recebimento for Definitivo, Liste os detalhes técnicos reais descritos no PDF. "
+            "Se for Provisório, a conferencia é simplificada (MARCA/MODELO, COR, QUANTIDADE). "
+            "NÃO use a palavra 'conforme'. Extraia o dado real (Ex: 'Marca: Midea')."
         )
-        return genai.GenerativeModel(model_name=selecionado, system_instruction=instrucao_rigida)
+        return genai.GenerativeModel(model_name=selecionado, system_instruction=prompt_base)
     except: return None
 
 model = inicializar_ia(CHAVE_API)
@@ -47,8 +44,7 @@ def extrair_texto_flexivel(texto):
         elif "OBJETO:" in l.upper(): dados["objeto"] = l.split(":", 1)[1].strip()
         elif l.startswith(("-", "*", "•")) or (len(l) > 3 and l[0].isdigit() and "." in l[:3]):
             item = re.sub(r'^[-*•0-9.\s]+', '', l)
-            # Filtra títulos e frases inúteis
-            if len(item) > 5 and "CONFORME" not in item.lower() and "CHECKLIST" not in item.upper():
+            if len(item) > 5 and "CHECKLIST" not in item.upper():
                 dados["checklist"].append(item)
     return dados
 
@@ -64,99 +60,110 @@ def desenhar_check(pdf, x, y, status):
     pdf.set_line_width(0.2); pdf.set_draw_color(0, 0, 0)
 
 # --- 3. INTERFACE ---
-st.set_page_config(page_title="Checklist Técnico Real", layout="centered")
-st.markdown("<style>.titulo-verde { color: #009A44; font-weight: bold; font-size: 22px; text-transform: uppercase; text-align: center; } .caixa { background-color: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #ddd; } .barra { background-color: #009A44; color: white; padding: 8px; font-weight: bold; border-radius: 5px; }</style>", unsafe_allow_html=True)
+st.set_page_config(page_title="Checklist IA", layout="centered")
+st.markdown("""<style>
+    .titulo-verde { color: #009A44; font-weight: bold; font-size: 22px; text-transform: uppercase; text-align: center; }
+    .caixa { background-color: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #ddd; }
+    .barra { background-color: #009A44; color: white; padding: 8px; font-weight: bold; border-radius: 5px; }
+    .stButton>button { width: 100%; }
+    .btn-excluir>button { background-color: #ff4b4b; color: white; border-radius: 20px; }
+</style>""", unsafe_allow_html=True)
 
+# --- INICIALIZAÇÃO DE ESTADOS ---
 if "checklist_items" not in st.session_state: st.session_state.checklist_items = []
 if "fotos" not in st.session_state: st.session_state.fotos = {}
 if "conferidos" not in st.session_state: st.session_state.conferidos = {}
-if "dados_auto" not in st.session_state: st.session_state.dados_auto = {}
+if "dados_auto" not in st.session_state: st.session_state.dados_auto = {"fornecedor":"","edital":"","objeto":""}
 if "item_da_foto" not in st.session_state: st.session_state.item_da_foto = None
 
-st.markdown('<p class="titulo-verde">📋 Recebimento Técnico de Bens</p>', unsafe_allow_html=True)
-natureza = st.radio("Selecione o tipo de conferência:", ["Consumo (Definitivo)", "Permanente (Provisório)"], horizontal=True)
+st.markdown('<p class="titulo-verde">📋 Recebimento Técnico Inteligente</p>', unsafe_allow_html=True)
+natureza = st.radio("Tipo de Recebimento:", ["Consumo (Definitivo)", "Permanente (Provisório)"], horizontal=True)
 
-# --- 4. EXTRAÇÃO DOS DADOS REAIS DO PDF ---
-pdf_file = st.file_uploader("Upload do TR ou Empenho", type="pdf")
+# --- 4. EXTRAÇÃO ---
+pdf_file = st.file_uploader("Upload do PDF", type="pdf")
 
 if pdf_file and not st.session_state.checklist_items:
-    if st.button("🔍 EXTRAIR DADOS REAIS DO DOCUMENTO", use_container_width=True):
-        with st.spinner("IA localizando marcas, modelos e itens reais..."):
+    if st.button("🔍 ANALISAR DOCUMENTO"):
+        with st.spinner("IA extraindo dados..."):
             try:
-                # O segredo está aqui: forçar a IA a encontrar os nomes reais
-                prompt_rigido = f"""
-                Analise o PDF anexo para um recebimento {natureza}.
-                LOCALIZE e EXTRAIA os nomes específicos que estão escritos no documento.
-                
-                Exemplo de como você deve responder:
-                FORNECEDOR: [Nome da empresa que está no PDF]
-                EDITAL: [Número da Ata/Empenho que está no PDF]
-                OBJETO: [O nome do produto que está no PDF]
-                CHECKLIST:
-                - Marca: [Escreva o nome da marca que encontrar no PDF]
-                - Modelo: [Escreva o nome do modelo que encontrar no PDF]
-                - [Outro detalhe técnico real encontrado no texto]
-                
-                NÃO use termos genéricos como 'conforme pedido'. Se não encontrar a informação, escreva 'Não localizado'.
-                """
-                res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt_rigido])
+                prompt = f"Analise o PDF para recebimento {natureza}. EXTRAIA MARCA, MODELO e ITENS REAIS. Formato: FORNECEDOR: x, EDITAL: x, OBJETO: x, CHECKLIST: - item"
+                res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt])
                 dados = extrair_texto_flexivel(res.text)
                 st.session_state.dados_auto = dados
                 st.session_state.checklist_items = dados["checklist"]
                 st.rerun()
-            except Exception as e:
-                st.error(f"Erro: {e}")
+            except Exception as e: st.error(f"Erro: {e}")
 
-# --- 5. CHECKLIST ---
+# --- 5. CHECKLIST DINÂMICO (EDITAR/EXCLUIR) ---
 if st.session_state.checklist_items:
-    obj_original = st.session_state.dados_auto.get("objeto", "RECEBIMENTO")
-    obj_curto = " ".join(obj_original.split()[:5]).upper()
+    obj_curto = " ".join(st.session_state.dados_auto.get("objeto", "BEM").split()[:5]).upper()
     st.markdown(f'<p class="titulo-verde">CONFERÊNCIA: {obj_curto}</p>', unsafe_allow_html=True)
 
     with st.container():
         st.markdown('<div class="caixa">', unsafe_allow_html=True)
         c1, c2 = st.columns(2)
-        edital = c1.text_input("Edital/ARP:", value=st.session_state.dados_auto.get("edital", ""))
-        fornecedor = c2.text_input("Fornecedor:", value=st.session_state.dados_auto.get("fornecedor", ""))
+        st.session_state.dados_auto["edital"] = c1.text_input("Edital/ARP:", value=st.session_state.dados_auto["edital"])
+        st.session_state.dados_auto["fornecedor"] = c2.text_input("Fornecedor:", value=st.session_state.dados_auto["fornecedor"])
         placa = c1.text_input("Placa / ID / Série:")
         centro_custo = c2.text_input("Centro de Custo:") if "Permanente" in natureza else ""
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="barra">1. ESPECIFICAÇÕES TÉCNICAS (VALORES DO PDF)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="barra">1. ESPECIFICAÇÕES (PODE EDITAR OU EXCLUIR)</div>', unsafe_allow_html=True)
     
     todos_ok = True
-    for i, item in enumerate(st.session_state.checklist_items):
+    # Loop para renderizar os itens
+    for i in range(len(st.session_state.checklist_items)):
+        # Criamos um container por item
         with st.container(border=True):
-            col_ch, col_tx = st.columns([0.15, 0.85])
-            st.session_state.conferidos[i] = col_ch.checkbox("OK", key=f"c_{i}")
-            if not st.session_state.conferidos[i]: todos_ok = False
-            col_tx.write(f"**{item}**")
+            col_ch, col_edit, col_exc = st.columns([0.1, 0.8, 0.1])
             
+            # 1. Checkbox OK
+            st.session_state.conferidos[i] = col_ch.checkbox("", key=f"c_{i}", value=st.session_state.conferidos.get(i, False))
+            if not st.session_state.conferidos[i]: todos_ok = False
+            
+            # 2. Texto Editável
+            st.session_state.checklist_items[i] = col_edit.text_input(f"Item {i+1}", value=st.session_state.checklist_items[i], key=f"txt_{i}", label_visibility="collapsed")
+            
+            # 3. Botão Excluir
+            if col_exc.button("🗑️", key=f"del_{i}"):
+                st.session_state.checklist_items.pop(i)
+                # Limpa estados relacionados para não bagunçar os índices
+                st.session_state.conferidos.clear()
+                st.session_state.fotos.clear()
+                st.rerun()
+
+            # 4. Botões de Foto (Sempre visíveis abaixo do item)
             if st.session_state.item_da_foto == i:
                 foto = st.camera_input(f"Capturar Foto {i+1}", key=f"f_{i}")
                 if foto:
                     st.session_state.fotos[i] = foto
-                    if st.button(f"✅ Salvar Foto {i+1}", key=f"s_{i}"):
+                    if st.button(f"✅ Salvar Foto {i+1}", key=f"save_{i}"):
                         st.session_state.item_da_foto = None; st.rerun()
             else:
-                c_bt, c_pv = st.columns([0.4, 0.6])
-                if c_bt.button("📸 Câmera", key=f"btn_{i}"):
+                c_btn, c_prev = st.columns([0.4, 0.6])
+                if c_btn.button("📸 Câmera", key=f"btn_cam_{i}"):
                     st.session_state.item_da_foto = i; st.rerun()
-                if i in st.session_state.fotos: c_pv.image(st.session_state.fotos[i], width=100)
+                if i in st.session_state.fotos: c_prev.image(st.session_state.fotos[i], width=80)
 
-    obs_geral = st.text_area("⚠️ Descreva as Pendências Encontradas:") if not todos_ok else ""
+    # Botão para adicionar novo item manualmente
+    if st.button("➕ Adicionar Novo Item Manualmente"):
+        st.session_state.checklist_items.append("Novo Item (Edite o texto)")
+        st.rerun()
+
+    obs_geral = st.text_area("⚠️ Observações de Pendências:") if not todos_ok else ""
     servidor = st.text_input("Servidor Responsável pelo Atesto:")
 
-    if st.button("🚀 GERAR RELATÓRIO FINAL"):
+    # --- 6. PDF ---
+    if st.button("🚀 GERAR RELATÓRIO PDF"):
         if not servidor: st.error("Informe o servidor.")
         else:
             try:
                 pdf = FPDF(); pdf.set_margins(20, 20, 20); pdf.add_page()
                 pdf.set_font("Arial", 'B', 14); pdf.set_text_color(0, 154, 68)
-                pdf.multi_cell(170, 10, f"CHECKLIST - {obj_curto}", align='C')
+                pdf.multi_cell(170, 10, f"RELATORIO - {obj_curto}", align='C')
                 pdf.ln(5); pdf.set_font("Arial", 'B', 10); pdf.set_text_color(0, 0, 0)
-                pdf.cell(170, 8, f"EDITAL: {edital}", ln=True, border='B')
-                pdf.write(8, "FORNECEDOR: "); pdf.multi_cell(140, 8, fornecedor.upper())
+                pdf.cell(170, 8, f"EDITAL: {st.session_state.dados_auto['edital']}", ln=True, border='B')
+                pdf.write(8, "FORNECEDOR: "); pdf.multi_cell(140, 8, st.session_state.dados_auto['fornecedor'].upper())
                 pdf.set_font("Arial", 'B', 10); pdf.cell(170, 8, f"ID: {placa.upper()}", ln=True)
                 if centro_custo: pdf.write(8, "C. CUSTO: "); pdf.multi_cell(140, 8, centro_custo.upper())
                 
@@ -190,4 +197,5 @@ if st.session_state.checklist_items:
                 st.download_button("📥 Baixar PDF", data=pdf.output(dest='S').encode('latin-1','replace'), file_name="Checklist.pdf")
             except Exception as e: st.error(f"Erro: {e}")
 
-if st.sidebar.button("Novo"): st.session_state.clear(); st.rerun()
+if st.sidebar.button("Nova Inspeção (Limpar Tudo)"):
+    st.session_state.clear(); st.rerun()
