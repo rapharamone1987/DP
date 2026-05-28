@@ -7,6 +7,7 @@ import os
 import json
 import time
 import re
+from PIL import Image # Necessário para calcular altura da foto
 
 # --- 1. CONFIGURAÇÃO DA IA ---
 if "GOOGLE_API_KEY" in st.secrets:
@@ -26,13 +27,12 @@ def inicializar_ia(api_key):
 
 model = inicializar_ia(CHAVE_API)
 
-# --- 2. FUNÇÃO PARA TRATAR ACENTUAÇÃO ---
+# --- 2. TRATAMENTO DE TEXTO E PDF ---
 def tr(texto):
+    """Trata acentuação para o padrão PDF Latin-1"""
     if not texto: return ""
-    # Converte para latin-1 ignorando o que não for compatível para não quebrar o PDF
     return str(texto).encode('latin-1', 'replace').decode('latin-1')
 
-# --- 3. CLASSE PDF CUSTOMIZADA ---
 class RelatorioPDF(FPDF):
     def header(self):
         self.set_fill_color(0, 154, 68) 
@@ -43,8 +43,8 @@ class RelatorioPDF(FPDF):
         self.set_y(-15)
         self.set_font("Arial", 'I', 8)
         self.set_text_color(128)
-        data_hora = datetime.now().strftime("%d/%m/%Y %H:%M")
-        self.cell(0, 10, tr(f"Gerado em {data_hora} - Página {self.page_no()}/{{nb}}"), 0, 0, 'C')
+        dt = datetime.now().strftime("%d/%m/%Y %H:%M")
+        self.cell(0, 10, tr(f"Gerado em {dt} - Página {self.page_no()}/{{nb}}"), 0, 0, 'C')
 
 def desenhar_check(pdf, x, y, status):
     if status:
@@ -57,13 +57,13 @@ def desenhar_check(pdf, x, y, status):
         pdf.line(x+1.5, y+1.5, x+3.5, y+3.5); pdf.line(x+3.5, y+1.5, x+1.5, y+3.5)
     pdf.set_line_width(0.2); pdf.set_draw_color(0, 0, 0)
 
-# --- 4. SUPORTE TEXTO ---
+# --- 3. LOGICA DE DADOS ---
 def extrair_texto_flexivel(texto):
     dados = {"fornecedor": "", "edital": "", "objeto": "", "checklist": []}
     linhas = texto.split('\n')
     for linha in linhas:
         l = linha.strip()
-        if not l or len(l) < 3: continue
+        if not l: continue
         if "FORNECEDOR:" in l.upper(): dados["fornecedor"] = l.split(":", 1)[1].strip()
         elif "EDITAL:" in l.upper() or "ARP:" in l.upper(): dados["edital"] = l.split(":", 1)[1].strip()
         elif "OBJETO:" in l.upper(): dados["objeto"] = l.split(":", 1)[1].strip()
@@ -73,7 +73,7 @@ def extrair_texto_flexivel(texto):
                 dados["checklist"].append({"id": time.time() + len(dados["checklist"]), "texto": item})
     return dados
 
-# --- 5. INTERFACE STREAMLIT ---
+# --- 4. INTERFACE STREAMLIT ---
 st.set_page_config(page_title="Checklist Pro", layout="centered")
 st.markdown("<style>.titulo-v { color: #009A44; font-weight: bold; font-size: 24px; text-align: center; } .barra { background-color: #009A44; color: white; padding: 10px; border-radius: 5px; font-weight: bold; }</style>", unsafe_allow_html=True)
 
@@ -84,13 +84,13 @@ if "dados_auto" not in st.session_state: st.session_state.dados_auto = {"fornece
 if "item_da_foto" not in st.session_state: st.session_state.item_da_foto = None
 
 st.markdown('<p class="titulo-v">📋 Recebimento Técnico Inteligente</p>', unsafe_allow_html=True)
-natureza = st.radio("Tipo de Recebimento:", ["Consumo (Definitivo)", "Permanente (Provisório)"], horizontal=True)
+natureza = st.radio("Natureza:", ["Consumo (Definitivo)", "Permanente (Provisório)"], horizontal=True)
 
 pdf_file = st.file_uploader("Upload do TR ou Empenho", type="pdf")
 
 if pdf_file and not st.session_state.checklist_items:
     if st.button("🔍 ANALISAR DOCUMENTO"):
-        with st.spinner("IA extraindo dados..."):
+        with st.spinner("Extraindo dados..."):
             try:
                 prompt = f"Analise o PDF para {natureza}. EXTRAIA MARCA, MODELO e DADOS REAIS. Formato: FORNECEDOR: x, EDITAL: x, OBJETO: x, CHECKLIST: - item"
                 res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt])
@@ -100,7 +100,7 @@ if pdf_file and not st.session_state.checklist_items:
                 st.rerun()
             except Exception as e: st.error(f"Erro: {e}")
 
-# --- 6. CHECKLIST E FORMULÁRIO ---
+# --- 5. FORMULÁRIO ---
 if st.session_state.checklist_items:
     obj_nome = st.session_state.dados_auto.get("objeto", "BEM")
     obj_curto = " ".join(obj_nome.split()[:6]).upper()
@@ -109,16 +109,14 @@ if st.session_state.checklist_items:
     with st.container(border=True):
         c1, c2 = st.columns(2)
         fornec_val = c1.text_input("Fornecedor:", value=st.session_state.dados_auto["fornecedor"])
-        edital_val = c2.text_input("Edital/ARP/Empenho:", value=st.session_state.dados_auto["edital"])
-        
-        c3, c4 = st.columns(2)
-        nf_val = c3.text_input("Número da Nota Fiscal (NF):")
-        qtd_val = c4.text_input("Quantidade Recebida:")
-        
-        placa = c1.text_input("Placa / ID / Patrimônio:")
+        edital_val = c2.text_input("Edital/ARP:", value=st.session_state.dados_auto["edital"])
+        nf_val = c1.text_input("Número da Nota Fiscal (NF):")
+        qtd_val = c2.text_input("Quantidade Recebida:")
+        placa = c1.text_input("Identificação (ID/Placa):")
         centro_custo = c2.text_input("Centro de Custo:") if "Permanente" in natureza else ""
 
-    st.write("---")
+    st.markdown('<div class="barra">1. CONFERÊNCIA TÉCNICA</div>', unsafe_allow_html=True)
+    
     todos_ok = True
     for i, it in enumerate(st.session_state.checklist_items):
         uid = it["id"]
@@ -131,9 +129,8 @@ if st.session_state.checklist_items:
                 st.session_state.checklist_items.pop(i); st.rerun()
 
             if st.session_state.item_da_foto == uid:
-                f = st.camera_input(f"Capturar Foto", key=f"cam_{uid}")
-                if f: 
-                    st.session_state.fotos[uid] = f
+                f = st.camera_input(f"Foto", key=f"cam_{uid}")
+                if f: st.session_state.fotos[uid] = f
                 if st.button("✅ Fechar Câmera", key=f"s_{uid}"):
                     st.session_state.item_da_foto = None; st.rerun()
             else:
@@ -141,14 +138,10 @@ if st.session_state.checklist_items:
                 if cb.button("📸 Câmera", key=f"bc_{uid}"): st.session_state.item_da_foto = uid; st.rerun()
                 if uid in st.session_state.fotos: cp.image(st.session_state.fotos[uid], width=120)
 
-    if st.button("➕ Adicionar Requisito"):
-        st.session_state.checklist_items.append({"id": time.time(), "texto": "Novo Item"})
-        st.rerun()
-
-    obs_geral = st.text_area("Observações / Pendências:") if not todos_ok else ""
+    obs_geral = st.text_area("Observações:") if not todos_ok else ""
     servidor = st.text_input("Nome do Servidor (Atestante):")
 
-    # --- 7. GERAÇÃO DO PDF (CORRIGIDA) ---
+    # --- 6. GERAÇÃO DO PDF ---
     if st.button("🚀 GERAR RELATÓRIO FINAL"):
         if not servidor: st.error("Informe o servidor.")
         else:
@@ -159,15 +152,11 @@ if st.session_state.checklist_items:
                 pdf.set_font("Arial", 'B', 12); pdf.multi_cell(180, 8, tr(obj_curto), align='C')
                 pdf.ln(5)
 
-                # Tabela Cabeçalho
+                # Cabeçalho
                 pdf.set_fill_color(240, 240, 240); pdf.set_text_color(50)
-                
-                def row(label, valor):
-                    pdf.set_font("Arial", 'B', 9)
-                    pdf.cell(40, 8, tr(f" {label}"), border=1, fill=True)
-                    pdf.set_font("Arial", '', 9)
-                    pdf.cell(140, 8, tr(f" {valor}"), border=1, ln=True)
-
+                def row(label, val):
+                    pdf.set_font("Arial", 'B', 9); pdf.cell(40, 8, tr(f" {label}"), border=1, fill=True)
+                    pdf.set_font("Arial", '', 9); pdf.cell(140, 8, tr(f" {val}"), border=1, ln=True)
                 row("FORNECEDOR:", fornec_val.upper())
                 row("EDITAL/ARP:", edital_val)
                 row("NOTA FISCAL:", nf_val)
@@ -182,24 +171,36 @@ if st.session_state.checklist_items:
 
                 for it in st.session_state.checklist_items:
                     u = it["id"]
-                    y_at = pdf.get_y()
-                    if y_at > 260: pdf.add_page(); y_at = pdf.get_y()
+                    if pdf.get_y() > 260: pdf.add_page()
                     
-                    desenhar_check(pdf, 17, y_at+1, st.session_state.conferidos.get(u))
+                    # Desenha item
+                    desenhar_check(pdf, 17, pdf.get_y()+1, st.session_state.conferidos.get(u))
                     pdf.set_x(25); pdf.set_font("Arial", 'B', 10)
                     pdf.multi_cell(165, 7, tr(it["texto"]))
                     
+                    # Desenha Foto corrigindo o bug do cursor
                     if u in st.session_state.fotos:
                         pdf.ln(2)
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
-                            tmp.write(st.session_state.fotos[u].getvalue()); tmp_path = tmp.name
-                        if pdf.get_y() > 180: pdf.add_page()
-                        curr_y = pdf.get_y()
-                        pdf.image(tmp_path, x=35, y=curr_y, w=140)
-                        pdf.set_y(curr_y + 90)
-                        os.unlink(tmp_path)
-                    pdf.ln(3)
+                            img_data = st.session_state.fotos[u].getvalue()
+                            tmp.write(img_data); tmp_path = tmp.name
+                            
+                            # Calcula altura proporcional
+                            with Image.open(tmp) as img:
+                                w, h = img.size
+                                aspect = h / w
+                                print_w = 140
+                                print_h = print_w * aspect
 
+                        if pdf.get_y() + print_h > 270: pdf.add_page()
+                        
+                        y_start = pdf.get_y()
+                        pdf.image(tmp_path, x=35, y=y_start, w=print_w)
+                        pdf.set_y(y_start + print_h + 5) # MOVE CURSOR PARA O FIM DA FOTO
+                        os.unlink(tmp_path)
+                    pdf.ln(2)
+
+                # Atesto
                 if pdf.get_y() > 230: pdf.add_page()
                 pdf.ln(10)
                 if todos_ok:
@@ -210,23 +211,13 @@ if st.session_state.checklist_items:
                     pdf.set_fill_color(255, 240, 240); pdf.set_draw_color(200, 0, 0); pdf.set_font("Arial", 'B', 10)
                     pdf.multi_cell(180, 8, tr(f"PENDÊNCIAS REGISTRADAS:\n{obs_geral}"), border=1, fill=True)
 
-                pdf.ln(25); pdf.set_draw_color(0); pdf.set_text_color(0)
-                pdf.line(60, pdf.get_y(), 150, pdf.get_y())
-                pdf.set_font("Arial", 'B', 10)
-                pdf.cell(180, 8, tr(f"SERVIDOR: {servidor.upper()}"), ln=True, align='C')
+                pdf.ln(25); pdf.line(60, pdf.get_y(), 150, pdf.get_y())
+                pdf.set_font("Arial", 'B', 10); pdf.cell(180, 8, tr(f"SERVIDOR: {servidor.upper()}"), ln=True, align='C')
                 
-                # --- LOGICA DE OUTPUT CORRIGIDA ---
                 pdf_output = pdf.output(dest='S')
-                # Se for string, encoda. Se já for bytes (comum em versões novas com imagens), usa direto.
-                if isinstance(pdf_output, str):
-                    pdf_output = pdf_output.encode('latin-1')
+                if isinstance(pdf_output, str): pdf_output = pdf_output.encode('latin-1')
+                st.download_button("📥 Baixar Relatório", data=pdf_output, file_name=f"Checklist_{nf_val}.pdf", mime="application/pdf")
+            except Exception as e: st.error(f"Erro: {e}")
 
-                st.download_button(
-                    label="📥 Baixar Relatório PDF",
-                    data=pdf_output,
-                    file_name=f"Relatorio_{nf_val or 'Inspecao'}.pdf",
-                    mime="application/pdf"
-                )
-            except Exception as e: st.error(f"Erro ao gerar PDF: {e}")
-
+if st.sidebar.button("Nova Inspeção"): st.session_state.clear(); st.rerun()
 if st.sidebar.button("Limpar Tudo (Novo)"): st.session_state.clear(); st.rerun()
