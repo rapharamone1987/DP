@@ -26,16 +26,16 @@ def inicializar_ia(api_key):
 
 model = inicializar_ia(CHAVE_API)
 
-# --- 2. FUNÇÃO PARA TRATAR ACENTUAÇÃO NO PDF ---
+# --- 2. FUNÇÃO PARA TRATAR ACENTUAÇÃO ---
 def tr(texto):
-    """Trata strings para o formato latin-1 do FPDF (corrige acentos)"""
     if not texto: return ""
+    # Converte para latin-1 ignorando o que não for compatível para não quebrar o PDF
     return str(texto).encode('latin-1', 'replace').decode('latin-1')
 
-# --- 3. CLASSE PDF CUSTOMIZADA (LAYOUT OFICIAL) ---
+# --- 3. CLASSE PDF CUSTOMIZADA ---
 class RelatorioPDF(FPDF):
     def header(self):
-        self.set_fill_color(0, 154, 68) # Verde Oficial
+        self.set_fill_color(0, 154, 68) 
         self.rect(0, 0, 210, 10, 'F')
         self.ln(12)
 
@@ -100,7 +100,7 @@ if pdf_file and not st.session_state.checklist_items:
                 st.rerun()
             except Exception as e: st.error(f"Erro: {e}")
 
-# --- 6. CHECKLIST E CAMPOS EXTRAS ---
+# --- 6. CHECKLIST E FORMULÁRIO ---
 if st.session_state.checklist_items:
     obj_nome = st.session_state.dados_auto.get("objeto", "BEM")
     obj_curto = " ".join(obj_nome.split()[:6]).upper()
@@ -124,7 +124,7 @@ if st.session_state.checklist_items:
         uid = it["id"]
         with st.container(border=True):
             col_ch, col_tx, col_ex = st.columns([0.1, 0.75, 0.15])
-            st.session_state.conferidos[uid] = col_ch.checkbox("OK", key=f"c_{uid}", value=st.session_state.conferidos.get(uid, False), label_visibility="collapsed")
+            st.session_state.conferidos[uid] = col_ch.checkbox("OK", key=f"c_{uid}", value=st.session_state.conferidos.get(uid, False))
             if not st.session_state.conferidos[uid]: todos_ok = False
             it["texto"] = col_tx.text_input("", value=it["texto"], key=f"t_{uid}", label_visibility="collapsed")
             if col_ex.button("🗑️", key=f"d_{uid}"):
@@ -134,7 +134,6 @@ if st.session_state.checklist_items:
                 f = st.camera_input(f"Capturar Foto", key=f"cam_{uid}")
                 if f: 
                     st.session_state.fotos[uid] = f
-                    st.success("Foto salva!")
                 if st.button("✅ Fechar Câmera", key=f"s_{uid}"):
                     st.session_state.item_da_foto = None; st.rerun()
             else:
@@ -149,21 +148,19 @@ if st.session_state.checklist_items:
     obs_geral = st.text_area("Observações / Pendências:") if not todos_ok else ""
     servidor = st.text_input("Nome do Servidor (Atestante):")
 
-    # --- 7. GERAÇÃO DO PDF ---
+    # --- 7. GERAÇÃO DO PDF (CORRIGIDA) ---
     if st.button("🚀 GERAR RELATÓRIO FINAL"):
         if not servidor: st.error("Informe o servidor.")
         else:
             try:
                 pdf = RelatorioPDF(); pdf.alias_nb_pages(); pdf.set_margins(15, 15, 15); pdf.add_page()
-                
-                # Título
                 pdf.set_font("Arial", 'B', 16); pdf.set_text_color(0, 154, 68)
                 pdf.cell(180, 10, tr("RELATÓRIO DE CONFORMIDADE TÉCNICA"), ln=True, align='C')
                 pdf.set_font("Arial", 'B', 12); pdf.multi_cell(180, 8, tr(obj_curto), align='C')
                 pdf.ln(5)
 
-                # Tabela de Dados (Cabeçalho Cinza)
-                pdf.set_fill_color(240, 240, 240); pdf.set_font("Arial", 'B', 9); pdf.set_text_color(50)
+                # Tabela Cabeçalho
+                pdf.set_fill_color(240, 240, 240); pdf.set_text_color(50)
                 
                 def row(label, valor):
                     pdf.set_font("Arial", 'B', 9)
@@ -179,17 +176,13 @@ if st.session_state.checklist_items:
                 if centro_custo: row("CENTRO CUSTO:", centro_custo.upper())
                 pdf.ln(8)
 
-                # Barra de Seção
                 pdf.set_fill_color(0, 154, 68); pdf.set_text_color(255, 255, 255); pdf.set_font("Arial", 'B', 11)
                 pdf.cell(180, 10, tr(" 1. ITENS DE CONFERÊNCIA TÉCNICA"), ln=True, fill=True)
                 pdf.set_text_color(0, 0, 0); pdf.ln(4)
 
-                # Loop de Itens e Fotos
                 for it in st.session_state.checklist_items:
                     u = it["id"]
                     y_at = pdf.get_y()
-                    
-                    # Se o texto for ficar muito no fim da página, pula
                     if y_at > 260: pdf.add_page(); y_at = pdf.get_y()
                     
                     desenhar_check(pdf, 17, y_at+1, st.session_state.conferidos.get(u))
@@ -200,19 +193,13 @@ if st.session_state.checklist_items:
                         pdf.ln(2)
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
                             tmp.write(st.session_state.fotos[u].getvalue()); tmp_path = tmp.name
-                        
-                        # Verifica se cabe a foto, senão pula página
                         if pdf.get_y() > 180: pdf.add_page()
-                        
-                        # Moldura e Foto (Mantendo proporção)
                         curr_y = pdf.get_y()
-                        pdf.set_draw_color(200)
                         pdf.image(tmp_path, x=35, y=curr_y, w=140)
-                        pdf.set_y(curr_y + 90) # Espaço fixo para a foto para evitar bugs
+                        pdf.set_y(curr_y + 90)
                         os.unlink(tmp_path)
                     pdf.ln(3)
 
-                # Caixa de Atesto
                 if pdf.get_y() > 230: pdf.add_page()
                 pdf.ln(10)
                 if todos_ok:
@@ -223,14 +210,23 @@ if st.session_state.checklist_items:
                     pdf.set_fill_color(255, 240, 240); pdf.set_draw_color(200, 0, 0); pdf.set_font("Arial", 'B', 10)
                     pdf.multi_cell(180, 8, tr(f"PENDÊNCIAS REGISTRADAS:\n{obs_geral}"), border=1, fill=True)
 
-                # Assinatura
                 pdf.ln(25); pdf.set_draw_color(0); pdf.set_text_color(0)
                 pdf.line(60, pdf.get_y(), 150, pdf.get_y())
                 pdf.set_font("Arial", 'B', 10)
                 pdf.cell(180, 8, tr(f"SERVIDOR: {servidor.upper()}"), ln=True, align='C')
                 
-                pdf_out = pdf.output(dest='S')
-                st.download_button("📥 Baixar Relatório PDF", data=bytes(pdf_out), file_name=f"Relatorio_{nf_val or 'Inspeção'}.pdf")
+                # --- LOGICA DE OUTPUT CORRIGIDA ---
+                pdf_output = pdf.output(dest='S')
+                # Se for string, encoda. Se já for bytes (comum em versões novas com imagens), usa direto.
+                if isinstance(pdf_output, str):
+                    pdf_output = pdf_output.encode('latin-1')
+
+                st.download_button(
+                    label="📥 Baixar Relatório PDF",
+                    data=pdf_output,
+                    file_name=f"Relatorio_{nf_val or 'Inspecao'}.pdf",
+                    mime="application/pdf"
+                )
             except Exception as e: st.error(f"Erro ao gerar PDF: {e}")
 
-if st.sidebar.button("Nova Inspeção (Reset)"): st.session_state.clear(); st.rerun()
+if st.sidebar.button("Limpar Tudo (Novo)"): st.session_state.clear(); st.rerun()
