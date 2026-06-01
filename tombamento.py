@@ -19,7 +19,9 @@ else:
 def inicializar_ia(api_key):
     try:
         genai.configure(api_key=api_key.strip())
-        return genai.GenerativeModel(model_name='gemini-1.5-flash')
+        modelos = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+        selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
+        return genai.GenerativeModel(model_name=selecionado)
     except: return None
 
 model = inicializar_ia(CHAVE_API)
@@ -28,7 +30,7 @@ model = inicializar_ia(CHAVE_API)
 def ocr_ia(foto_bytes, instrucao):
     try:
         img = Image.open(foto_bytes)
-        res = model.generate_content([f"Extraia apenas o valor real de: {instrucao}. Não use 'conforme'. Responda apenas o número/texto.", img])
+        res = model.generate_content([f"Extraia o valor de: {instrucao}. Responda APENAS o número ou texto encontrado.", img])
         return res.text.strip()
     except: return "Erro na leitura"
 
@@ -41,158 +43,145 @@ st.set_page_config(page_title="Tombamento Patrimonial", layout="centered")
 
 if "bens_lista" not in st.session_state: st.session_state.bens_lista = []
 if "modo_operacao" not in st.session_state: st.session_state.modo_operacao = None
-if "etapa" not in st.session_state: st.session_state.etapa = 0 # 0 = Config, 1-4 = Passos
 if "idx_atual" not in st.session_state: st.session_state.idx_atual = 0
 if "inventario" not in st.session_state: st.session_state.inventario = {}
+if "tentou_ia" not in st.session_state: st.session_state.tentou_ia = False
 
 st.markdown("""<style>
-    .barra { background-color: #1E461E; color: white; padding: 10px; border-radius: 5px; font-weight: bold; text-align: center; }
-    .step-box { border: 2px solid #1E461E; padding: 15px; border-radius: 10px; margin-top: 10px; }
+    .barra { background-color: #004d00; color: white; padding: 10px; border-radius: 5px; font-weight: bold; text-align: center; }
+    .stButton>button { width: 100%; }
 </style>""", unsafe_allow_html=True)
 
-st.title("📋 Registro de Tombamento")
+st.title("🛡️ Sistema de Tombamento")
 
-# --- TELA 0: CONFIGURAÇÃO INICIAL (UPLOAD E MODO) ---
+# --- TELA 0: CARGA DA LISTA ---
 if not st.session_state.bens_lista:
-    st.subheader("1. Configuração do Trabalho")
+    st.subheader("Configuração do Tombamento")
     
-    # Escolha do Modo
-    modo = st.radio("Como deseja realizar o tombamento?", 
-                    ["Individualizado (Item por item com Scanner)", "Em Lote (Vários bens com fotos gerais)"],
-                    help="Individual: Para eletrônicos e veículos. Lote: Para mobiliários iguais.")
+    modo = st.radio("Selecione o modo:", ["Individualizado (Scanner)", "Em Lote (Fotos Gerais)"])
     st.session_state.modo_operacao = modo
 
-    # Carga da Lista
     st.write("---")
-    st.write("**2. Carregar Lista de Bens**")
-    upload_tipo = st.tabs(["📄 Upload PDF (TR/Empenho)", "📝 Digitar/Colar Lista"])
+    st.write("**Carregar Relação de Bens**")
     
-    with upload_tipo[0]:
-        pdf_file = st.file_uploader("Suba o arquivo da lista", type="pdf")
-        if pdf_file and st.button("Analisar PDF com IA"):
-            with st.spinner("IA extraindo lista de bens..."):
-                prompt = 'Extraia a lista de itens. Retorne JSON: {"itens": [{"nome": "item", "qtd": 1}]}'
-                res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt])
-                data = json.loads(res.text.replace("```json", "").replace("```", "").strip())
-                st.session_state.bens_lista = data["itens"]
-                st.rerun()
+    pdf_file = st.file_uploader("Suba o PDF (TR/Empenho)", type="pdf")
+    
+    col1, col2 = st.columns(2)
+    
+    if col1.button("🔍 Analisar PDF com IA"):
+        if pdf_file:
+            with st.spinner("IA extraindo lista... Isso pode levar 20 segundos."):
+                try:
+                    # Prompt simplificado para evitar que a IA "trave" pensando
+                    prompt = "Liste os itens deste documento para tombamento. Retorne APENAS os nomes dos itens, um por linha."
+                    res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt])
+                    
+                    itens = [l.strip("- *") for l in res.text.split('\n') if len(l.strip()) > 3]
+                    if itens:
+                        st.session_state.bens_lista = [{"nome": i, "qtd": 1} for i in itens]
+                        st.rerun()
+                    else:
+                        st.error("IA não encontrou itens. Tente o modo manual ao lado.")
+                except Exception as e:
+                    st.error(f"Erro na IA: {e}. Use o modo manual.")
+                    st.session_state.tentou_ia = True
+        else:
+            st.warning("Selecione um PDF primeiro.")
 
-    with upload_tipo[1]:
-        txt_lista = st.text_area("Digite um item por linha:")
-        if st.button("Carregar Lista Manual"):
-            st.session_state.bens_lista = [{"nome": l.strip(), "qtd": 1} for l in txt_lista.split('\n') if l.strip()]
+    if col2.button("📝 Entrada Manual"):
+        st.session_state.tentou_ia = True
+
+    if st.session_state.tentou_ia:
+        txt_manual = st.text_area("Cole ou digite a lista de bens (um por linha):", placeholder="Ex: Cadeira\nMonitor\nNotebook")
+        if st.button("Confirmar Lista Manual"):
+            st.session_state.bens_lista = [{"nome": l.strip(), "qtd": 1} for l in txt_manual.split('\n') if l.strip()]
             st.rerun()
 
 # --- TELA DE EXECUÇÃO ---
 elif st.session_state.bens_lista:
-    
-    # --- MODO INDIVIDUAL ---
+    item = st.session_state.bens_lista[st.session_state.idx_atual]
+    st.markdown(f'<div class="barra">ITEM {st.session_state.idx_atual + 1} de {len(st.session_state.bens_lista)}</div>', unsafe_allow_html=True)
+    st.subheader(item["nome"])
+
     if "Individualizado" in st.session_state.modo_operacao:
-        item = st.session_state.bens_lista[st.session_state.idx_atual]
-        st.markdown(f'<div class="barra">ITEM {st.session_state.idx_atual + 1}: {item["nome"].upper()}</div>', unsafe_allow_html=True)
-        
-        # Inicializa dados do item
         if st.session_state.idx_atual not in st.session_state.inventario:
             st.session_state.inventario[st.session_state.idx_atual] = {"plaqueta": "", "serial": "", "foto_fixa": None, "foto_geral": None}
         
         inv = st.session_state.inventario[st.session_state.idx_atual]
 
-        # ETAPAS SEQUENCIAIS
-        # PASSO 1: SCANNER PLAQUETA
+        # FLUXO SEQUENCIAL DE CÂMERAS
         if inv["plaqueta"] == "":
-            st.info("🎯 **Passo 1:** Scaneie o código de barras da Plaqueta de Patrimônio.")
-            cam_p = st.camera_input("Focar na Plaqueta", key=f"cp_{st.session_state.idx_atual}")
-            if cam_p:
-                with st.spinner("IA lendo número..."):
-                    inv["plaqueta"] = ocr_ia(cam_p, "Número do Patrimônio/Plaqueta")
+            st.info("📷 **Passo 1:** Scaneie o código de barras da Plaqueta.")
+            cam = st.camera_input("Scanner de Plaqueta", key=f"p_{st.session_state.idx_atual}")
+            if cam:
+                with st.spinner("Lendo número..."):
+                    inv["plaqueta"] = ocr_ia(cam, "Número do Patrimônio/Plaqueta")
                 st.rerun()
         
-        # PASSO 2: SCANNER SERIAL
         elif inv["serial"] == "":
-            st.success(f"Plaqueta lida: {inv['plaqueta']}")
-            st.info("🎯 **Passo 2:** Scaneie o Número de Série (S/N) do fabricante.")
-            cam_s = st.camera_input("Focar no Serial", key=f"cs_{st.session_state.idx_atual}")
-            c1, c2 = st.columns(2)
-            if cam_s:
-                with st.spinner("IA lendo serial..."):
-                    inv["serial"] = ocr_ia(cam_s, "Número de Série")
+            st.success(f"Plaqueta: {inv['plaqueta']}")
+            st.info("📷 **Passo 2:** Scaneie o Número de Série do fabricante.")
+            cam = st.camera_input("Scanner de Serial", key=f"s_{st.session_state.idx_atual}")
+            if cam:
+                with st.spinner("Lendo serial..."):
+                    inv["serial"] = ocr_ia(cam, "Serial Number / SN")
                 st.rerun()
-            if c1.button("Pular Serial"): inv["serial"] = "N/A"; st.rerun()
-            if c2.button("Reiniciar Plaqueta"): inv["plaqueta"] = ""; st.rerun()
+            if st.button("Pular Serial (N/A)"): inv["serial"] = "N/A"; st.rerun()
 
-        # PASSO 3: FOTO PLAQUETA FIXADA
         elif inv["foto_fixa"] is None:
             st.success(f"Serial: {inv['serial']}")
-            st.info("🎯 **Passo 3:** Foto da plaqueta já colada no bem.")
-            f_fixa = st.camera_input("Foto da Plaqueta Colada", key=f"ff_{st.session_state.idx_atual}")
-            if f_fixa:
-                inv["foto_fixa"] = f_fixa
+            st.info("📷 **Passo 3:** Foto da plaqueta colada no bem.")
+            cam = st.camera_input("Foto da Fixação", key=f"f_{st.session_state.idx_atual}")
+            if cam:
+                inv["foto_fixa"] = cam
                 if st.button("Confirmar Foto"): st.rerun()
 
-        # PASSO 4: FOTO GERAL
         elif inv["foto_geral"] is None:
-            st.info("🎯 **Passo 4:** Foto geral do bem (estado físico).")
-            f_geral = st.camera_input("Foto Geral do Bem", key=f"fg_{st.session_state.idx_atual}")
-            if f_geral:
-                inv["foto_geral"] = f_geral
-                if st.button("🏁 Finalizar este Item"):
+            st.info("📷 **Passo 4:** Foto geral do bem.")
+            cam = st.camera_input("Foto Geral", key=f"g_{st.session_state.idx_atual}")
+            if cam:
+                inv["foto_geral"] = cam
+                if st.button("🏁 Finalizar Item"):
                     if st.session_state.idx_atual + 1 < len(st.session_state.bens_lista):
                         st.session_state.idx_atual += 1
                     else:
-                        st.session_state.etapa = 99 # FIM
+                        st.session_state.concluido = True
                     st.rerun()
 
-    # --- MODO LOTE ---
-    else:
-        st.markdown('<div class="barra">TOMBAMENTO EM LOTE</div>', unsafe_allow_html=True)
-        st.write(f"Bens: {', '.join([b['nome'] for b in st.session_state.bens_lista])}")
-        
-        st.info("No modo lote, registre as fotos de comprovação de todo o grupo de uma vez.")
-        for i in range(3):
-            f_lote = st.camera_input(f"Foto de Lote {i+1}", key=f"lote_{i}")
-            if f_lote: st.session_state.inventario[f"lote_{i}"] = f_lote
-        
-        if st.button("🏁 Finalizar Lote"):
-            st.session_state.etapa = 99
-            st.rerun()
-
-# --- TELA FINAL: GERAR PDF ---
-if st.session_state.get("etapa") == 99:
-    st.balloons()
-    st.success("Tombamento Concluído!")
-    servidor = st.text_input("Servidor Responsável:")
-    
-    if st.button("🚀 GERAR TERMO DE TOMBAMENTO"):
-        try:
-            pdf = FPDF(); pdf.set_margins(15, 15, 15); pdf.add_page()
-            pdf.set_font("Arial", 'B', 16); pdf.cell(180, 10, tr("TERMO DE TOMBAMENTO"), ln=True, align='C')
-            
-            if "Individualizado" in st.session_state.modo_operacao:
-                for i, item in enumerate(st.session_state.bens_lista):
-                    inv = st.session_state.inventario[i]
+    # --- FINALIZAÇÃO ---
+    if st.session_state.get("concluido"):
+        st.balloons()
+        servidor = st.text_input("Nome do Servidor:")
+        if st.button("🚀 GERAR PDF"):
+            try:
+                pdf = FPDF(); pdf.set_margins(15, 15, 15); pdf.add_page()
+                pdf.set_font("Arial", 'B', 16); pdf.cell(180, 10, tr("TERMO DE TOMBAMENTO"), ln=True, align='C')
+                
+                for i, it in enumerate(st.session_state.bens_lista):
+                    res = st.session_state.inventario[i]
                     pdf.set_fill_color(240); pdf.set_font("Arial", 'B', 12)
-                    pdf.cell(180, 10, tr(f"{i+1}. {item['nome']}"), border=1, ln=True, fill=True)
+                    pdf.cell(180, 10, tr(f"{i+1}. {it['nome']}"), border=1, ln=True, fill=True)
                     pdf.set_font("Arial", '', 10)
-                    pdf.cell(90, 8, tr(f"PLAQUETA: {inv['plaqueta']}"), border=1)
-                    pdf.cell(90, 8, tr(f"SERIAL: {inv['serial']}"), border=1, ln=True)
+                    pdf.cell(90, 8, tr(f"PLAQUETA: {res['plaqueta']}"), border=1)
+                    pdf.cell(90, 8, tr(f"SERIAL: {res['serial']}"), border=1, ln=True)
                     
-                    # Fotos Lado a Lado
+                    # Fotos
                     curr_y = pdf.get_y()
-                    if inv["foto_fixa"]:
+                    if res["foto_fixa"]:
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t1:
-                            t1.write(inv["foto_fixa"].getvalue())
-                            pdf.image(t1.name, x=20, y=curr_y+2, w=80)
-                    if inv["foto_geral"]:
+                            t1.write(res["foto_fixa"].getvalue())
+                            pdf.image(t1.name, x=20, y=curr_y+2, w=75)
+                    if res["foto_geral"]:
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t2:
-                            t2.write(inv["foto_geral"].getvalue())
-                            pdf.image(t2.name, x=110, y=curr_y+2, w=80)
-                    pdf.set_y(curr_y + 65)
-            
-            pdf.ln(20); pdf.cell(180, 8, tr(f"Servidor: {servidor}"), align='C')
-            st.download_button("📥 Baixar PDF", data=pdf.output(dest='S'), file_name="Tombamento.pdf")
-        except Exception as e: st.error(f"Erro no PDF: {e}")
+                            t2.write(res["foto_geral"].getvalue())
+                            pdf.image(t2.name, x=105, y=curr_y+2, w=75)
+                    pdf.set_y(curr_y + 60)
+                
+                pdf.ln(10); pdf.cell(180, 10, tr(f"Responsável: {servidor}"), align='C')
+                st.download_button("📥 Baixar Termo", data=pdf.output(dest='S'), file_name="Tombamento.pdf")
+            except Exception as e: st.error(f"Erro no PDF: {e}")
 
 # Sidebar
 with st.sidebar:
-    if st.button("Reiniciar Tudo"):
+    if st.button("Reiniciar Sistema"):
         st.session_state.clear(); st.rerun()
