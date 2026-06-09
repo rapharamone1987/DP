@@ -4,3 +4,6 @@ fpdf
 Pillow
 groq
 pdfplumber
+streamlit
+groq
+pandas
