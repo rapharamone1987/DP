@@ -1,187 +1,197 @@
 import streamlit as st
-import google.generativeai as genai
+from groq import Groq
+import pdfplumber
+import pandas as pd
 from fpdf import FPDF
 from datetime import datetime
 import tempfile
 import os
 import json
 import time
-import re
+import io
 from PIL import Image
 
-# --- 1. CONFIGURAÇÃO DA IA ---
-if "GOOGLE_API_KEY" in st.secrets:
-    CHAVE_API = st.secrets["GOOGLE_API_KEY"]
+# --- 1. CONFIGURAÇÃO DO CLIENTE GROQ ---
+if "GROQ_API_KEY" in st.secrets:
+    CHAVE_API = st.secrets["GROQ_API_KEY"]
 else:
-    CHAVE_API = "" 
+    CHAVE_API = ""
 
-@st.cache_resource
-def inicializar_ia(api_key):
-    try:
-        genai.configure(api_key=api_key.strip())
-        modelos = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        selecionado = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in modelos else modelos[0]
-        return genai.GenerativeModel(model_name=selecionado)
-    except: return None
-
-model = inicializar_ia(CHAVE_API)
+client = None
+if CHAVE_API:
+    client = Groq(api_key=CHAVE_API)
 
 # --- 2. FUNÇÕES DE APOIO ---
-def ocr_ia(foto_bytes, instrucao):
-    try:
-        img = Image.open(foto_bytes)
-        res = model.generate_content([f"Extraia o valor de: {instrucao}. Responda APENAS o número ou texto encontrado.", img])
-        return res.text.strip()
-    except: return "Erro na leitura"
-
 def tr(texto):
+    """Trata acentuação para PDF"""
     if not texto: return ""
     return str(texto).encode('latin-1', 'replace').decode('latin-1')
 
+def extrair_texto_pdf(pdf_file):
+    texto = ""
+    with pdfplumber.open(pdf_file) as pdf:
+        for pagina in pdf.pages:
+            texto += pagina.extract_text() + "\n"
+    return texto
+
 # --- 3. INTERFACE E ESTADO ---
-st.set_page_config(page_title="Tombamento Patrimonial", layout="centered")
+st.set_page_config(page_title="Tombamento Groq", layout="centered")
 
 if "bens_lista" not in st.session_state: st.session_state.bens_lista = []
-if "modo_operacao" not in st.session_state: st.session_state.modo_operacao = None
-if "idx_atual" not in st.session_state: st.session_state.idx_atual = 0
 if "inventario" not in st.session_state: st.session_state.inventario = {}
-if "tentou_ia" not in st.session_state: st.session_state.tentou_ia = False
+if "idx_atual" not in st.session_state: st.session_state.idx_atual = 0
+if "concluido" not in st.session_state: st.session_state.concluido = False
 
 st.markdown("""<style>
+    .titulo { color: #004d00; font-weight: bold; font-size: 24px; text-align: center; }
     .barra { background-color: #004d00; color: white; padding: 10px; border-radius: 5px; font-weight: bold; text-align: center; }
-    .stButton>button { width: 100%; }
+    .stButton>button { width: 100%; border-radius: 20px; }
 </style>""", unsafe_allow_html=True)
 
-st.title("🛡️ Sistema de Tombamento")
+st.title("🛡️ Sistema de Tombamento Digital")
 
-# --- TELA 0: CARGA DA LISTA ---
+# --- 4. TELA 0: CARGA DE DADOS ---
 if not st.session_state.bens_lista:
-    st.subheader("Configuração do Tombamento")
-    
-    modo = st.radio("Selecione o modo:", ["Individualizado (Scanner)", "Em Lote (Fotos Gerais)"])
-    st.session_state.modo_operacao = modo
+    st.subheader("Configuração da Carga")
+    tipo_carga = st.tabs(["📊 Colar Excel/CSV", "📄 Analisar PDF (Groq)", "📝 Lista Manual"])
 
-    st.write("---")
-    st.write("**Carregar Relação de Bens**")
-    
-    pdf_file = st.file_uploader("Suba o PDF (TR/Empenho)", type="pdf")
-    
-    col1, col2 = st.columns(2)
-    
-    if col1.button("🔍 Analisar PDF com IA"):
-        if pdf_file:
-            with st.spinner("IA extraindo lista... Isso pode levar 20 segundos."):
-                try:
-                    # Prompt simplificado para evitar que a IA "trave" pensando
-                    prompt = "Liste os itens deste documento para tombamento. Retorne APENAS os nomes dos itens, um por linha."
-                    res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt])
-                    
-                    itens = [l.strip("- *") for l in res.text.split('\n') if len(l.strip()) > 3]
-                    if itens:
-                        st.session_state.bens_lista = [{"nome": i, "qtd": 1} for i in itens]
-                        st.rerun()
-                    else:
-                        st.error("IA não encontrou itens. Tente o modo manual ao lado.")
-                except Exception as e:
-                    st.error(f"Erro na IA: {e}. Use o modo manual.")
-                    st.session_state.tentou_ia = True
-        else:
-            st.warning("Selecione um PDF primeiro.")
+    with tipo_carga[0]:
+        csv_input = st.text_area("Cole as colunas da sua planilha aqui:")
+        if st.button("Carregar Planilha"):
+            try:
+                df = pd.read_csv(io.StringIO(csv_input), sep=None, engine='python')
+                st.session_state.bens_lista = [{"nome": str(row[0])} for _, row in df.iterrows()]
+                st.rerun()
+            except: st.error("Erro ao ler formato. Tente copiar e colar as células novamente.")
 
-    if col2.button("📝 Entrada Manual"):
-        st.session_state.tentou_ia = True
+    with tipo_carga[1]:
+        pdf_file = st.file_uploader("Suba o TR/Empenho", type="pdf")
+        if pdf_file and st.button("🔍 Extrair com Groq"):
+            with st.spinner("Analisando PDF..."):
+                texto = extrair_texto_pdf(pdf_file)
+                prompt = f"Liste apenas os nomes dos bens para tombamento contidos neste texto, um por linha:\n{texto}"
+                completion = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                itens = [l.strip("- *") for l in completion.choices[0].message.content.split('\n') if len(l.strip()) > 3]
+                st.session_state.bens_lista = [{"nome": i} for i in itens]
+                st.rerun()
 
-    if st.session_state.tentou_ia:
-        txt_manual = st.text_area("Cole ou digite a lista de bens (um por linha):", placeholder="Ex: Cadeira\nMonitor\nNotebook")
-        if st.button("Confirmar Lista Manual"):
-            st.session_state.bens_lista = [{"nome": l.strip(), "qtd": 1} for l in txt_manual.split('\n') if l.strip()]
+    with tipo_carga[2]:
+        txt_manual = st.text_area("Um item por linha:")
+        if st.button("Carregar Lista"):
+            st.session_state.bens_lista = [{"nome": l.strip()} for l in txt_manual.split('\n') if l.strip()]
             st.rerun()
 
-# --- TELA DE EXECUÇÃO ---
-elif st.session_state.bens_lista:
-    item = st.session_state.bens_lista[st.session_state.idx_atual]
-    st.markdown(f'<div class="barra">ITEM {st.session_state.idx_atual + 1} de {len(st.session_state.bens_lista)}</div>', unsafe_allow_html=True)
+# --- 5. TELA DE EXECUÇÃO ---
+elif st.session_state.bens_lista and not st.session_state.concluido:
+    idx = st.session_state.idx_atual
+    item = st.session_state.bens_lista[idx]
+    
+    st.markdown(f'<div class="barra">ITEM {idx + 1} de {len(st.session_state.bens_lista)}</div>', unsafe_allow_html=True)
     st.subheader(item["nome"])
+    
+    if idx not in st.session_state.inventario:
+        st.session_state.inventario[idx] = {"placa": "", "serial": "", "f_fixa": None, "f_geral": None}
+    
+    inv = st.session_state.inventario[idx]
 
-    if "Individualizado" in st.session_state.modo_operacao:
-        if st.session_state.idx_atual not in st.session_state.inventario:
-            st.session_state.inventario[st.session_state.idx_atual] = {"plaqueta": "", "serial": "", "foto_fixa": None, "foto_geral": None}
+    # Passo 1 & 2: Dados (Usa leitor do teclado ou digitação)
+    with st.expander("📝 1. Identificação Técnica", expanded=True):
+        st.info("Dica: Use o ícone de 'Scan/Câmera' no teclado do celular para ler o código.")
+        inv["placa"] = st.text_input("Número do Patrimônio (Plaqueta):", value=inv["placa"], key=f"p_{idx}")
+        inv["serial"] = st.text_input("Número de Série (Fabricante):", value=inv["serial"], key=f"s_{idx}")
+
+    # Passo 3 & 4: Fotos
+    with st.expander("📸 2. Registro Fotográfico", expanded=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            if inv["f_fixa"] is None:
+                f1 = st.camera_input("Foto da Plaqueta Colada", key=f"cam1_{idx}")
+                if f1: inv["f_fixa"] = f1; st.rerun()
+            else:
+                st.image(inv["f_fixa"], width=150, caption="Etiqueta OK")
+                if st.button("🔄 Refazer", key=f"ref1_{idx}"): inv["f_fixa"] = None; st.rerun()
         
-        inv = st.session_state.inventario[st.session_state.idx_atual]
+        with col2:
+            if inv["f_geral"] is None:
+                f2 = st.camera_input("Foto Geral do Bem", key=f"cam2_{idx}")
+                if f2: inv["f_geral"] = f2; st.rerun()
+            else:
+                st.image(inv["f_geral"], width=150, caption="Geral OK")
+                if st.button("🔄 Refazer", key=f"ref2_{idx}"): inv["f_geral"] = None; st.rerun()
 
-        # FLUXO SEQUENCIAL DE CÂMERAS
-        if inv["plaqueta"] == "":
-            st.info("📷 **Passo 1:** Scaneie o código de barras da Plaqueta.")
-            cam = st.camera_input("Scanner de Plaqueta", key=f"p_{st.session_state.idx_atual}")
-            if cam:
-                with st.spinner("Lendo número..."):
-                    inv["plaqueta"] = ocr_ia(cam, "Número do Patrimônio/Plaqueta")
-                st.rerun()
-        
-        elif inv["serial"] == "":
-            st.success(f"Plaqueta: {inv['plaqueta']}")
-            st.info("📷 **Passo 2:** Scaneie o Número de Série do fabricante.")
-            cam = st.camera_input("Scanner de Serial", key=f"s_{st.session_state.idx_atual}")
-            if cam:
-                with st.spinner("Lendo serial..."):
-                    inv["serial"] = ocr_ia(cam, "Serial Number / SN")
-                st.rerun()
-            if st.button("Pular Serial (N/A)"): inv["serial"] = "N/A"; st.rerun()
+    # Navegação
+    st.divider()
+    c_nav1, c_nav2 = st.columns(2)
+    if idx > 0:
+        if c_nav1.button("⬅️ Anterior"): st.session_state.idx_atual -= 1; st.rerun()
+    
+    if idx + 1 < len(st.session_state.bens_lista):
+        if c_nav2.button("Próximo Item ➡️"):
+            if inv["placa"] and inv["f_geral"]: 
+                st.session_state.idx_atual += 1; st.rerun()
+            else: st.warning("Preencha ao menos a Plaqueta e a Foto Geral.")
+    else:
+        if c_nav2.button("🏁 Finalizar Tombamento"):
+            st.session_state.concluido = True; st.rerun()
 
-        elif inv["foto_fixa"] is None:
-            st.success(f"Serial: {inv['serial']}")
-            st.info("📷 **Passo 3:** Foto da plaqueta colada no bem.")
-            cam = st.camera_input("Foto da Fixação", key=f"f_{st.session_state.idx_atual}")
-            if cam:
-                inv["foto_fixa"] = cam
-                if st.button("Confirmar Foto"): st.rerun()
+# --- 6. TELA FINAL: PDF ---
+elif st.session_state.concluido:
+    st.balloons()
+    st.success("Tombamento concluído com sucesso!")
+    servidor = st.text_input("Nome do Servidor Responsável:")
+    setor = st.text_input("Setor de Destino:")
 
-        elif inv["foto_geral"] is None:
-            st.info("📷 **Passo 4:** Foto geral do bem.")
-            cam = st.camera_input("Foto Geral", key=f"g_{st.session_state.idx_atual}")
-            if cam:
-                inv["foto_geral"] = cam
-                if st.button("🏁 Finalizar Item"):
-                    if st.session_state.idx_atual + 1 < len(st.session_state.bens_lista):
-                        st.session_state.idx_atual += 1
-                    else:
-                        st.session_state.concluido = True
-                    st.rerun()
-
-    # --- FINALIZAÇÃO ---
-    if st.session_state.get("concluido"):
-        st.balloons()
-        servidor = st.text_input("Nome do Servidor:")
-        if st.button("🚀 GERAR PDF"):
-            try:
-                pdf = FPDF(); pdf.set_margins(15, 15, 15); pdf.add_page()
-                pdf.set_font("Arial", 'B', 16); pdf.cell(180, 10, tr("TERMO DE TOMBAMENTO"), ln=True, align='C')
+    if st.button("🚀 GERAR TERMO DE TOMBAMENTO"):
+        try:
+            pdf = FPDF(); pdf.set_margins(15, 15, 15)
+            for i, it in enumerate(st.session_state.bens_lista):
+                pdf.add_page()
+                res = st.session_state.inventario[i]
                 
-                for i, it in enumerate(st.session_state.bens_lista):
-                    res = st.session_state.inventario[i]
-                    pdf.set_fill_color(240); pdf.set_font("Arial", 'B', 12)
-                    pdf.cell(180, 10, tr(f"{i+1}. {it['nome']}"), border=1, ln=True, fill=True)
-                    pdf.set_font("Arial", '', 10)
-                    pdf.cell(90, 8, tr(f"PLAQUETA: {res['plaqueta']}"), border=1)
-                    pdf.cell(90, 8, tr(f"SERIAL: {res['serial']}"), border=1, ln=True)
-                    
-                    # Fotos
-                    curr_y = pdf.get_y()
-                    if res["foto_fixa"]:
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t1:
-                            t1.write(res["foto_fixa"].getvalue())
-                            pdf.image(t1.name, x=20, y=curr_y+2, w=75)
-                    if res["foto_geral"]:
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t2:
-                            t2.write(res["foto_geral"].getvalue())
-                            pdf.image(t2.name, x=105, y=curr_y+2, w=75)
-                    pdf.set_y(curr_y + 60)
-                
-                pdf.ln(10); pdf.cell(180, 10, tr(f"Responsável: {servidor}"), align='C')
-                st.download_button("📥 Baixar Termo", data=pdf.output(dest='S'), file_name="Tombamento.pdf")
-            except Exception as e: st.error(f"Erro no PDF: {e}")
+                # Título
+                pdf.set_font("Arial", 'B', 16); pdf.set_text_color(0, 77, 0)
+                pdf.cell(180, 10, tr("TERMO DE TOMBAMENTO"), ln=True, align='C')
+                pdf.ln(5)
 
-# Sidebar
-with st.sidebar:
-    if st.button("Reiniciar Sistema"):
-        st.session_state.clear(); st.rerun()
+                # Info Box
+                pdf.set_fill_color(240, 240, 240); pdf.set_font("Arial", 'B', 10); pdf.set_text_color(0)
+                pdf.cell(180, 10, tr(f" ITEM: {it['nome'].upper()}"), border=1, ln=True, fill=True)
+                pdf.cell(90, 10, tr(f" PATRIMÔNIO: {res['placa']}"), border=1)
+                pdf.cell(90, 10, tr(f" SÉRIE: {res['serial']}"), border=1, ln=True)
+                pdf.cell(180, 10, tr(f" LOCAL: {setor.upper()}"), border=1, ln=True)
+                
+                # Fotos Lado a Lado
+                curr_y = pdf.get_y() + 10
+                if res["f_fixa"]:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t1:
+                        t1.write(res["f_fixa"].getvalue())
+                        pdf.image(t1.name, x=15, y=curr_y, w=85)
+                if res["f_geral"]:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t2:
+                        t2.write(res["f_geral"].getvalue())
+                        pdf.image(t2.name, x=105, y=curr_y, w=85)
+                
+                pdf.set_y(curr_y + 70)
+                pdf.ln(10)
+                pdf.set_font("Arial", 'I', 9)
+                pdf.multi_cell(180, 6, tr("Atesto para fins de inventário que o bem acima foi devidamente identificado, etiquetado e conferido nesta data."), align='C')
+
+            # Assinatura Final
+            pdf.add_page()
+            pdf.set_y(100)
+            pdf.line(60, pdf.get_y(), 150, pdf.get_y())
+            pdf.set_font("Arial", 'B', 12)
+            pdf.cell(180, 10, tr(servidor.upper()), ln=True, align='C')
+            pdf.set_font("Arial", '', 10)
+            pdf.cell(180, 10, tr("Servidor Responsável"), ln=True, align='C')
+
+            out = pdf.output(dest='S')
+            if isinstance(out, str): out = out.encode('latin-1')
+            st.download_button("📥 Baixar Termo PDF", data=out, file_name="Tombamento.pdf", mime="application/pdf")
+        except Exception as e: st.error(f"Erro ao gerar PDF: {e}")
+
+if st.sidebar.button("Reiniciar Sistema"):
+    st.session_state.clear(); st.rerun()
