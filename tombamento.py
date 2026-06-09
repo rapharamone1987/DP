@@ -9,7 +9,7 @@ import os
 import io
 from PIL import Image
 
-# --- 1. CONFIGURAÇÃO GROQ (Apenas para carregar a lista do PDF) ---
+# --- 1. CONFIGURAÇÃO ---
 if "GROQ_API_KEY" in st.secrets:
     CHAVE_API = st.secrets["GROQ_API_KEY"]
 else:
@@ -22,150 +22,174 @@ def tr(texto):
     if not texto: return ""
     return str(texto).encode('latin-1', 'replace').decode('latin-1')
 
-def extrair_texto_pdf(pdf_file):
+def extrair_dados_ia(pdf_file):
     texto = ""
     with pdfplumber.open(pdf_file) as pdf:
         for pagina in pdf.pages:
             texto += pagina.extract_text() + "\n"
-    return texto
+    
+    prompt = f"""Extraia uma tabela de bens deste texto. 
+    Retorne no formato CSV usando ponto-e-vírgula (;). 
+    Colunas: PATRIMONIO;ITEM
+    Texto: {texto}"""
+    
+    res = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    # Tenta limpar a resposta para pegar só o CSV
+    csv_raw = res.choices[0].message.content
+    if "```" in csv_raw:
+        csv_raw = csv_raw.split("```")[1].replace("csv", "").strip()
+    return pd.read_csv(io.StringIO(csv_raw), sep=';')
 
 # --- 3. INTERFACE E ESTADO ---
-st.set_page_config(page_title="Tombamento Ágil", layout="centered")
+st.set_page_config(page_title="Tombamento por Busca", layout="centered")
 
-if "bens_lista" not in st.session_state: st.session_state.bens_lista = []
-if "inventario" not in st.session_state: st.session_state.inventario = {}
-if "idx_atual" not in st.session_state: st.session_state.idx_atual = 0
-if "concluido" not in st.session_state: st.session_state.concluido = False
+if "df_bens" not in st.session_state: st.session_state.df_bens = pd.DataFrame()
+if "registros" not in st.session_state: st.session_state.registros = {}
 if "camera_ativa" not in st.session_state: st.session_state.camera_ativa = None
 
 st.markdown("""<style>
     .barra { background-color: #004d00; color: white; padding: 10px; border-radius: 5px; font-weight: bold; text-align: center; }
-    .stButton>button { width: 100%; border-radius: 10px; height: 3.5em; font-weight: bold; }
-    input { font-size: 20px !important; font-weight: bold !important; color: #004d00 !important; }
+    .stButton>button { width: 100%; border-radius: 10px; font-weight: bold; }
+    .found-card { background-color: #e8f5e9; border: 2px solid #2e7d32; padding: 15px; border-radius: 10px; margin: 10px 0; }
 </style>""", unsafe_allow_html=True)
 
-st.title("🛡️ Tombamento Ágil (Teclado Barcode)")
+st.title("🛡️ Sistema de Tombamento e Busca")
 
-# --- 4. TELA DE CARGA ---
-if not st.session_state.bens_lista:
-    st.subheader("Carregar Relação de Bens")
-    tab1, tab2, tab3 = st.tabs(["📊 Excel/Planilha", "📄 Analisar PDF", "📝 Manual"])
+# --- 4. FASE 1: CARGA E EDIÇÃO ---
+if st.session_state.df_bens.empty:
+    st.subheader("1. Carregar Tabela de Bens")
+    tab1, tab2 = st.tabs(["📄 Extrair do PDF (IA)", "📊 Colar do Excel"])
     
     with tab1:
-        csv_in = st.text_area("Copie as colunas do Excel e cole aqui:")
-        if st.button("Carregar Planilha"):
-            try:
-                df = pd.read_csv(io.StringIO(csv_in), sep=None, engine='python', header=None)
-                st.session_state.bens_lista = [{"nome": str(row[0])} for _, row in df.iterrows()]
-                st.rerun()
-            except: st.error("Erro no formato.")
-
-    with tab2:
-        pdf_file = st.file_uploader("Suba o PDF", type="pdf")
-        if pdf_file and client:
-            if st.button("🔍 Extrair Lista com Groq"):
-                with st.spinner("Analisando PDF..."):
-                    texto = extrair_texto_pdf(pdf_file)
-                    completion = client.chat.completions.create(
-                        model="llama-3.3-70b-versatile",
-                        messages=[{"role": "user", "content": f"Liste apenas os nomes dos bens deste texto, um por linha:\n{texto}"}]
-                    )
-                    itens = [l.strip("- *") for l in completion.choices[0].message.content.split('\n') if len(l.strip()) > 3]
-                    st.session_state.bens_lista = [{"nome": i} for i in itens]
+        pdf_up = st.file_uploader("Suba o arquivo", type="pdf")
+        if pdf_up and client and st.button("Analisar PDF"):
+            with st.spinner("IA extraindo patrimônios..."):
+                try:
+                    st.session_state.df_bens = extrair_dados_ia(pdf_up)
                     st.rerun()
+                except: st.error("Erro na extração. Tente colar os dados na aba ao lado.")
+                
+    with tab2:
+        txt_csv = st.text_area("Cole as colunas Patrimônio e Item aqui:")
+        if st.button("Carregar Dados"):
+            try:
+                st.session_state.df_bens = pd.read_csv(io.StringIO(txt_csv), sep=None, engine='python')
+                st.session_state.df_bens.columns = ["PATRIMONIO", "ITEM"] # Padroniza nomes
+                st.rerun()
+            except: st.error("Erro no formato. Certifique-se de ter as colunas Patrimônio e Item.")
 
-    with tab3:
-        txt_manual = st.text_area("Um item por linha:")
-        if st.button("Carregar Lista Manual"):
-            st.session_state.bens_lista = [{"nome": l.strip()} for l in txt_manual.split('\n') if l.strip()]
-            st.rerun()
+# --- 5. FASE 2: EDIÇÃO E FILTRO ---
+elif not st.session_state.get("iniciado"):
+    st.subheader("2. Revisar Tabela")
+    st.info("Verifique os números de patrimônio e exclua as linhas desnecessárias.")
+    
+    # Editor dinâmico (permite deletar linhas e editar números)
+    st.session_state.df_bens = st.data_editor(st.session_state.df_bens, num_rows="dynamic", use_container_width=True)
+    
+    if st.button("🚀 Iniciar Operação de Campo"):
+        st.session_state.iniciado = True
+        st.rerun()
 
-# --- 5. TELA DE EXECUÇÃO ---
-elif st.session_state.bens_lista and not st.session_state.concluido:
-    idx = st.session_state.idx_atual
-    item = st.session_state.bens_lista[idx]
+# --- 6. FASE 3: BUSCA E REGISTRO ---
+elif st.session_state.get("iniciado") and not st.session_state.get("finalizado"):
+    st.markdown('<div class="barra">BUSCA E IDENTIFICAÇÃO</div>', unsafe_allow_html=True)
     
-    st.markdown(f'<div class="barra">ITEM {idx + 1} de {len(st.session_state.bens_lista)}</div>', unsafe_allow_html=True)
-    st.subheader(f"Inventariando: {item['nome']}")
-    
-    if idx not in st.session_state.inventario:
-        st.session_state.inventario[idx] = {"placa": "", "serial": "", "f_fixa": None, "f_geral": None}
-    
-    inv = st.session_state.inventario[idx]
+    # Progresso
+    total = len(st.session_state.df_bens)
+    concluidos = len(st.session_state.registros)
+    st.write(f"📊 **Status:** {concluidos} de {total} registrados.")
 
-    # --- ENTRADA DE DADOS (O Teclado Barcode vai digitar aqui) ---
-    with st.container(border=True):
-        st.info("👋 Toque no campo e use o botão de scan do seu teclado.")
-        inv["placa"] = st.text_input("Nº PATRIMÔNIO (Plaqueta):", value=inv["placa"], key=f"in_p_{idx}")
-        inv["serial"] = st.text_input("Nº SÉRIE (Fabricante):", value=inv["serial"], key=f"in_s_{idx}")
-
-    # --- REGISTRO FOTOGRÁFICO ---
-    st.write("### 📸 Fotos de Comprovação")
-    c1, c2 = st.columns(2)
+    # BUSCA
+    st.write("### 🔍 Scanear ou Digitar Plaqueta")
+    busca = st.text_input("FOQUE O SCANNER NESTE CAMPO:", key="input_busca")
     
-    with c1:
-        if inv["f_fixa"] is None:
-            if st.session_state.camera_ativa == f"f1_{idx}":
-                f1 = st.camera_input("Foto da Plaqueta Colada", key=f"cam1_{idx}")
-                if f1: inv["f_fixa"] = f1; st.session_state.camera_ativa = None; st.rerun()
-            elif st.button("📷 Plaqueta Colada"): st.session_state.camera_ativa = f"f1_{idx}"; st.rerun()
+    if busca:
+        # Tenta encontrar o número na coluna PATRIMONIO (convertendo para string para comparar)
+        item_match = st.session_state.df_bens[st.session_state.df_bens["PATRIMONIO"].astype(str) == str(busca)]
+        
+        if not item_match.empty:
+            nome_item = item_match.iloc[0]["ITEM"]
+            st.markdown(f"""<div class="found-card">
+                <b>✅ ITEM LOCALIZADO:</b><br>{nome_item}<br>
+                <b>Patrimônio:</b> {busca}
+            </div>""", unsafe_allow_html=True)
+            
+            # Se já foi registrado, avisa
+            if busca in st.session_state.registros:
+                st.warning("⚠️ Este item já foi registrado anteriormente.")
+                if st.button("Ver Registro"): st.write(st.session_state.registros[busca])
+            
+            # Campos para complementar
+            serial = st.text_input("Número de Série (Fabricante):", key=f"ser_{busca}")
+            
+            c1, c2 = st.columns(2)
+            # FOTO 1: ETIQUETA
+            with c1:
+                if f"f1_{busca}" not in st.session_state:
+                    if st.button("📷 Foto Etiqueta"): st.session_state.camera_ativa = "f1"; st.rerun()
+                    if st.session_state.camera_ativa == "f1":
+                        f1 = st.camera_input("Foque na Etiqueta Colada")
+                        if f1: st.session_state[f"f1_{busca}"] = f1; st.session_state.camera_ativa = None; st.rerun()
+                else: st.image(st.session_state[f"f1_{busca}"], width=120)
+
+            # FOTO 2: GERAL
+            with c2:
+                if f"f2_{busca}" not in st.session_state:
+                    if st.button("📷 Foto do Bem"): st.session_state.camera_ativa = "f2"; st.rerun()
+                    if st.session_state.camera_ativa == "f2":
+                        f2 = st.camera_input("Foque no Bem Inteiro")
+                        if f2: st.session_state[f"f2_{busca}"] = f2; st.session_state.camera_ativa = None; st.rerun()
+                else: st.image(st.session_state[f"f2_{busca}"], width=120)
+
+            if st.button("💾 SALVAR REGISTRO"):
+                if serial and f"f2_{busca}" in st.session_state:
+                    st.session_state.registros[busca] = {
+                        "item": nome_item,
+                        "patrimonio": busca,
+                        "serial": serial,
+                        "foto_fixa": st.session_state[f"f1_{busca}"],
+                        "foto_geral": st.session_state[f"f2_{busca}"]
+                    }
+                    st.success("Salvo com sucesso!")
+                    time.sleep(1)
+                    st.rerun()
+                else: st.error("Preencha o Serial e as Fotos.")
         else:
-            st.image(inv["f_fixa"], width=150)
-            if st.button("🔄 Refazer", key=f"r1_{idx}"): inv["f_fixa"] = None; st.rerun()
-
-    with c2:
-        if inv["f_geral"] is None:
-            if st.session_state.camera_ativa == f"f2_{idx}":
-                f2 = st.camera_input("Foto Geral do Bem", key=f"cam2_{idx}")
-                if f2: inv["f_geral"] = f2; st.session_state.camera_ativa = None; st.rerun()
-            elif st.button("📷 Bem Geral"): st.session_state.camera_ativa = f"f2_{idx}"; st.rerun()
-        else:
-            st.image(inv["f_geral"], width=150)
-            if st.button("🔄 Refazer ", key=f"r2_{idx}"): inv["f_geral"] = None; st.rerun()
+            st.error(f"❌ Patrimônio {busca} não encontrado na lista carregada.")
 
     st.divider()
-    col_nav1, col_nav2 = st.columns(2)
-    if idx > 0:
-        if col_nav1.button("⬅️ Voltar"): st.session_state.idx_atual -= 1; st.rerun()
-    
-    if idx + 1 < len(st.session_state.bens_lista):
-        if col_nav2.button("Próximo Item ➡️"):
-            if inv["placa"] and inv["f_geral"]:
-                st.session_state.idx_atual += 1; st.session_state.camera_ativa = None; st.rerun()
-            else: st.warning("Preencha a Plaqueta e a Foto Geral.")
-    else:
-        if col_nav2.button("🏁 Finalizar"):
-            st.session_state.concluido = True; st.rerun()
+    if st.button("🏁 Finalizar e Gerar Termo"):
+        st.session_state.finalizado = True; st.rerun()
 
-# --- 6. PDF FINAL ---
-elif st.session_state.concluido:
-    st.balloons()
-    servidor = st.text_input("Nome do Servidor Responsável:")
-    if st.button("🚀 GERAR TERMO DE TOMBAMENTO"):
+# --- 7. FASE FINAL: PDF ---
+elif st.session_state.get("finalizado"):
+    servidor = st.text_input("Nome do Servidor:")
+    if st.button("🚀 BAIXAR PDF"):
         pdf = FPDF(); pdf.set_margins(15, 15, 15)
-        for i, it in enumerate(st.session_state.bens_lista):
+        for p, r in st.session_state.registros.items():
             pdf.add_page()
-            res = st.session_state.inventario[i]
             pdf.set_font("Arial", 'B', 16); pdf.set_text_color(0, 77, 0)
             pdf.cell(180, 10, tr("TERMO DE TOMBAMENTO"), ln=True, align='C')
-            pdf.set_fill_color(240); pdf.set_font("Arial", 'B', 11); pdf.set_text_color(0)
-            pdf.cell(180, 10, tr(f" ITEM: {it['nome'].upper()}"), border=1, ln=True, fill=True)
-            pdf.cell(90, 10, tr(f" PATRIMÔNIO: {res['placa']}"), border=1)
-            pdf.cell(90, 10, tr(f" SÉRIE: {res['serial']}"), border=1, ln=True)
+            pdf.ln(5); pdf.set_fill_color(240); pdf.set_font("Arial", 'B', 11); pdf.set_text_color(0)
+            pdf.cell(180, 10, tr(f" ITEM: {r['item']}"), border=1, ln=True, fill=True)
+            pdf.cell(90, 10, tr(f" PATRIMÔNIO: {r['patrimonio']}"), border=1)
+            pdf.cell(90, 10, tr(f" SÉRIE: {r['serial']}"), border=1, ln=True)
             
+            # Fotos
             curr_y = pdf.get_y() + 5
-            if res["f_fixa"]:
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t1:
-                    t1.write(res["f_fixa"].getvalue()); pdf.image(t1.name, x=15, y=curr_y, w=85)
-            if res["f_geral"]:
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t2:
-                    t2.write(res["f_geral"].getvalue()); pdf.image(t2.name, x=105, y=curr_y, w=85)
-            pdf.set_y(curr_y + 65)
-            pdf.set_font("Arial", 'I', 9); pdf.multi_cell(180, 6, tr("\nAtesto que o bem foi conferido e identificado fisicamente."), align='C')
-
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t1:
+                t1.write(r["foto_fixa"].getvalue()); pdf.image(t1.name, x=15, y=curr_y, w=85)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t2:
+                t2.write(r["foto_geral"].getvalue()); pdf.image(t2.name, x=105, y=curr_y, w=85)
+            
         pdf.add_page(); pdf.set_y(100); pdf.line(60, pdf.get_y(), 150, pdf.get_y())
         pdf.cell(180, 10, tr(servidor.upper()), align='C')
-        st.download_button("📥 Baixar PDF", data=pdf.output(dest='S'), file_name="Tombamento.pdf")
+        st.download_button("📥 Download PDF", data=pdf.output(dest='S'), file_name="Tombamento.pdf")
+
+if st.sidebar.button("Reiniciar"): st.session_state.clear(); st.rerun()
 
 if st.sidebar.button("Novo"):
     st.session_state.clear(); st.rerun()
