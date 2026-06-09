@@ -7,6 +7,8 @@ from datetime import datetime
 import tempfile
 import os
 import io
+import json
+import time
 from PIL import Image
 
 # --- 1. CONFIGURAÇÃO ---
@@ -28,20 +30,27 @@ def extrair_dados_ia(pdf_file):
         for pagina in pdf.pages:
             texto += pagina.extract_text() + "\n"
     
-    prompt = f"""Extraia uma tabela de bens deste texto. 
-    Retorne no formato CSV usando ponto-e-vírgula (;). 
-    Colunas: PATRIMONIO;ITEM
+    # Prompt em JSON para evitar erro de colunas misturadas
+    prompt = f"""Analise este texto de um documento de patrimônio. 
+    Extraia o Número do Patrimônio e a Descrição do Item.
+    Retorne APENAS um JSON no formato:
+    [
+      {{"PATRIMONIO": "valor", "ITEM": "descrição"}},
+      {{"PATRIMONIO": "valor", "ITEM": "descrição"}}
+    ]
+    Ignore cabeçalhos e rodapés. Se o item não tiver número de patrimônio claro, ignore.
     Texto: {texto}"""
     
     res = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.1 # Temperatura baixa para ser mais preciso
     )
-    # Tenta limpar a resposta para pegar só o CSV
-    csv_raw = res.choices[0].message.content
-    if "```" in csv_raw:
-        csv_raw = csv_raw.split("```")[1].replace("csv", "").strip()
-    return pd.read_csv(io.StringIO(csv_raw), sep=';')
+    
+    content = res.choices[0].message.content
+    # Limpa a resposta da IA (remove markdown ```json)
+    json_str = content.replace("```json", "").replace("```", "").strip()
+    return pd.DataFrame(json.loads(json_str))
 
 # --- 3. INTERFACE E ESTADO ---
 st.set_page_config(page_title="Tombamento por Busca", layout="centered")
@@ -52,8 +61,8 @@ if "camera_ativa" not in st.session_state: st.session_state.camera_ativa = None
 
 st.markdown("""<style>
     .barra { background-color: #004d00; color: white; padding: 10px; border-radius: 5px; font-weight: bold; text-align: center; }
-    .stButton>button { width: 100%; border-radius: 10px; font-weight: bold; }
     .found-card { background-color: #e8f5e9; border: 2px solid #2e7d32; padding: 15px; border-radius: 10px; margin: 10px 0; }
+    .stDataEditor { border: 1px solid #ddd; border-radius: 5px; }
 </style>""", unsafe_allow_html=True)
 
 st.title("🛡️ Sistema de Tombamento e Busca")
@@ -61,135 +70,137 @@ st.title("🛡️ Sistema de Tombamento e Busca")
 # --- 4. FASE 1: CARGA E EDIÇÃO ---
 if st.session_state.df_bens.empty:
     st.subheader("1. Carregar Tabela de Bens")
-    tab1, tab2 = st.tabs(["📄 Extrair do PDF (IA)", "📊 Colar do Excel"])
+    tab1, tab2 = st.tabs(["📄 Extrair do PDF (IA)", "📊 Colar do Excel/Planilha"])
     
     with tab1:
-        pdf_up = st.file_uploader("Suba o arquivo", type="pdf")
-        if pdf_up and client and st.button("Analisar PDF"):
+        pdf_up = st.file_uploader("Suba o arquivo do TR/Empenho", type="pdf")
+        if pdf_up and client and st.button("🔍 Analisar PDF com IA"):
             with st.spinner("IA extraindo patrimônios..."):
                 try:
-                    st.session_state.df_bens = extrair_dados_ia(pdf_up)
+                    df_extraido = extrair_dados_ia(pdf_up)
+                    st.session_state.df_bens = df_extraido
                     st.rerun()
-                except: st.error("Erro na extração. Tente colar os dados na aba ao lado.")
+                except Exception as e:
+                    st.error(f"Erro na extração: {e}")
                 
     with tab2:
-        txt_csv = st.text_area("Cole as colunas Patrimônio e Item aqui:")
-        if st.button("Carregar Dados"):
+        st.write("Copie as colunas 'Patrimônio' e 'Descrição' da sua planilha e cole abaixo:")
+        txt_csv = st.text_area("Cole aqui (incluindo o cabeçalho):", height=150)
+        if st.button("Carregar Dados do Excel"):
             try:
-                st.session_state.df_bens = pd.read_csv(io.StringIO(txt_csv), sep=None, engine='python')
-                st.session_state.df_bens.columns = ["PATRIMONIO", "ITEM"] # Padroniza nomes
+                # O sep=None faz o pandas adivinhar se é vírgula ou Tabulação (Excel)
+                df_manual = pd.read_csv(io.StringIO(txt_csv), sep=None, engine='python')
+                # Força os nomes das colunas
+                df_manual.columns = ["PATRIMONIO", "ITEM"]
+                st.session_state.df_bens = df_manual
                 st.rerun()
-            except: st.error("Erro no formato. Certifique-se de ter as colunas Patrimônio e Item.")
+            except:
+                st.error("Erro no formato. Dica: Cole as colunas diretamente do Excel.")
 
-# --- 5. FASE 2: EDIÇÃO E FILTRO ---
+# --- 5. FASE 2: REVISÃO (IMPORTANTE PARA LIMPAR DADOS) ---
 elif not st.session_state.get("iniciado"):
-    st.subheader("2. Revisar Tabela")
-    st.info("Verifique os números de patrimônio e exclua as linhas desnecessárias.")
+    st.subheader("2. Conferir e Ajustar Lista")
+    st.info("💡 Use a lixeira lateral para remover linhas de lixo. Você pode editar os números se a IA leu errado.")
     
-    # Editor dinâmico (permite deletar linhas e editar números)
-    st.session_state.df_bens = st.data_editor(st.session_state.df_bens, num_rows="dynamic", use_container_width=True)
+    # Editor que permite editar qualquer célula e deletar linhas
+    st.session_state.df_bens = st.data_editor(
+        st.session_state.df_bens, 
+        num_rows="dynamic", 
+        use_container_width=True,
+        column_config={
+            "PATRIMONIO": st.column_config.TextColumn("Nº Patrimônio"),
+            "ITEM": st.column_config.TextColumn("Descrição do Bem", width="large")
+        }
+    )
     
-    if st.button("🚀 Iniciar Operação de Campo"):
+    if st.button("🚀 Iniciar Operação no Pátio"):
+        # Garante que Patrimônio seja string e limpa espaços
+        st.session_state.df_bens["PATRIMONIO"] = st.session_state.df_bens["PATRIMONIO"].astype(str).str.strip()
         st.session_state.iniciado = True
         st.rerun()
 
 # --- 6. FASE 3: BUSCA E REGISTRO ---
 elif st.session_state.get("iniciado") and not st.session_state.get("finalizado"):
-    st.markdown('<div class="barra">BUSCA E IDENTIFICAÇÃO</div>', unsafe_allow_html=True)
+    st.markdown('<div class="barra">MODO BUSCA ATIVO</div>', unsafe_allow_html=True)
     
-    # Progresso
-    total = len(st.session_state.df_bens)
-    concluidos = len(st.session_state.registros)
-    st.write(f"📊 **Status:** {concluidos} de {total} registrados.")
+    st.write(f"📊 **Progresso:** {len(st.session_state.registros)} de {len(st.session_state.df_bens)} registrados.")
 
-    # BUSCA
     st.write("### 🔍 Scanear ou Digitar Plaqueta")
-    busca = st.text_input("FOQUE O SCANNER NESTE CAMPO:", key="input_busca")
+    # Limpa o campo de busca automaticamente usando session_state se necessário
+    busca = st.text_input("FOQUE O SCANNER NESTE CAMPO:", key="input_busca").strip()
     
     if busca:
-        # Tenta encontrar o número na coluna PATRIMONIO (convertendo para string para comparar)
-        item_match = st.session_state.df_bens[st.session_state.df_bens["PATRIMONIO"].astype(str) == str(busca)]
+        # Busca exata
+        match = st.session_state.df_bens[st.session_state.df_bens["PATRIMONIO"] == busca]
         
-        if not item_match.empty:
-            nome_item = item_match.iloc[0]["ITEM"]
+        if not match.empty:
+            nome_item = match.iloc[0]["ITEM"]
             st.markdown(f"""<div class="found-card">
                 <b>✅ ITEM LOCALIZADO:</b><br>{nome_item}<br>
                 <b>Patrimônio:</b> {busca}
             </div>""", unsafe_allow_html=True)
             
-            # Se já foi registrado, avisa
             if busca in st.session_state.registros:
-                st.warning("⚠️ Este item já foi registrado anteriormente.")
-                if st.button("Ver Registro"): st.write(st.session_state.registros[busca])
+                st.warning("⚠️ Já registrado.")
             
-            # Campos para complementar
             serial = st.text_input("Número de Série (Fabricante):", key=f"ser_{busca}")
             
             c1, c2 = st.columns(2)
-            # FOTO 1: ETIQUETA
+            # FOTO 1
             with c1:
                 if f"f1_{busca}" not in st.session_state:
-                    if st.button("📷 Foto Etiqueta"): st.session_state.camera_ativa = "f1"; st.rerun()
+                    if st.button("📷 Foto Etiqueta", key=f"btn1_{busca}"): st.session_state.camera_ativa = "f1"; st.rerun()
                     if st.session_state.camera_ativa == "f1":
-                        f1 = st.camera_input("Foque na Etiqueta Colada")
+                        f1 = st.camera_input("Fixação")
                         if f1: st.session_state[f"f1_{busca}"] = f1; st.session_state.camera_ativa = None; st.rerun()
                 else: st.image(st.session_state[f"f1_{busca}"], width=120)
 
-            # FOTO 2: GERAL
+            # FOTO 2
             with c2:
                 if f"f2_{busca}" not in st.session_state:
-                    if st.button("📷 Foto do Bem"): st.session_state.camera_ativa = "f2"; st.rerun()
+                    if st.button("📷 Foto do Bem", key=f"btn2_{busca}"): st.session_state.camera_ativa = "f2"; st.rerun()
                     if st.session_state.camera_ativa == "f2":
-                        f2 = st.camera_input("Foque no Bem Inteiro")
+                        f2 = st.camera_input("Geral")
                         if f2: st.session_state[f"f2_{busca}"] = f2; st.session_state.camera_ativa = None; st.rerun()
                 else: st.image(st.session_state[f"f2_{busca}"], width=120)
 
-            if st.button("💾 SALVAR REGISTRO"):
+            if st.button("💾 SALVAR REGISTRO", key=f"save_{busca}"):
                 if serial and f"f2_{busca}" in st.session_state:
                     st.session_state.registros[busca] = {
-                        "item": nome_item,
-                        "patrimonio": busca,
-                        "serial": serial,
-                        "foto_fixa": st.session_state[f"f1_{busca}"],
-                        "foto_geral": st.session_state[f"f2_{busca}"]
+                        "item": nome_item, "patrimonio": busca, "serial": serial,
+                        "f1": st.session_state[f"f1_{busca}"], "f2": st.session_state[f"f2_{busca}"]
                     }
-                    st.success("Salvo com sucesso!")
+                    st.success("Salvo!")
                     time.sleep(1)
                     st.rerun()
-                else: st.error("Preencha o Serial e as Fotos.")
         else:
-            st.error(f"❌ Patrimônio {busca} não encontrado na lista carregada.")
+            st.error(f"❌ Placa {busca} não está na lista.")
 
     st.divider()
-    if st.button("🏁 Finalizar e Gerar Termo"):
+    if st.button("🏁 Finalizar e Baixar PDF"):
         st.session_state.finalizado = True; st.rerun()
 
 # --- 7. FASE FINAL: PDF ---
 elif st.session_state.get("finalizado"):
     servidor = st.text_input("Nome do Servidor:")
-    if st.button("🚀 BAIXAR PDF"):
+    if st.button("🚀 GERAR PDF"):
         pdf = FPDF(); pdf.set_margins(15, 15, 15)
         for p, r in st.session_state.registros.items():
             pdf.add_page()
-            pdf.set_font("Arial", 'B', 16); pdf.set_text_color(0, 77, 0)
-            pdf.cell(180, 10, tr("TERMO DE TOMBAMENTO"), ln=True, align='C')
-            pdf.ln(5); pdf.set_fill_color(240); pdf.set_font("Arial", 'B', 11); pdf.set_text_color(0)
+            pdf.set_font("Arial", 'B', 16); pdf.cell(180, 10, tr("TERMO DE TOMBAMENTO"), ln=True, align='C')
+            pdf.set_fill_color(240); pdf.set_font("Arial", 'B', 11)
             pdf.cell(180, 10, tr(f" ITEM: {r['item']}"), border=1, ln=True, fill=True)
             pdf.cell(90, 10, tr(f" PATRIMÔNIO: {r['patrimonio']}"), border=1)
             pdf.cell(90, 10, tr(f" SÉRIE: {r['serial']}"), border=1, ln=True)
             
-            # Fotos
             curr_y = pdf.get_y() + 5
             with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t1:
-                t1.write(r["foto_fixa"].getvalue()); pdf.image(t1.name, x=15, y=curr_y, w=85)
+                t1.write(r["f1"].getvalue()); pdf.image(t1.name, x=15, y=curr_y, w=85)
             with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t2:
-                t2.write(r["foto_geral"].getvalue()); pdf.image(t2.name, x=105, y=curr_y, w=85)
+                t2.write(r["f2"].getvalue()); pdf.image(t2.name, x=105, y=curr_y, w=85)
             
-        pdf.add_page(); pdf.set_y(100); pdf.line(60, pdf.get_y(), 150, pdf.get_y())
-        pdf.cell(180, 10, tr(servidor.upper()), align='C')
-        st.download_button("📥 Download PDF", data=pdf.output(dest='S'), file_name="Tombamento.pdf")
+        pdf_out = pdf.output(dest='S')
+        if isinstance(pdf_out, str): pdf_out = pdf_out.encode('latin-1')
+        st.download_button("📥 Baixar PDF", data=pdf_out, file_name="Tombamento.pdf")
 
-if st.sidebar.button("Reiniciar"): st.session_state.clear(); st.rerun()
-
-if st.sidebar.button("Novo"):
-    st.session_state.clear(); st.rerun()
+if st.sidebar.button("Limpar Tudo"): st.session_state.clear(); st.rerun()
