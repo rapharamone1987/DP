@@ -10,7 +10,7 @@ import pandas as pd
 import io
 from PIL import Image
 
-# --- 1. CONFIGURAÇÃO DA IA (GEMINI PARA VER FOTOS) ---
+# --- 1. CONFIGURAÇÃO DA IA ---
 if "GOOGLE_API_KEY" in st.secrets:
     CHAVE_API = st.secrets["GOOGLE_API_KEY"]
 else:
@@ -25,9 +25,8 @@ def inicializar_ia(api_key):
 
 model = inicializar_ia(CHAVE_API)
 
-# --- 2. FUNÇÃO DE SCANNER (IA QUE LÊ A FOTO) ---
+# --- 2. FUNÇÕES DE APOIO ---
 def ocr_etiqueta(foto_bytes, tipo_dado):
-    """Envia a foto para o Gemini ler o que está escrito nela"""
     try:
         img = Image.open(foto_bytes)
         prompt = f"Leia esta imagem e extraia apenas o {tipo_dado}. Responda apenas com os números ou letras encontrados, sem frases."
@@ -51,29 +50,50 @@ if "camera_ativa" not in st.session_state: st.session_state.camera_ativa = None
 st.markdown("""<style>
     .barra { background-color: #004d00; color: white; padding: 10px; border-radius: 5px; font-weight: bold; text-align: center; }
     .stButton>button { width: 100%; border-radius: 10px; height: 3.5em; font-weight: bold; }
-    .scan-btn>button { background-color: #e1f5fe; color: #01579b; border: 1px solid #01579b; }
 </style>""", unsafe_allow_html=True)
 
 st.title("🛡️ Tombamento com Scanner IA")
 
-# --- 4. TELA DE CARGA ---
+# --- 4. TELA DE CARGA (COM O BOTÃO DE PDF) ---
 if not st.session_state.bens_lista:
     st.subheader("Carregar Relação de Bens")
-    tab1, tab2 = st.tabs(["📊 Colar Excel", "📝 Lista Manual"])
+    # ADICIONADA A ABA DE PDF ABAIXO
+    tab1, tab2, tab3 = st.tabs(["📄 Analisar PDF (IA)", "📊 Colar Excel", "📝 Lista Manual"])
     
     with tab1:
-        csv_in = st.text_area("Cole as colunas da planilha:")
-        if st.button("Carregar Planilha"):
-            df = pd.read_csv(io.StringIO(csv_in), sep=None, engine='python')
-            st.session_state.bens_lista = [{"nome": str(row[0])} for _, row in df.iterrows()]
-            st.rerun()
+        pdf_file = st.file_uploader("Suba o PDF do TR ou Empenho", type="pdf")
+        if pdf_file:
+            if st.button("🔍 Extrair Lista com IA"):
+                with st.spinner("IA extraindo lista de bens..."):
+                    try:
+                        # Comando para extrair apenas a lista de nomes
+                        prompt = "Liste apenas os nomes dos bens (produtos) contidos neste documento para tombamento, um por linha. Não escreva mais nada."
+                        res = model.generate_content([{'mime_type': 'application/pdf', 'data': pdf_file.read()}, prompt])
+                        itens = [l.strip("- *") for l in res.text.split('\n') if len(l.strip()) > 3]
+                        if itens:
+                            st.session_state.bens_lista = [{"nome": i} for i in itens]
+                            st.rerun()
+                        else:
+                            st.error("IA não encontrou itens no PDF.")
+                    except Exception as e:
+                        st.error(f"Erro na IA: {e}")
+
     with tab2:
+        csv_in = st.text_area("Cole as colunas da planilha (Excel):")
+        if st.button("Carregar Planilha"):
+            try:
+                df = pd.read_csv(io.StringIO(csv_in), sep=None, engine='python')
+                st.session_state.bens_lista = [{"nome": str(row[0])} for _, row in df.iterrows()]
+                st.rerun()
+            except: st.error("Erro no formato da planilha.")
+
+    with tab3:
         txt_in = st.text_area("Um item por linha:")
-        if st.button("Carregar Lista"):
+        if st.button("Carregar Lista Manual"):
             st.session_state.bens_lista = [{"nome": l.strip()} for l in txt_in.split('\n') if l.strip()]
             st.rerun()
 
-# --- 5. EXECUÇÃO COM SCANNER ---
+# --- 5. EXECUÇÃO COM SCANNER (DAQUI EM DIANTE SEGUE O FLUXO DE CÂMERA) ---
 elif st.session_state.bens_lista and not st.session_state.get("concluido"):
     idx = st.session_state.idx_atual
     item = st.session_state.bens_lista[idx]
@@ -121,11 +141,10 @@ elif st.session_state.bens_lista and not st.session_state.get("concluido"):
     # --- FOTOS DE COMPROVAÇÃO ---
     st.write("### 📸 Fotos de Comprovação")
     c1, c2 = st.columns(2)
-    
     with c1:
         if inv["f_fixa"] is None:
             if st.session_state.camera_ativa == f"foto_fixa_{idx}":
-                f1 = st.camera_input("Foto da Plaqueta Colada", key=f"f1_{idx}")
+                f1 = st.camera_input("Foto da Plaqueta Colada", key=f1_idx)
                 if f1: inv["f_fixa"] = f1; st.session_state.camera_ativa = None; st.rerun()
             else:
                 if st.button("📷 Plaqueta Colada", key=f"b1_{idx}"):
@@ -137,7 +156,7 @@ elif st.session_state.bens_lista and not st.session_state.get("concluido"):
     with c2:
         if inv["f_geral"] is None:
             if st.session_state.camera_ativa == f"foto_geral_{idx}":
-                f2 = st.camera_input("Foto Geral", key=f"f2_{idx}")
+                f2 = st.camera_input("Foto Geral", key=f2_idx)
                 if f2: inv["f_geral"] = f2; st.session_state.camera_ativa = None; st.rerun()
             else:
                 if st.button("📷 Bem Geral", key=f"b2_{idx}"):
@@ -146,7 +165,6 @@ elif st.session_state.bens_lista and not st.session_state.get("concluido"):
             st.image(inv["f_geral"], width=100)
             if st.button("🔄 Refazer ", key=f"r2_{idx}"): inv["f_geral"] = None; st.rerun()
 
-    # Navegação
     st.divider()
     if st.button("Próximo Item ➡️"):
         st.session_state.idx_atual += 1
@@ -154,7 +172,7 @@ elif st.session_state.bens_lista and not st.session_state.get("concluido"):
             st.session_state.concluido = True
         st.rerun()
 
-# --- 6. PDF FINAL ---
+# --- 6. PDF FINAL (CONTINUA IGUAL) ---
 elif st.session_state.get("concluido"):
     servidor = st.text_input("Nome do Servidor:")
     if st.button("🚀 GERAR TERMO DE TOMBAMENTO"):
