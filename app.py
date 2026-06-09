@@ -78,7 +78,7 @@ if "fotos" not in st.session_state: st.session_state.fotos = {}
 if "conferidos" not in st.session_state: st.session_state.conferidos = {}
 if "item_da_foto" not in st.session_state: st.session_state.item_da_foto = None
 
-st.markdown('<p class="titulo-v">📋 Recebimento Técnico (Groq Llama 3.3)</p>', unsafe_allow_html=True)
+st.markdown('<p class="titulo-v">📋 Recebimento Técnico </p>', unsafe_allow_html=True)
 
 # --- 4. CARGA DE DADOS ---
 if not st.session_state.checklist_items:
