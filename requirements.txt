@@ -2,3 +2,5 @@ streamlit
 google-generativeai
 fpdf
 Pillow
+groq
+pdfplumber
