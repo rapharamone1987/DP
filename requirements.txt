@@ -7,3 +7,4 @@ pdfplumber
 streamlit
 groq
 pandas
+streamlit-barcode-scanner
