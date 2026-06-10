@@ -37,28 +37,30 @@ def extrair_patrimonios_ia(pdf_file):
 def processar_imagem_pdf(st_image):
     if st_image is None: return None
     temp_dir = tempfile.gettempdir()
-    # Se já for um caminho de arquivo (da restauração de backup), retorna ele
-    if isinstance(st_image, str) and os.path.exists(st_image): return st_image
-    
     temp_path = os.path.join(temp_dir, f"img_{time.time()}.jpg")
     img = Image.open(st_image)
     if img.mode != 'RGB': img = img.convert('RGB')
     img.save(temp_path, "JPEG", quality=75)
     return temp_path
 
-# --- 3. CLASSE PDF ---
+# --- 3. CLASSE PDF OFICIAL ---
 class PDFTombamento(FPDF):
     def header(self):
-        self.set_fill_color(0, 154, 68); self.rect(0, 0, 210, 15, 'F')
-        self.set_y(20); self.set_font("Arial", 'B', 16); self.set_text_color(0, 154, 68)
-        self.cell(0, 10, tr("RELATÓRIO DE TOMBAMENTO PATRIMONIAL"), 0, 1, 'C'); self.ln(5)
-    def footer(self):
-        self.set_y(-15); self.set_fill_color(0, 154, 68); self.rect(0, 282, 210, 15, 'F')
-        self.set_font("Arial", 'I', 8); self.set_text_color(255, 255, 255)
-        self.cell(0, 10, tr(f"Página {self.page_no()}"), 0, 0, 'C')
+        self.set_fill_color(0, 154, 68) 
+        self.rect(0, 0, 210, 15, 'F')
+        self.set_y(20)
+        self.set_font("Arial", 'B', 16); self.set_text_color(0, 154, 68)
+        self.cell(0, 10, tr("RELATÓRIO DE TOMBAMENTO PATRIMONIAL"), 0, 1, 'C')
+        self.ln(5)
 
-# --- 4. INTERFACE E ESTADO ---
-st.set_page_config(page_title="Tombamento Anti-Falha", layout="centered")
+    def footer(self):
+        self.set_y(-15)
+        self.set_fill_color(0, 154, 68); self.rect(0, 282, 210, 15, 'F')
+        self.set_font("Arial", 'I', 8); self.set_text_color(255, 255, 255)
+        self.cell(0, 10, tr(f"Gerado em {datetime.now().strftime('%d/%m/%Y')} - Página {self.page_no()}"), 0, 0, 'C')
+
+# --- 4. INTERFACE ---
+st.set_page_config(page_title="Tombamento Pro", layout="centered")
 
 if "df_patris" not in st.session_state: st.session_state.df_patris = pd.DataFrame()
 if "registros" not in st.session_state: st.session_state.registros = {}
@@ -70,42 +72,30 @@ st.markdown("""<style>
     .stButton>button { width: 100%; border-radius: 10px; font-weight: bold; }
 </style>""", unsafe_allow_html=True)
 
-# --- SIDEBAR: O COFRE DE SEGURANÇA ---
+# --- SIDEBAR: BACKUP ---
 with st.sidebar:
-    st.header("🔐 Segurança de Dados")
+    st.header("🔐 Segurança")
     if st.session_state.registros:
-        # Criar dados para backup (transforma imagens em bytes para salvar)
-        backup_data = {
-            "desc_lote": st.session_state.desc_lote,
-            "df_patris": st.session_state.df_patris.to_json(),
-            "registros_keys": list(st.session_state.registros.keys())
-        }
-        st.download_button("💾 Baixar Backup Atual", 
-                           data=json.dumps(backup_data), 
-                           file_name=f"backup_tombamento_{datetime.now().strftime('%H%M')}.json",
-                           help="Se a internet cair, você usa este arquivo para recuperar tudo.")
+        backup = {"desc": st.session_state.desc_lote, "reg": list(st.session_state.registros.keys())}
+        st.download_button("💾 Salvar Backup (Texto)", data=json.dumps(backup), file_name="backup.json")
     
     st.write("---")
-    upload_backup = st.file_uploader("📂 Restaurar de Backup", type="json")
-    if upload_backup:
-        back = json.loads(upload_backup.read())
-        st.session_state.desc_lote = back["desc_lote"]
-        st.session_state.df_patris = pd.read_json(io.StringIO(back["df_patris"]))
-        st.success("Backup carregado! (Nota: Fotos precisam ser tiradas novamente ou gerenciadas via DB para persistência total)")
+    if st.button("🔄 Reiniciar Tudo"):
+        st.session_state.clear(); st.rerun()
 
 st.title("🛡️ Tombamento Digital")
 
 # --- 5. FASE 1: CARGA ---
 if st.session_state.df_patris.empty:
     st.session_state.desc_lote = st.text_input("Descrição Única do Bem:")
-    t1, t2 = st.tabs(["📄 PDF", "📊 Lista"])
+    t1, t2 = st.tabs(["📄 Extrair PDF", "📊 Colar Lista"])
     with t1:
-        file = st.file_uploader("PDF", type="pdf")
+        file = st.file_uploader("Upload PDF", type="pdf")
         if file and client and st.button("Analisar PDF"):
             st.session_state.df_patris = extrair_patrimonios_ia(file); st.rerun()
     with t2:
-        txt = st.text_area("Números:")
-        if st.button("Carregar"):
+        txt = st.text_area("Cole os números (um por linha):")
+        if st.button("Carregar Lista"):
             st.session_state.df_patris = pd.DataFrame({"PATRIMONIO": [l.strip() for l in txt.split('\n') if l.strip()]}); st.rerun()
 
 # --- 6. FASE 2: OPERAÇÃO ---
@@ -115,41 +105,44 @@ elif not st.session_state.get("finalizado"):
     
     if busca:
         if busca in st.session_state.df_patris["PATRIMONIO"].astype(str).values:
-            st.success(f"✅ Patrimônio: {busca}")
-            serial = st.text_input("Série:", key=f"s_{busca}")
+            st.success(f"✅ Identificado: {busca}")
+            serial = st.text_input("Número de Série:", key=f"s_{busca}")
             
             c1, c2 = st.columns(2)
+            # FOTO 1
             with c1:
                 if f"f1_{busca}" not in st.session_state:
                     if st.button("📷 Foto Plaqueta"): st.session_state.camera_ativa = f"f1_{busca}"; st.rerun()
                     if st.session_state.camera_ativa == f"f1_{busca}":
-                        f = st.camera_input("Traseira", key=f"c1_{busca}", facing_mode="environment")
+                        # REMOVIDO facing_mode para evitar erro 503/TypeError
+                        f = st.camera_input("Focar na Etiqueta", key=f"cam1_{busca}")
                         if f: st.session_state[f"f1_{busca}"] = f; st.session_state.camera_ativa = None; st.rerun()
                 else:
                     st.image(st.session_state[f"f1_{busca}"], width=150)
-                    if st.button("🗑️ Apagar", key=f"d1_{busca}"): del st.session_state[f"f1_{busca}"]; st.rerun()
-
+                    if st.button("🗑️ Apagar Foto", key=f"del_f1_{busca}"): del st.session_state[f"f1_{busca}"]; st.rerun()
+            # FOTO 2
             with c2:
                 if f"f2_{busca}" not in st.session_state:
-                    if st.button("📷 Foto Bem"): st.session_state.camera_ativa = f"f2_{busca}"; st.rerun()
+                    if st.button("📷 Foto do Bem"): st.session_state.camera_ativa = f"f2_{busca}"; st.rerun()
                     if st.session_state.camera_ativa == f"f2_{busca}":
-                        f = st.camera_input("Traseira ", key=f"c2_{busca}", facing_mode="environment")
+                        # REMOVIDO facing_mode para evitar erro 503/TypeError
+                        f = st.camera_input("Focar no Bem", key=f"cam2_{busca}")
                         if f: st.session_state[f"f2_{busca}"] = f; st.session_state.camera_ativa = None; st.rerun()
                 else:
                     st.image(st.session_state[f"f2_{busca}"], width=150)
-                    if st.button("🗑️ Apagar ", key=f"d2_{busca}"): del st.session_state[f"f2_{busca}"]; st.rerun()
+                    if st.button("🗑️ Apagar Foto ", key=f"del_f2_{busca}"): del st.session_state[f"f2_{busca}"]; st.rerun()
 
-            if st.button("💾 SALVAR", key=f"sv_{busca}"):
+            if st.button("💾 SALVAR REGISTRO", key=f"sv_{busca}"):
                 if f"f2_{busca}" in st.session_state:
                     st.session_state.registros[busca] = {"serial": serial, "img1": st.session_state[f"f1_{busca}"], "img2": st.session_state[f"f2_{busca}"]}
                     st.rerun()
-        else: st.error("Não encontrado.")
+        else: st.error("Placa não encontrada.")
 
     if st.session_state.registros:
-        st.write("### 📋 Lançados")
+        st.write("### 📋 Itens Lançados")
         for p in list(st.session_state.registros.keys()):
             col_inf, col_ex = st.columns([0.8, 0.2])
-            col_inf.write(f"Patr: {p} | Série: {st.session_state.registros[p]['serial']}")
+            col_inf.write(f"**P:** {p} | **S:** {st.session_state.registros[p]['serial']}")
             if col_ex.button("🗑️", key=f"del_item_{p}"): del st.session_state.registros[p]; st.rerun()
 
     st.divider()
@@ -159,7 +152,7 @@ elif not st.session_state.get("finalizado"):
 elif st.session_state.get("finalizado"):
     servidor = st.text_input("Responsável:")
     setor = st.text_input("Setor:")
-    if st.button("🚀 BAIXAR TERMO"):
+    if st.button("🚀 BAIXAR TERMO OFICIAL"):
         try:
             pdf = PDFTombamento(); pdf.alias_nb_pages(); pdf.set_margins(15, 15, 15)
             lista = list(st.session_state.registros.items())
@@ -180,11 +173,11 @@ elif st.session_state.get("finalizado"):
                 
                 pdf.set_y(pdf.get_y() + 68); pdf.set_font("Arial", 'I', 9); pdf.set_text_color(0)
                 pdf.multi_cell(0, 8, tr("ATESTO O RECEBIMENTO DEFINITIVO do(s) bem(ns) acima descrito(s) por conformidade física nesta data."), align='C')
+                
                 if i == len(lista) - 1:
                     if pdf.get_y() > 240: pdf.add_page()
                     pdf.ln(10); pdf.set_font("Arial", 'B', 11); pdf.cell(0, 6, tr(servidor.upper()), 0, 1, 'C')
                     pdf.set_font("Arial", '', 9); pdf.cell(0, 5, tr("Responsável pelo Tombamento"), 0, 1, 'C')
-            st.download_button("Salvar PDF", data=pdf.output(dest='S').encode('latin-1'), file_name="Termo.pdf")
+            
+            st.download_button("Clique para Salvar PDF", data=pdf.output(dest='S').encode('latin-1'), file_name="Termo.pdf")
         except Exception as e: st.error(f"Erro: {e}")
-
-if st.sidebar.button("Reiniciar"): st.session_state.clear(); st.rerun()
