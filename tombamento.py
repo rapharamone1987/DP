@@ -21,7 +21,7 @@ client = Groq(api_key=CHAVE_API) if CHAVE_API else None
 
 # --- 2. FUNÇÕES DE APOIO ---
 def tr(texto):
-    """Corrige acentuação para PDF Latin-1"""
+    """Trata acentuação para PDF Latin-1"""
     if not texto: return ""
     return str(texto).encode('latin-1', 'replace').decode('latin-1')
 
@@ -37,7 +37,6 @@ def extrair_patrimonios_ia(pdf_file):
     return pd.DataFrame({"PATRIMONIO": json.loads(json_str)})
 
 def processar_imagem_pdf(st_image):
-    """Converte UploadedFile do Streamlit em arquivo temporário real"""
     if st_image is None: return None
     temp_dir = tempfile.gettempdir()
     temp_path = os.path.join(temp_dir, f"img_{time.time()}.jpg")
@@ -84,16 +83,16 @@ st.title("🛡️ Sistema de Tombamento")
 
 # --- 5. FASE 1: CARGA ---
 if st.session_state.df_patris.empty:
-    st.session_state.desc_lote = st.text_input("Descrição do Bem (Única para o lote):", placeholder="Ex: Ar Condicionado Split 12.000 BTUs")
+    st.session_state.desc_lote = st.text_input("Descrição do Bem (Única para o lote):")
     
     t1, t2 = st.tabs(["📄 Extrair PDF", "📊 Colar Lista"])
     with t1:
-        file = st.file_uploader("Suba o PDF com a lista de números", type="pdf")
+        file = st.file_uploader("Suba o PDF", type="pdf")
         if file and client and st.button("Analisar PDF"):
             st.session_state.df_patris = extrair_patrimonios_ia(file)
             st.rerun()
     with t2:
-        txt = st.text_area("Cole os números de patrimônio (um por linha):")
+        txt = st.text_area("Cole os números (um por linha):")
         if st.button("Carregar Lista Manual"):
             st.session_state.df_patris = pd.DataFrame({"PATRIMONIO": [l.strip() for l in txt.split('\n') if l.strip()]})
             st.rerun()
@@ -129,16 +128,14 @@ elif not st.session_state.get("finalizado"):
             if st.button("💾 SALVAR REGISTRO", key=f"sv_{busca}"):
                 if f"f2_{busca}" in st.session_state:
                     st.session_state.registros[busca] = {"placa": busca, "serial": serial, "img1": st.session_state[f"f1_{busca}"], "img2": st.session_state[f"f2_{busca}"]}
-                    st.toast("Salvo com sucesso!", icon="✅")
-                    time.sleep(1)
                     st.rerun()
-        else: st.error("Placa não encontrada na lista.")
+        else: st.error("Placa não encontrada.")
 
     st.divider()
-    st.write(f"**Registrados:** {len(st.session_state.registros)} de {len(st.session_state.df_patris)}")
-    if st.button("🏁 Finalizar e Gerar PDF"): st.session_state.finalizado = True; st.rerun()
+    if st.button("🏁 Finalizar e Gerar PDF"):
+        st.session_state.finalizado = True; st.rerun()
 
-# --- 7. FASE FINAL: PDF (COM TEXTO SOBRE AS FOTOS) ---
+# --- 7. FASE FINAL: PDF (ASSINATURA NA MESMA PÁGINA) ---
 elif st.session_state.get("finalizado"):
     servidor = st.text_input("Nome do Servidor Responsável:")
     setor = st.text_input("Setor de Destino:")
@@ -146,8 +143,9 @@ elif st.session_state.get("finalizado"):
     if st.button("📥 BAIXAR RELATÓRIO PDF"):
         try:
             pdf = PDFTombamento(); pdf.alias_nb_pages(); pdf.set_margins(15, 15, 15)
+            lista_registros = list(st.session_state.registros.items())
             
-            for placa, dados in st.session_state.registros.items():
+            for i, (placa, dados) in enumerate(lista_registros):
                 pdf.add_page()
                 
                 # Identificação
@@ -161,35 +159,37 @@ elif st.session_state.get("finalizado"):
                 pdf.cell(180, 10, tr(f" SETOR DE DESTINO: {setor.upper()}"), border=1, ln=True)
                 pdf.ln(5)
 
-                # --- TEXTO EM CIMA DAS FOTOS ---
+                # Legendas das Fotos
                 pdf.set_font("Arial", 'B', 9); pdf.set_text_color(0, 154, 68)
                 pdf.cell(90, 8, tr("EVIDÊNCIA DA PLAQUETA"), 0, 0, 'C')
                 pdf.cell(90, 8, tr("VISTA GERAL DO BEM"), 0, 1, 'C')
                 
-                # Inserção das Imagens
+                # Fotos
                 p1 = processar_imagem_pdf(dados["img1"])
                 p2 = processar_imagem_pdf(dados["img2"])
-                
                 y_fotos = pdf.get_y()
-                if p1: 
-                    pdf.image(p1, x=15, y=y_fotos, w=85, h=65)
-                    os.unlink(p1)
-                if p2: 
-                    pdf.image(p2, x=110, y=y_fotos, w=85, h=65)
-                    os.unlink(p2)
+                if p1: pdf.image(p1, x=15, y=y_fotos, w=85, h=65); os.unlink(p1)
+                if p2: pdf.image(p2, x=110, y=y_fotos, w=85, h=65); os.unlink(p2)
                 
-                # Rodapé de Atesto do Item
-                pdf.set_y(y_fotos + 70)
+                pdf.set_y(y_fotos + 68)
                 pdf.set_font("Arial", 'I', 9); pdf.set_text_color(0)
-                pdf.multi_cell(0, 8, tr("\nAtesto que o bem acima descrito foi devidamente identificado e etiquetado conforme as normas de gestão patrimonial."), align='C')
+                pdf.multi_cell(0, 8, tr("Atesto que o bem acima descrito foi devidamente identificado e etiquetado fisicamente nesta data."), align='C')
 
-            # Página Final de Assinatura
-            pdf.add_page(); pdf.set_y(120)
-            pdf.line(60, pdf.get_y(), 150, pdf.get_y())
-            pdf.set_font("Arial", 'B', 12); pdf.cell(0, 10, tr(servidor.upper()), 0, 1, 'C')
-            pdf.set_font("Arial", '', 10); pdf.cell(0, 10, tr("Responsável pelo Tombamento"), 0, 1, 'C')
+                # --- LÓGICA DA ASSINATURA NA MESMA PÁGINA (SÓ PARA O ÚLTIMO ITEM) ---
+                if i == len(lista_registros) - 1:
+                    # Verifica se há espaço (assinatura precisa de uns 40mm)
+                    if pdf.get_y() > 230:
+                        pdf.add_page() # Se estiver no fim da página, cria nova para não cortar a assinatura
+                    
+                    pdf.ln(15)
+                    pdf.set_draw_color(0)
+                    pdf.line(60, pdf.get_y(), 150, pdf.get_y())
+                    pdf.set_font("Arial", 'B', 12)
+                    pdf.cell(0, 10, tr(servidor.upper()), 0, 1, 'C')
+                    pdf.set_font("Arial", '', 10)
+                    pdf.cell(0, 8, tr("Responsável pelo Tombamento"), 0, 1, 'C')
 
-            st.download_button("Clique aqui para Salvar", data=pdf.output(dest='S').encode('latin-1'), file_name="Relatorio_Tombamento.pdf", mime="application/pdf")
+            st.download_button("Clique para Salvar", data=pdf.output(dest='S').encode('latin-1'), file_name="Relatorio_Tombamento.pdf", mime="application/pdf")
         except Exception as e: st.error(f"Erro no PDF: {e}")
 
 if st.sidebar.button("Limpar Tudo"): st.session_state.clear(); st.rerun()
