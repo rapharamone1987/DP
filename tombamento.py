@@ -59,7 +59,7 @@ class PDFTombamento(FPDF):
         if self.page_no() == 1:
             self.set_y(10)
             self.set_font("Arial", 'B', 14)
-            self.set_text_color(99, 157, 49)
+            self.set_text_color(0, 0, 0)
             self.cell(0, 10, tr("RELATÓRIO DE TOMBAMENTO PATRIMONIAL"), 0, 1, 'C')
             self.ln(2)
 
