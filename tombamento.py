@@ -43,7 +43,7 @@ def processar_imagem_pdf(st_image):
     img.save(temp_path, "JPEG", quality=70)
     return temp_path
 
-# --- 3. CLASSE PDF COM FAIXA TRICOLOR E LAYOUT OTIMIZADO ---
+# --- 3. CLASSE PDF (ESTILO RS COM TÍTULO PRETO) ---
 class PDFTombamento(FPDF):
     def desenhar_faixa_tricolor(self, y_pos):
         h_faixa = 6
@@ -59,7 +59,7 @@ class PDFTombamento(FPDF):
         if self.page_no() == 1:
             self.set_y(10)
             self.set_font("Arial", 'B', 14)
-            self.set_text_color(0, 0, 0)
+            self.set_text_color(0, 0, 0) # COR ALTERADA PARA PRETO
             self.cell(0, 10, tr("RELATÓRIO DE TOMBAMENTO PATRIMONIAL"), 0, 1, 'C')
             self.ln(2)
 
@@ -67,8 +67,7 @@ class PDFTombamento(FPDF):
         self.set_y(-10)
         self.desenhar_faixa_tricolor(291)
         self.set_y(-18)
-        self.set_font("Arial", 'I', 7)
-        self.set_text_color(100)
+        self.set_font("Arial", 'I', 7); self.set_text_color(100)
         self.cell(0, 10, tr(f"Página {self.page_no()}"), 0, 0, 'C')
 
 # --- 4. INTERFACE ---
@@ -88,7 +87,7 @@ st.title("🛡️ Tombamento Digital")
 
 # --- 5. FASE 1: CARGA ---
 if st.session_state.df_patris.empty:
-    st.session_state.desc_lote = st.text_area("Descrição do Bem (Única para o lote):", height=100)
+    st.session_state.desc_lote = st.text_area("Descrição do Bem (Única para o lote):")
     t1, t2 = st.tabs(["📄 Extrair PDF", "📊 Colar Lista"])
     with t1:
         file = st.file_uploader("Upload PDF", type="pdf")
@@ -102,41 +101,63 @@ if st.session_state.df_patris.empty:
 # --- 6. FASE 2: OPERAÇÃO ---
 elif not st.session_state.get("finalizado"):
     st.markdown(f'<div class="barra-verde">{st.session_state.desc_lote.upper()}</div>', unsafe_allow_html=True)
-    busca = st.text_input("SCANEAR PLAQUETA:", key="input_scan").strip()
+    busca = st.text_input("SCANEAR OU DIGITAR NÚMERO:", key="input_scan").strip()
     
     if busca:
         if busca in st.session_state.df_patris["PATRIMONIO"].astype(str).values:
             st.success(f"✅ Identificado: {busca}")
             serial = st.text_input("Número de Série:", key=f"s_{busca}")
+            
+            # --- SEÇÃO DE FOTOS COM OPÇÃO DE UPLOAD ---
             c1, c2 = st.columns(2)
+            
+            # FOTO 1: PLAQUETA
             with c1:
+                st.write("**Evidência da Plaqueta**")
                 if f"f1_{busca}" not in st.session_state:
-                    if st.button("📷 Foto Plaqueta"): st.session_state.camera_ativa = f"f1_{busca}"; st.rerun()
-                    if st.session_state.camera_ativa == f"f1_{busca}":
-                        f = st.camera_input("Foque na Plaqueta", key=f"c1_{busca}")
-                        if f: st.session_state[f"f1_{busca}"] = f; st.session_state.camera_ativa = None; st.rerun()
+                    t_f1_cam, t_f1_arq = st.tabs(["📷 Câmera", "📁 Arquivo"])
+                    with t_f1_cam:
+                        if st.button("Ligar Câmera", key=f"btn_c1_{busca}"): 
+                            st.session_state.camera_ativa = f"f1_{busca}"; st.rerun()
+                        if st.session_state.camera_ativa == f"f1_{busca}":
+                            f = st.camera_input("Foto", key=f"cam1_{busca}")
+                            if f: st.session_state[f"f1_{busca}"] = f; st.session_state.camera_ativa = None; st.rerun()
+                    with t_f1_arq:
+                        up_f1 = st.file_uploader("Escolher foto", type=['jpg','jpeg','png'], key=f"up1_{busca}")
+                        if up_f1: st.session_state[f"f1_{busca}"] = up_f1; st.rerun()
                 else:
                     st.image(st.session_state[f"f1_{busca}"], width=150)
-                    if st.button("🗑️ Apagar", key=f"d1_{busca}"): del st.session_state[f"f1_{busca}"]; st.rerun()
+                    if st.button("Apagar Foto 1", key=f"del1_{busca}"):
+                        del st.session_state[f"f1_{busca}"]; st.rerun()
+
+            # FOTO 2: BEM GERAL
             with c2:
+                st.write("**Vista Geral do Bem**")
                 if f"f2_{busca}" not in st.session_state:
-                    if st.button("📷 Foto do Bem"): st.session_state.camera_ativa = f"f2_{busca}"; st.rerun()
-                    if st.session_state.camera_ativa == f"f2_{busca}":
-                        f = st.camera_input("Foque no Bem", key=f"c2_{busca}")
-                        if f: st.session_state[f"f2_{busca}"] = f; st.session_state.camera_ativa = None; st.rerun()
+                    t_f2_cam, t_f2_arq = st.tabs(["📷 Câmera ", "📁 Arquivo "])
+                    with t_f2_cam:
+                        if st.button("Ligar Câmera ", key=f"btn_c2_{busca}"): 
+                            st.session_state.camera_ativa = f"f2_{busca}"; st.rerun()
+                        if st.session_state.camera_ativa == f"f2_{busca}":
+                            f = st.camera_input("Foto ", key=f"cam2_{busca}")
+                            if f: st.session_state[f"f2_{busca}"] = f; st.session_state.camera_ativa = None; st.rerun()
+                    with t_f2_arq:
+                        up_f2 = st.file_uploader("Escolher foto ", type=['jpg','jpeg','png'], key=f"up2_{busca}")
+                        if up_f2: st.session_state[f"f2_{busca}"] = up_f2; st.rerun()
                 else:
                     st.image(st.session_state[f"f2_{busca}"], width=150)
-                    if st.button("🗑️ Apagar ", key=f"d2_{busca}"): del st.session_state[f"f2_{busca}"]; st.rerun()
+                    if st.button("Apagar Foto 2", key=f"del2_{busca}"):
+                        del st.session_state[f"f2_{busca}"]; st.rerun()
 
             if st.button("💾 SALVAR REGISTRO", key=f"sv_{busca}"):
                 if f"f2_{busca}" in st.session_state:
                     st.session_state.registros[busca] = {"serial": serial, "img1": st.session_state[f"f1_{busca}"], "img2": st.session_state[f"f2_{busca}"]}
                     st.rerun()
-        else: st.error("Não encontrado.")
+        else: st.error("Patrimônio não listado.")
 
     if st.session_state.registros:
         st.write("---")
-        st.write(f"### 📋 Lançados ({len(st.session_state.registros)} de {len(st.session_state.df_patris)})")
+        st.write(f"### 📋 Lançados ({len(st.session_state.registros)})")
         for p in list(st.session_state.registros.keys()):
             col_inf, col_ex = st.columns([0.8, 0.2])
             col_inf.write(f"**P:** {p} | **S:** {st.session_state.registros[p]['serial']}")
@@ -153,47 +174,35 @@ elif st.session_state.get("finalizado"):
         try:
             pdf = PDFTombamento(); pdf.alias_nb_pages(); pdf.set_margins(15, 10, 15)
             lista = list(st.session_state.registros.items())
-            
             for i, (placa, dados) in enumerate(lista):
-                # Se for o primeiro item ou um item ímpar (0, 2, 4...), adiciona página
-                if i % 2 == 0:
-                    pdf.add_page()
+                if i % 2 == 0: pdf.add_page()
                 else:
-                    pdf.ln(10) # Espaçamento entre o item de cima e o de baixo
-                    pdf.set_draw_color(200); pdf.line(15, pdf.get_y(), 195, pdf.get_y()); pdf.ln(5)
+                    pdf.ln(5); pdf.set_draw_color(200); pdf.line(15, pdf.get_y(), 195, pdf.get_y()); pdf.ln(5)
 
-                # Cabeçalho do Item (Multi-célula para não estourar)
                 pdf.set_fill_color(99, 157, 49); pdf.set_text_color(255); pdf.set_font("Arial", 'B', 10)
                 pdf.multi_cell(0, 8, tr(f" BEM: {st.session_state.desc_lote.upper()}"), 0, 'L', fill=True)
-                
                 pdf.set_text_color(0); pdf.set_font("Arial", 'B', 9); pdf.set_fill_color(240)
                 pdf.cell(90, 8, tr(f" PATRIMÔNIO: {placa}"), border=1, fill=True)
                 pdf.cell(90, 8, tr(f" SÉRIE: {dados['serial']}"), border=1, ln=True, fill=True)
                 pdf.cell(0, 8, tr(f" SETOR: {setor.upper()}"), border=1, ln=True)
                 
                 pdf.ln(2); pdf.set_font("Arial", 'B', 8); pdf.set_text_color(99, 157, 49)
-                pdf.cell(90, 6, tr("EVIDÊNCIA DA PLAQUETA"), 0, 0, 'C')
-                pdf.cell(90, 6, tr("VISTA GERAL DO BEM"), 0, 1, 'C')
+                pdf.cell(90, 6, tr("EVIDÊNCIA DA PLAQUETA"), 0, 0, 'C'); pdf.cell(90, 6, tr("VISTA GERAL DO BEM"), 0, 1, 'C')
                 
-                # Fotos (tamanho reduzido para caber 2 blocos)
                 p1 = processar_imagem_pdf(dados["img1"]); p2 = processar_imagem_pdf(dados["img2"])
                 y_fotos = pdf.get_y()
                 if p1: pdf.image(p1, x=25, y=y_fotos, w=70, h=52); os.unlink(p1)
                 if p2: pdf.image(p2, x=115, y=y_fotos, w=70, h=52); os.unlink(p2)
                 
-                pdf.set_y(y_fotos + 54)
-                pdf.set_font("Arial", 'I', 8); pdf.set_text_color(0)
+                pdf.set_y(y_fotos + 54); pdf.set_font("Arial", 'I', 8); pdf.set_text_color(0)
                 pdf.multi_cell(0, 5, tr("ATESTO O RECEBIMENTO DEFINITIVO do bem acima por conformidade física."), 0, 'C')
 
-                # Assinatura (Apenas no último item da lista)
                 if i == len(lista) - 1:
-                    pdf.ln(5)
-                    pdf.set_font("Arial", 'B', 10)
+                    pdf.ln(5); pdf.set_font("Arial", 'B', 10)
                     pdf.cell(0, 5, tr(servidor.upper()), 0, 1, 'C')
-                    pdf.set_font("Arial", '', 8)
-                    pdf.cell(0, 4, tr("Responsável pelo Tombamento"), 0, 1, 'C')
+                    pdf.set_font("Arial", '', 8); pdf.cell(0, 4, tr("Responsável pelo Tombamento"), 0, 1, 'C')
 
-            st.download_button("📥 Salvar Relatório", data=pdf.output(dest='S').encode('latin-1'), file_name="Termo.pdf")
-        except Exception as e: st.error(f"Erro no PDF: {e}")
+            st.download_button("📥 Salvar PDF", data=pdf.output(dest='S').encode('latin-1'), file_name="Relatorio_Tombamento.pdf")
+        except Exception as e: st.error(f"Erro: {e}")
 
-if st.sidebar.button("Limpar Tudo"): st.session_state.clear(); st.rerun()
+if st.sidebar.button("Novo Trabalho"): st.session_state.clear(); st.rerun()
