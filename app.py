@@ -205,4 +205,12 @@ elif st.session_state.items_lista:
 
                 if obs:
                     pdf.ln(5); pdf.set_font("Arial", 'B', 9); pdf.cell(0, 6, tr("OBSERVAÇÕES / JUSTIFICATIVAS:"), 0, 1)
-                    pdf.set_font("Arial", '
+                    pdf.set_font("Arial", '', 9); pdf.multi_cell(0, 5, tr(obs), 1)
+
+                pdf.ln(10); pdf.set_font("Arial", 'B', 11); pdf.cell(0, 6, tr(servidor.upper()), 0, 1, 'C')
+                pdf.set_font("Arial", '', 9); pdf.cell(0, 5, tr("Responsável pelo Recebimento"), 0, 1, 'C')
+
+                st.download_button("📥 Baixar PDF", data=pdf.output(dest='S').encode('latin-1'), file_name="Relatorio.pdf")
+            except Exception as e: st.error(f"Erro: {e}")
+
+if st.sidebar.button("Nova Inspeção"): st.session_state.clear(); st.rerun()
