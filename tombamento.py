@@ -167,8 +167,8 @@ elif not st.session_state.get("finalizado"):
 elif st.session_state.get("finalizado"):
     c1, c2 = st.columns(2)
     servidor = c1.text_input("Responsável:")
-    setor = c2.text_input("Setor:")
-    obs_finais = st.text_area("Observações Gerais (Aparecerão no final do relatório):")
+    unidade_destino = c2.text_input("Unidade de Destino:") # ALTERADO DE SETOR PARA UNIDADE DE DESTINO
+    obs_finais = st.text_area("Observações Gerais:")
 
     if st.button("🚀 BAIXAR RELATÓRIO"):
         try:
@@ -180,14 +180,16 @@ elif st.session_state.get("finalizado"):
                 else:
                     pdf.ln(5); pdf.set_draw_color(200); pdf.line(15, pdf.get_y(), 195, pdf.get_y()); pdf.ln(5)
 
-                # Cabeçalho do Item com Borda Ativada
+                # Cabeçalho do Item com Borda
                 pdf.set_fill_color(99, 157, 49); pdf.set_text_color(255); pdf.set_font("Arial", 'B', 10)
-                pdf.multi_cell(0, 8, tr(f" BEM: {st.session_state.desc_lote.upper()}"), 1, 'L', fill=True) # BORDA 1
+                pdf.multi_cell(0, 8, tr(f" BEM: {st.session_state.desc_lote.upper()}"), 1, 'L', fill=True)
                 
                 pdf.set_text_color(0); pdf.set_font("Arial", 'B', 9); pdf.set_fill_color(240)
                 pdf.cell(90, 8, tr(f" PATRIMÔNIO: {placa}"), border=1, fill=True)
                 pdf.cell(90, 8, tr(f" SÉRIE: {dados['serial']}"), border=1, ln=True, fill=True)
-                pdf.cell(0, 8, tr(f" SETOR: {setor.upper()}"), border=1, ln=True)
+                
+                # ALTERADO DE SETOR PARA UNIDADE DE DESTINO NO PDF
+                pdf.cell(0, 8, tr(f" UNIDADE DE DESTINO: {unidade_destino.upper()}"), border=1, ln=True)
                 
                 pdf.ln(2); pdf.set_font("Arial", 'B', 8); pdf.set_text_color(99, 157, 49)
                 pdf.cell(90, 6, tr("EVIDÊNCIA DA PLAQUETA"), 0, 0, 'C'); pdf.cell(90, 6, tr("VISTA GERAL DO BEM"), 0, 1, 'C')
@@ -200,16 +202,11 @@ elif st.session_state.get("finalizado"):
                 pdf.set_y(y_fotos + 54); pdf.set_font("Arial", 'I', 8); pdf.set_text_color(0)
                 pdf.multi_cell(0, 5, tr("ATESTO O RECEBIMENTO DEFINITIVO do bem acima por estar em conformidade física."), 0, 'C')
 
-            # --- SEÇÃO DE OBSERVAÇÕES NO FINAL ---
             if obs_finais:
                 if pdf.get_y() > 220: pdf.add_page()
-                pdf.ln(10)
-                pdf.set_font("Arial", 'B', 10); pdf.set_text_color(0)
-                pdf.cell(0, 8, tr("OBSERVAÇÕES:"), 0, 1, 'L')
-                pdf.set_font("Arial", '', 9)
-                pdf.multi_cell(0, 6, tr(obs_finais), 1, 'L')
+                pdf.ln(10); pdf.set_font("Arial", 'B', 10); pdf.cell(0, 8, tr("OBSERVAÇÕES:"), 0, 1, 'L')
+                pdf.set_font("Arial", '', 9); pdf.multi_cell(0, 6, tr(obs_finais), 1, 'L')
 
-            # Assinatura compacta
             if pdf.get_y() > 240: pdf.add_page()
             pdf.ln(10); pdf.set_font("Arial", 'B', 11)
             pdf.cell(0, 6, tr(servidor.upper()), 0, 1, 'C')
