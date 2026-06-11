@@ -92,7 +92,7 @@ class PDFChecklist(FPDF):
         self.set_y(10)
         if self.page_no() == 1:
             self.set_font("Arial", 'B', 14); self.set_text_color(0)
-            titulo = "RELATÓRIO DE RECEBIMENTO TÉCNICO" if self.status_geral else "RELATÓRIO DE DESCONFORMIDADE TÉCNICA"
+            titulo = "RELATÓRIO DE RECEBIMENTO TÉCNICO" if self.status_geral else "SECRETARIA DA AGRICULTURA, PECUÁRIA, PRODUÇÃO SUSTENTÁVEL E IRRIGAÇÃO - RELATÓRIO DE DESCONFORMIDADE TÉCNICA"
             self.cell(0, 10, tr(titulo), 0, 1, 'C')
 
     def footer(self):
@@ -101,8 +101,8 @@ class PDFChecklist(FPDF):
         self.cell(0, 10, tr(f"Página {self.page_no()}"), 0, 0, 'C')
 
 # --- 5. INTERFACE ---
-st.set_page_config(page_title="Recebimento RS", layout="centered")
-st.title("📋 Recebimento Técnico RS")
+st.set_page_config(page_title="Recebimento de Bens e Materiais", layout="centered")
+st.title("📋 Checklist Recebimento Técnico RS")
 
 if not st.session_state.items_lista:
     st.session_state.natureza_ia = st.radio("Natureza do Item:", ["Consumo", "Permanente"], horizontal=True)
@@ -185,7 +185,7 @@ elif st.session_state.items_lista:
                 pdf.add_page()
                 # Imprime cabeçalho inicial
                 pdf.set_fill_color(99, 157, 49); pdf.set_text_color(255); pdf.set_font("Arial", 'B', 10)
-                pdf.multi_cell(0, 8, tr(f" BEM: {cab['objeto'].upper()}"), 1, 'L', fill=True)
+                pdf.multi_cell(0, 8, tr(f" ITEM: {cab['objeto'].upper()}"), 1, 'L', fill=True)
                 pdf.set_text_color(0); pdf.set_font("Arial", '', 9); pdf.set_fill_color(245)
                 for label, val in campos_print:
                     pdf.set_font("Arial", 'B', 9); pdf.write(7, tr(f" {label}: "))
