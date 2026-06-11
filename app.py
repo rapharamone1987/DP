@@ -21,9 +21,6 @@ def init_state():
     if "cab" not in st.session_state: st.session_state.cab = {"fornecedor":"","edital":"","objeto":""}
     if "ok" not in st.session_state: st.session_state.ok = {}
     if "obs" not in st.session_state: st.session_state.obs = {}
-    if "img" not in st.session_state: st.session_state.img = {}
-    if "cam" not in st.session_state: st.session_state.cam = None
-    if "tipo" not in st.session_state: st.session_state.tipo = "Consumo"
 init_state()
 
 # =========================
@@ -36,7 +33,8 @@ def limpar_json(txt):
     try:
         m = re.search(r"\{.*\}", txt, re.DOTALL)
         return json.loads(m.group(0) if m else txt)
-    except: return None
+    except:
+        return None
 
 def extrair(pdf, tipo):
     texto = ""
@@ -44,7 +42,8 @@ def extrair(pdf, tipo):
         for pg in p.pages[:4]:
             texto += (pg.extract_text() or "") + "\n"
 
-    if not client or not texto.strip(): return None
+    if not client or not texto.strip():
+        return None
 
     prompt = f"""
 Analise para recebimento de {tipo}. Extraia apenas características físicas verificáveis.
@@ -65,8 +64,7 @@ Responda SOMENTE JSON:
 # =========================
 # PDF
 # =========================
-def tr(t):
-    return str(t).encode("latin-1","replace").decode("latin-1")
+def tr(t): return str(t).encode("latin-1","replace").decode("latin-1")
 
 class PDF(FPDF):
     def __init__(self, ok, data):
@@ -82,6 +80,7 @@ class PDF(FPDF):
     def header(self):
         self.faixa(0)
         self.set_y(10)
+
         if self.page_no()==1:
             self.set_font("Arial","",11)
             self.cell(0,6,tr("SECRETARIA DA AGRICULTURA, PECUÁRIA, PRODUÇÃO SUSTENTÁVEL E IRRIGAÇÃO"),0,1,"C")
@@ -113,11 +112,11 @@ st.title("📋 Checklist Recebimento Técnico")
 
 if not st.session_state.items:
 
-    st.session_state.tipo = st.radio("Natureza",["Consumo","Permanente"],horizontal=True)
+    tipo = st.radio("Natureza",["Consumo","Permanente"],horizontal=True)
     file = st.file_uploader("PDF",type=["pdf"])
 
     if file and st.button("Analisar"):
-        r = extrair(file, st.session_state.tipo)
+        r = extrair(file, tipo)
         if r:
             st.session_state.cab = r
             st.session_state.items = [{"id":time.time()+i,"txt":t} for i,t in enumerate(r.get("checklist",[]))]
@@ -129,6 +128,9 @@ if not st.session_state.items:
         st.session_state.items = [{"id":time.time(),"txt":"Novo requisito"}]
         st.rerun()
 
+# =========================
+# FORMULÁRIO
+# =========================
 else:
     c1,c2 = st.columns(2)
 
@@ -142,32 +144,46 @@ else:
 
     todos_ok = True
 
-    for i,it in enumerate(st.session_state.items):
+    # ✅ LOOP CORRIGIDO
+    for i, it in enumerate(st.session_state.items):
         uid = it["id"]
-        col1,col2,col3 = st.columns([1,6,1])
 
-        st.session_state.ok[uid] = col1.checkbox("OK",value=st.session_state.ok.get(uid,False),key=f"ok{uid}")
-        if not st.session_state.ok[uid]: todos_ok=False
+        col1, col2, col3 = st.columns([1,6,1])
 
-        it["txt"] = col2.text_input("",it["txt"],key=f"txt{uid}")
-        if col3.button("X",key=f"del{uid}"):
+        st.session_state.ok[uid] = col1.checkbox(
+            "OK",
+            value=st.session_state.ok.get(uid, False),
+            key=f"ok{uid}"
+        )
+
+        if not st.session_state.ok.get(uid, False):
+            todos_ok = False
+
+        it["txt"] = col2.text_input("", it["txt"], key=f"txt{uid}")
+
+        if col3.button("X", key=f"del{uid}"):
             st.session_state.items.pop(i)
+            st.session_state.ok.pop(uid, None)
+            st.session_state.obs.pop(uid, None)
             st.rerun()
 
         st.session_state.obs[uid] = st.text_area(
             "Observação",
-            st.session_state.obs.get(uid,""),
+            st.session_state.obs.get(uid, ""),
             key=f"obs{uid}",
             height=70
         )
 
     if st.button("Adicionar"):
-        st.session_state.items.append({"id":time.time(),"txt":"Novo"})
+        st.session_state.items.append({"id":time.time(),"txt":"Novo requisito"})
         st.rerun()
 
     obs = st.text_area("Observações gerais")
     servidor = st.text_input("Servidor")
 
+    # =========================
+    # PDF
+    # =========================
     if st.button("Gerar PDF"):
         data = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%d/%m/%Y %H:%M")
 
@@ -187,7 +203,6 @@ else:
         campos = [
             ("FORNECEDOR",cab["fornecedor"]),
             ("EDITAL",cab["edital"]),
-            ("TIPO",st.session_state.tipo),
             ("NF",nf),
             ("QTD",qtd),
             ("UNIDADE",unidade),
@@ -206,13 +221,16 @@ else:
         pdf.set_font("Arial","B",9)
         pdf.set_fill_color(220,220,220)
         pdf.cell(0,6,"REQUISITOS",1,1,"C",True)
+
         pdf.ln(3)
 
-        ok_count=0; nok=0
+        ok_count=0
+        nok=0
 
         for i,it in enumerate(st.session_state.items,1):
             uid=it["id"]
             status=st.session_state.ok.get(uid,False)
+
             if status: ok_count+=1
             else: nok+=1
 
@@ -241,8 +259,11 @@ else:
 
         pdf.ln(3)
 
-        pdf.set_fill_color(235,245,235 if todos_ok else 230)
+        cor = (235,245,235) if todos_ok else (255,230,230)
+        pdf.set_fill_color(*cor)
+
         msg = "ATESTO O RECEBIMENTO POR CONFORMIDADE TÉCNICA." if todos_ok else "DESCONFORMIDADE IDENTIFICADA."
+
         pdf.set_font("Arial","B",9)
         pdf.multi_cell(0,6,tr(msg),1,"C",True)
 
@@ -257,7 +278,8 @@ else:
         pdf.set_font("Arial","",9)
         pdf.cell(0,5,"Responsável",0,1,"C")
 
-        st.download_button("Baixar PDF",pdf.output(dest="S").encode("latin-1"),"relatorio.pdf")
+        st.download_button("Baixar PDF", pdf.output(dest="S").encode("latin-1"), "relatorio.pdf")
 
 if st.sidebar.button("Reset"):
-    st.session_state.clear(); st.rerun()
+    st.session_state.clear()
+    st.rerun()
