@@ -5,5 +5,5 @@ Pillow
 groq
 pdfplumber
 streamlit
-groq
-pandas
+reportlab
+openpyxl
