@@ -930,4 +930,3 @@ with st.container(border=True):
             file_name="Relatorio_Avaliacao_Bens_Inserviveis.pdf",
             mime="application/pdf"
         )
-``
