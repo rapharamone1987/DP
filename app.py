@@ -13,19 +13,17 @@ import re
 from PIL import Image
 
 # ==========================================
-# 1. CONFIGURAÇÃO DE PASTA E ESTADO (TOPO)
+# 1. CONFIGURAÇÃO DE PASTA E ESTADO
 # ==========================================
-# Definimos o nome da pasta exatamente como está no seu GitHub
 banco_atas = "banco_atas"
 
-# Verifica se a pasta existe, senão tenta criar (importante para o servidor)
 if not os.path.exists(banco_atas):
     try:
         os.makedirs(banco_atas, exist_ok=True)
     except:
-        banco_atas = tempfile.gettempdir() # Fallback de segurança
+        banco_atas = tempfile.gettempdir()
 
-# Inicialização Blindada do Estado (Evita AttributeError)
+# Inicialização Blindada (Evita AttributeError)
 if "items_lista" not in st.session_state: st.session_state.items_lista = []
 if "cabecalho" not in st.session_state: 
     st.session_state.cabecalho = {"fornecedor": "", "edital": "", "objeto": "", "nf": "", "qtd": "", "placa": "", "unidade": ""}
@@ -45,25 +43,34 @@ client = Groq(api_key=key) if key else None
 def tr(t): return str(t).encode('latin-1', 'replace').decode('latin-1')
 
 def limpar_json_ia(texto):
+    """Extrai apenas o conteúdo entre chaves, ignorando conversas da IA"""
     try:
+        # Tenta encontrar o JSON no meio de qualquer conversa
         match = re.search(r'\{.*\}', texto, re.DOTALL)
-        return json.loads(match.group(0)) if match else json.loads(texto)
-    except: return None
+        if match:
+            return json.loads(match.group(0))
+        return json.loads(texto)
+    except:
+        return None
 
 def extrair_dados_ia(texto_pdf):
     prompt = (
         "Você é um Especialista em Recebimento de bens e materiais no setor público. "
-        "Analise o documento e extraia detalhes técnicos FÍSICOS REAIS (Marca, modelo, peças, medidas). "
-        "Ignore cláusulas contratuais. Responda APENAS JSON: "
+        "Analise o documento e extraia detalhes técnicos FÍSICOS REAIS (Marca, modelo, peças, medidas, voltagem, etc). "
+        "Ignore cláusulas contratuais. Responda EXCLUSIVAMENTE um JSON puro no formato: "
         '{"fornecedor": "nome", "edital": "número", "objeto": "descrição", "checklist": ["item 1", "item 2"]}'
     )
     if client:
-        res = client.chat.completions.create(
-            model="llama-3.3-70b-versatile", 
-            messages=[{"role": "user", "content": prompt + "\n" + texto_pdf}], 
-            temperature=0.1
-        )
-        return limpar_json_ia(res.choices[0].message.content)
+        try:
+            res = client.chat.completions.create(
+                model="llama-3.3-70b-versatile", 
+                messages=[{"role": "user", "content": prompt + "\n" + texto_pdf}], 
+                temperature=0.1
+            )
+            return limpar_json_ia(res.choices[0].message.content)
+        except Exception as e:
+            st.error(f"Erro na API Groq: {e}")
+            return None
     return None
 
 def perguntar_ia(pergunta, contexto):
@@ -92,7 +99,7 @@ def desenhar_check(pdf, x, y, status):
     pdf.set_line_width(0.2); pdf.set_draw_color(0, 0, 0)
 
 # ==========================================
-# 3. CLASSE PDF (IDENTIDADE RS)
+# 3. CLASSE PDF RS
 # ==========================================
 class PDFRS(FPDF):
     def __init__(self, status_geral=True):
@@ -117,8 +124,6 @@ class PDFRS(FPDF):
 # 4. INTERFACE STREAMLIT
 # ==========================================
 st.set_page_config(page_title="Recebimento RS", layout="centered")
-st.markdown("<style>.barra-v { background-color: #639d31; color: white; padding: 10px; border-radius: 5px; font-weight: bold; text-align: center; margin-bottom: 20px; }</style>", unsafe_allow_html=True)
-
 menu = st.tabs(["🔍 Operação", "📚 Biblioteca"])
 
 with menu[0]:
@@ -136,6 +141,8 @@ with menu[0]:
                     st.session_state.cabecalho.update(res)
                     st.session_state.items_lista = [{"id": time.time()+i, "texto": txt} for i, txt in enumerate(res['checklist'])]
                     st.rerun()
+                else:
+                    st.error("Falha ao analisar os dados do PDF. Verifique se o arquivo não é uma imagem digitalizada.")
 
         if col2.button("🖊️ Entrada Manual"):
             if pdf_file:
@@ -150,10 +157,11 @@ with menu[0]:
                 p_user = st.text_input("Sua dúvida sobre o documento:")
                 if st.button("Perguntar"): st.info(f"**IA:** {perguntar_ia(p_user, st.session_state.texto_pdf)}")
 
-        st.markdown(f'<div class="barra-v">ITEM: {st.session_state.cabecalho["objeto"].upper()}</div>', unsafe_allow_html=True)
+        obj_label = st.session_state.cabecalho["objeto"].upper()
+        st.markdown(f'<div style="background-color:#639d31;color:white;padding:10px;border-radius:5px;font-weight:bold;text-align:center;margin-bottom:20px;">ITEM: {obj_label}</div>', unsafe_allow_html=True)
 
         with st.container(border=True):
-            st.write("### 📝 Dados do Processo")
+            st.write("### 📝 Dados do Processo (Editáveis)")
             c1, c2 = st.columns(2)
             st.session_state.cabecalho["fornecedor"] = c1.text_input("Fornecedor:", value=st.session_state.cabecalho["fornecedor"])
             st.session_state.cabecalho["edital"] = c2.text_input("ARP/Edital:", value=st.session_state.cabecalho["edital"])
@@ -162,7 +170,7 @@ with menu[0]:
             qtd = c2.text_input("Qtd:", value=st.session_state.cabecalho.get("qtd",""))
             placa = c1.text_input("ID:", value=st.session_state.cabecalho.get("placa",""))
             unidade = c2.text_input("Destino:", value=st.session_state.cabecalho.get("unidade",""))
-            st.session_state.atesto_tipo = st.selectbox("Atesto no PDF:", ["Definitivo", "Provisório"])
+            st.session_state.atesto_tipo = st.selectbox("Tipo de Atesto no PDF:", ["Definitivo", "Provisório"])
 
         st.write("### ✅ Checklist")
         todos_ok = True
@@ -172,7 +180,7 @@ with menu[0]:
                 col_ch, col_tx, col_ex = st.columns([0.15, 0.7, 0.15])
                 st.session_state.conferidos_status[uid] = col_ch.checkbox("OK", key=f"ch_{uid}", value=st.session_state.conferidos_status.get(uid, False))
                 if not st.session_state.conferidos_status.get(uid): todos_ok = False
-                itm["texto"] = col_tx.text_input(f"Itm{uid}", itm["texto"], key=f"in_{uid}", label_visibility="collapsed")
+                itm["texto"] = col_tx.text_input(f"Item {i}", itm["texto"], key=f"in_{uid}", label_visibility="collapsed")
                 if col_ex.button("🗑️", key=f"del_{uid}"): st.session_state.items_lista.pop(i); st.rerun()
                 
                 if uid not in st.session_state.registros_media:
@@ -201,7 +209,7 @@ with menu[0]:
                     pdf = PDFRS(status_geral=todos_ok); pdf.alias_nb_pages(); pdf.set_margins(15, 10, 15); pdf.add_page()
                     cab = st.session_state.cabecalho
                     pdf.set_fill_color(99, 157, 49); pdf.set_text_color(255); pdf.set_font("Arial", 'B', 10)
-                    pdf.multi_cell(0, 8, tr(f" ITEM: {cab['objeto'].upper()}"), 1, 'L', fill=True)
+                    pdf.multi_cell(0, 8, tr(f" ITEM: {st.session_state.cabecalho['objeto'].upper()}"), 1, 'L', fill=True)
                     pdf.set_text_color(0); pdf.set_font("Arial", '', 9); pdf.set_fill_color(245)
                     for l, v in [("FORNECEDOR", cab['fornecedor']), ("ARP", cab['edital']), ("NF", nf), ("QTD", qtd), ("ID", placa), ("DESTINO", unidade)]:
                         if v: pdf.set_font("Arial", 'B', 9); pdf.write(7, tr(f" {l}: ")); pdf.set_font("Arial", '', 9); pdf.multi_cell(0, 7, tr(v.upper()), 'B', 'L', False)
@@ -236,25 +244,33 @@ with menu[1]:
             try:
                 caminho = os.path.join(banco_atas, f"{nome_b}.pdf")
                 with open(caminho, "wb") as f: f.write(up_b.getbuffer())
-                st.success("Salvo!")
+                st.success("Salvo com sucesso!")
             except Exception as e: st.error(f"Erro: {e}")
     st.write("---")
     if os.path.exists(banco_atas):
-        for f_name in os.listdir(banco_atas):
-            if f_name.endswith(".pdf"):
-                c1, c2, c3 = st.columns([0.6, 0.2, 0.2])
-                c1.write(f"📄 {f_name}")
-                if c2.button("Abrir", key=f"l_{f_name}"):
-                    caminho_abrir = os.path.join(banco_atas, f_name)
-                    with pdfplumber.open(caminho_abrir) as pdf:
-                        st.session_state.texto_pdf = "\n".join([(p.extract_text() or "") for p in pdf.pages[:6]])
-                    res = extrair_dados_ia(st.session_state.texto_pdf)
-                    if res:
-                        st.session_state.cabecalho.update(res)
-                        st.session_state.items_lista = [{"id": time.time()+i, "texto": txt} for i, txt in enumerate(res['checklist'])]
-                        st.rerun()
-                if c3.button("🗑️", key=f"d_{f_name}"): 
-                    os.remove(os.path.join(banco_atas, f_name))
-                    st.rerun()
+        files_in_dir = [f for f in os.listdir(banco_atas) if f.endswith(".pdf")]
+        if not files_in_dir:
+            st.info("A biblioteca está vazia.")
+        for f_name in files_in_dir:
+            c1, c2, c3 = st.columns([0.6, 0.2, 0.2])
+            c1.write(f"📄 {f_name}")
+            if c2.button("Abrir", key=f"lib_open_{f_name}"):
+                caminho_abrir = os.path.join(banco_atas, f_name)
+                with st.spinner(f"Processando {f_name}..."):
+                    try:
+                        with pdfplumber.open(caminho_abrir) as pdf:
+                            st.session_state.texto_pdf = "\n".join([(p.extract_text() or "") for p in pdf.pages[:6]])
+                        res = extrair_dados_ia(st.session_state.texto_pdf)
+                        if res:
+                            st.session_state.cabecalho.update(res)
+                            st.session_state.items_lista = [{"id": time.time()+i, "texto": txt} for i, txt in enumerate(res['checklist'])]
+                            st.rerun()
+                        else:
+                            st.error("A IA falhou ao ler este arquivo salvo.")
+                    except Exception as e:
+                        st.error(f"Erro ao abrir arquivo: {e}")
+            if c3.button("🗑️", key=f"lib_del_{f_name}"): 
+                os.remove(os.path.join(banco_atas, f_name))
+                st.rerun()
 
 if st.sidebar.button("Nova Inspeção"): st.session_state.clear(); st.rerun()
