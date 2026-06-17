@@ -1,6 +1,7 @@
 import streamlit as st
 from groq import Groq
 import pdfplumber
+import pandas as pd
 from fpdf import FPDF
 from datetime import datetime
 import tempfile
@@ -12,20 +13,27 @@ import re
 from PIL import Image
 
 # ==========================================
-# 1. INICIALIZAÇÃO OBRIGATÓRIA (PROTEÇÃO TOTAL)
+# 1. CONFIGURAÇÃO DE PASTA E ESTADO (TOPO)
 # ==========================================
-# Isso impede o erro "AttributeError" e "FileNotFoundError"
+# Definimos o nome da pasta exatamente como está no seu GitHub
+banco_atas = "banco_atas"
+
+# Verifica se a pasta existe, senão tenta criar (importante para o servidor)
+if not os.path.exists(banco_atas):
+    try:
+        os.makedirs(banco_atas, exist_ok=True)
+    except:
+        banco_atas = tempfile.gettempdir() # Fallback de segurança
+
+# Inicialização Blindada do Estado (Evita AttributeError)
 if "items_lista" not in st.session_state: st.session_state.items_lista = []
 if "cabecalho" not in st.session_state: 
     st.session_state.cabecalho = {"fornecedor": "", "edital": "", "objeto": "", "nf": "", "qtd": "", "placa": "", "unidade": ""}
-if "registros_media" not in st.session_state: st.session_state.registros_media = {}
+if "midia" not in st.session_state: st.session_state.midia = {}
 if "conferidos_status" not in st.session_state: st.session_state.conferidos_status = {}
 if "camera_ativa" not in st.session_state: st.session_state.camera_ativa = None
 if "atesto_tipo" not in st.session_state: st.session_state.atesto_tipo = "Definitivo"
 if "texto_pdf" not in st.session_state: st.session_state.texto_pdf = ""
-
-# Define o caminho da pasta conforme sua imagem
-PASTA_ATAS = "banco_atas"
 
 # CONFIGURAÇÃO DA IA
 key = st.secrets.get("GROQ_API_KEY", "")
@@ -43,17 +51,16 @@ def limpar_json_ia(texto):
     except: return None
 
 def extrair_dados_ia(texto_pdf):
-    # SEU PROMPT ORIGINAL PRESERVADO
-    prompt_sistema = (
+    prompt = (
         "Você é um Especialista em Recebimento de bens e materiais no setor público. "
-        "Liste os detalhes técnicos reais descritos no PDF conforme o tipo de item (MARCA, MODELO, peças, cores, medidas, voltagem, etc). "
-        "Ignore cláusulas jurídicas. Extraia o dado real do PDF. Responda APENAS JSON: "
+        "Analise o documento e extraia detalhes técnicos FÍSICOS REAIS (Marca, modelo, peças, medidas). "
+        "Ignore cláusulas contratuais. Responda APENAS JSON: "
         '{"fornecedor": "nome", "edital": "número", "objeto": "descrição", "checklist": ["item 1", "item 2"]}'
     )
     if client:
         res = client.chat.completions.create(
             model="llama-3.3-70b-versatile", 
-            messages=[{"role": "user", "content": prompt_sistema + "\n" + texto_pdf}], 
+            messages=[{"role": "user", "content": prompt + "\n" + texto_pdf}], 
             temperature=0.1
         )
         return limpar_json_ia(res.choices[0].message.content)
@@ -61,7 +68,7 @@ def extrair_dados_ia(texto_pdf):
 
 def perguntar_ia(pergunta, contexto):
     if client and contexto:
-        prompt = f"Responda de forma curta baseada no documento: {pergunta}\n\nTexto:\n{contexto}"
+        prompt = f"Baseado no documento, responda de forma técnica e curta: {pergunta}\n\nDocumento:\n{contexto}"
         res = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}], temperature=0)
         return res.choices[0].message.content
     return "Nenhum documento disponível."
@@ -85,7 +92,7 @@ def desenhar_check(pdf, x, y, status):
     pdf.set_line_width(0.2); pdf.set_draw_color(0, 0, 0)
 
 # ==========================================
-# 3. CLASSE PDF (ESTILO RS)
+# 3. CLASSE PDF (IDENTIDADE RS)
 # ==========================================
 class PDFRS(FPDF):
     def __init__(self, status_geral=True):
@@ -107,18 +114,21 @@ class PDFRS(FPDF):
         self.cell(0, 10, tr(f"Página {self.page_no()}"), 0, 0, 'C')
 
 # ==========================================
-# 4. INTERFACE
+# 4. INTERFACE STREAMLIT
 # ==========================================
 st.set_page_config(page_title="Recebimento RS", layout="centered")
+st.markdown("<style>.barra-v { background-color: #639d31; color: white; padding: 10px; border-radius: 5px; font-weight: bold; text-align: center; margin-bottom: 20px; }</style>", unsafe_allow_html=True)
+
 menu = st.tabs(["🔍 Operação", "📚 Biblioteca"])
 
 with menu[0]:
     if not st.session_state.items_lista:
-        pdf_file = st.file_uploader("Suba o PDF (Obrigatório para Chat)", type="pdf")
+        st.subheader("Carregar Documento")
+        pdf_file = st.file_uploader("Upload do PDF", type="pdf")
         col1, col2 = st.columns(2)
         
         if col1.button("🔍 Analisar com IA") and pdf_file:
-            with st.spinner("Extraindo dados..."):
+            with st.spinner("Analisando arquivo..."):
                 with pdfplumber.open(pdf_file) as pdf:
                     st.session_state.texto_pdf = "\n".join([(p.extract_text() or "") for p in pdf.pages[:6]])
                 res = extrair_dados_ia(st.session_state.texto_pdf)
@@ -128,7 +138,7 @@ with menu[0]:
                     st.rerun()
 
         if col2.button("🖊️ Entrada Manual"):
-            if pdf_file: # Se tiver PDF, carrega texto pro chat mas deixa itens vazios
+            if pdf_file:
                 with pdfplumber.open(pdf_file) as pdf:
                     st.session_state.texto_pdf = "\n".join([(p.extract_text() or "") for p in pdf.pages[:6]])
             st.session_state.items_lista = [{"id": time.time(), "texto": "Novo Requisito"}]
@@ -136,23 +146,23 @@ with menu[0]:
 
     elif st.session_state.items_lista:
         if st.session_state.texto_pdf:
-            with st.expander("🤖 Chat Suporte com o Documento"):
-                pergunta = st.text_input("Dúvida sobre o item?")
-                if st.button("Perguntar"): st.info(f"**IA:** {perguntar_ia(pergunta, st.session_state.texto_pdf)}")
+            with st.expander("🤖 Chat Suporte (Dúvidas sobre o PDF)"):
+                p_user = st.text_input("Sua dúvida sobre o documento:")
+                if st.button("Perguntar"): st.info(f"**IA:** {perguntar_ia(p_user, st.session_state.texto_pdf)}")
 
-        st.markdown(f'<div style="background-color:#639d31;color:white;padding:10px;border-radius:5px;font-weight:bold;text-align:center;margin-bottom:20px;">ITEM: {st.session_state.cabecalho["objeto"].upper()}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="barra-v">ITEM: {st.session_state.cabecalho["objeto"].upper()}</div>', unsafe_allow_html=True)
 
         with st.container(border=True):
-            st.write("### 📝 Dados do Processo (Editáveis)")
+            st.write("### 📝 Dados do Processo")
             c1, c2 = st.columns(2)
             st.session_state.cabecalho["fornecedor"] = c1.text_input("Fornecedor:", value=st.session_state.cabecalho["fornecedor"])
             st.session_state.cabecalho["edital"] = c2.text_input("ARP/Edital:", value=st.session_state.cabecalho["edital"])
-            st.session_state.cabecalho["objeto"] = st.text_area("Descrição do Item:", value=st.session_state.cabecalho["objeto"], height=70)
-            st.session_state.cabecalho["nf"] = c1.text_input("NF:", value=st.session_state.cabecalho.get("nf",""))
-            st.session_state.cabecalho["qtd"] = c2.text_input("Qtd:", value=st.session_state.cabecalho.get("qtd",""))
-            st.session_state.cabecalho["placa"] = c1.text_input("ID:", value=st.session_state.cabecalho.get("placa",""))
-            st.session_state.cabecalho["unidade"] = c2.text_input("Destino:", value=st.session_state.cabecalho.get("unidade",""))
-            st.session_state.atesto_tipo = st.selectbox("Tipo de Atesto:", ["Definitivo", "Provisório"])
+            st.session_state.cabecalho["objeto"] = st.text_area("Descrição:", value=st.session_state.cabecalho["objeto"], height=70)
+            nf = c1.text_input("NF:", value=st.session_state.cabecalho.get("nf",""))
+            qtd = c2.text_input("Qtd:", value=st.session_state.cabecalho.get("qtd",""))
+            placa = c1.text_input("ID:", value=st.session_state.cabecalho.get("placa",""))
+            unidade = c2.text_input("Destino:", value=st.session_state.cabecalho.get("unidade",""))
+            st.session_state.atesto_tipo = st.selectbox("Atesto no PDF:", ["Definitivo", "Provisório"])
 
         st.write("### ✅ Checklist")
         todos_ok = True
@@ -193,7 +203,7 @@ with menu[0]:
                     pdf.set_fill_color(99, 157, 49); pdf.set_text_color(255); pdf.set_font("Arial", 'B', 10)
                     pdf.multi_cell(0, 8, tr(f" ITEM: {cab['objeto'].upper()}"), 1, 'L', fill=True)
                     pdf.set_text_color(0); pdf.set_font("Arial", '', 9); pdf.set_fill_color(245)
-                    for l, v in [("FORNECEDOR", cab['fornecedor']), ("ARP", cab['edital']), ("NF", cab['nf']), ("QTD", cab['qtd']), ("ID", cab['placa']), ("DESTINO", cab['unidade'])]:
+                    for l, v in [("FORNECEDOR", cab['fornecedor']), ("ARP", cab['edital']), ("NF", nf), ("QTD", qtd), ("ID", placa), ("DESTINO", unidade)]:
                         if v: pdf.set_font("Arial", 'B', 9); pdf.write(7, tr(f" {l}: ")); pdf.set_font("Arial", '', 9); pdf.multi_cell(0, 7, tr(v.upper()), 'B', 'L', False)
                     
                     for it in st.session_state.items_lista:
@@ -219,25 +229,32 @@ with menu[0]:
 # ABA 2: BIBLIOTECA
 with menu[1]:
     st.subheader("📁 Gerenciamento de Atas")
-    up_b = st.file_uploader("Salvar PDF no banco", type="pdf")
+    up_b = st.file_uploader("Salvar PDF no banco", type="pdf", key="biblioteca_upload")
     nome_b = st.text_input("Identificação (ex: ARP 123):")
-    if st.button("Salvar") and up_b and nome_b:
-        with open(os.path.join(PASTA_ATAS, f"{nome_b}.pdf"), "wb") as f: f.write(up_b.getbuffer())
-        st.success("Salvo!")
+    if st.button("Salvar na Biblioteca"):
+        if up_b and nome_b:
+            try:
+                caminho = os.path.join(banco_atas, f"{nome_b}.pdf")
+                with open(caminho, "wb") as f: f.write(up_b.getbuffer())
+                st.success("Salvo!")
+            except Exception as e: st.error(f"Erro: {e}")
     st.write("---")
-    if os.path.exists(PASTA_ATAS):
-        for f in os.listdir(PASTA_ATAS):
-            if f.endswith(".pdf"):
+    if os.path.exists(banco_atas):
+        for f_name in os.listdir(banco_atas):
+            if f_name.endswith(".pdf"):
                 c1, c2, c3 = st.columns([0.6, 0.2, 0.2])
-                c1.write(f"📄 {f}")
-                if c2.button("Abrir", key=f"l_{f}"):
-                    with pdfplumber.open(os.path.join(PASTA_ATAS, f)) as pdf:
+                c1.write(f"📄 {f_name}")
+                if c2.button("Abrir", key=f"l_{f_name}"):
+                    caminho_abrir = os.path.join(banco_atas, f_name)
+                    with pdfplumber.open(caminho_abrir) as pdf:
                         st.session_state.texto_pdf = "\n".join([(p.extract_text() or "") for p in pdf.pages[:6]])
                     res = extrair_dados_ia(st.session_state.texto_pdf)
                     if res:
                         st.session_state.cabecalho.update(res)
                         st.session_state.items_lista = [{"id": time.time()+i, "texto": txt} for i, txt in enumerate(res['checklist'])]
                         st.rerun()
-                if c3.button("🗑️", key=f"d_{f}"): os.remove(os.path.join(PASTA_ATAS, f)); st.rerun()
+                if c3.button("🗑️", key=f"d_{f_name}"): 
+                    os.remove(os.path.join(banco_atas, f_name))
+                    st.rerun()
 
 if st.sidebar.button("Nova Inspeção"): st.session_state.clear(); st.rerun()
