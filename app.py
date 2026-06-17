@@ -13,13 +13,12 @@ import re
 from PIL import Image
 
 # ==========================================
-# 1. INICIALIZAÇÃO OBRIGATÓRIA (TOPO ABSOLUTO)
+# 1. INICIALIZAÇÃO OBRIGATÓRIA (PROTEÇÃO TOTAL)
 # ==========================================
-# Isso impede o erro "AttributeError" garantindo que as chaves existam sempre
 if "items_lista" not in st.session_state: st.session_state.items_lista = []
 if "cabecalho" not in st.session_state: 
     st.session_state.cabecalho = {"fornecedor": "", "edital": "", "objeto": "", "nf": "", "qtd": "", "placa": "", "unidade": ""}
-if "registros_media" not in st.session_state: st.session_state.registros_media = {}
+if "midia" not in st.session_state: st.session_state.midia = {}
 if "conferidos_status" not in st.session_state: st.session_state.conferidos_status = {}
 if "camera_ativa" not in st.session_state: st.session_state.camera_ativa = None
 if "atesto_tipo" not in st.session_state: st.session_state.atesto_tipo = "Definitivo"
@@ -69,7 +68,7 @@ def perguntar_ia(pergunta, contexto):
         prompt = f"Responda de forma técnica e curta baseada no documento: {pergunta}\n\nDocumento:\n{contexto}"
         res = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}], temperature=0)
         return res.choices[0].message.content
-    return "Nenhum documento disponível para consulta."
+    return "Nenhum documento disponível."
 
 def processar_imagem_pdf(st_image):
     if st_image is None: return None
@@ -90,7 +89,7 @@ def desenhar_check(pdf, x, y, status):
     pdf.set_line_width(0.2); pdf.set_draw_color(0, 0, 0)
 
 # ==========================================
-# 3. CLASSE PDF RS (LAYOUT PREMIUM)
+# 3. CLASSE PDF RS
 # ==========================================
 class PDFRS(FPDF):
     def __init__(self, status_geral=True):
@@ -104,24 +103,21 @@ class PDFRS(FPDF):
         self.set_font("Arial", 'B', 10); self.set_text_color(0)
         self.cell(0, 6, tr("SECRETARIA DA AGRICULTURA, PECUÁRIA, PRODUÇÃO SUSTENTÁVEL E IRRIGAÇÃO"), 0, 1, 'C')
         self.set_font("Arial", 'B', 14)
-        titulo = "RELATÓRIO DE RECEBIMENTO TÉCNICO" if self.status_geral else "RELATÓRIO DE DESCONFORMIDADE TÉCNICA"
-        self.cell(0, 8, tr(titulo), 0, 1, 'C')
+        t = "RELATÓRIO DE RECEBIMENTO TÉCNICO" if self.status_geral else "RELATÓRIO DE DESCONFORMIDADE TÉCNICA"
+        self.cell(0, 8, tr(t), 0, 1, 'C')
     def footer(self):
         self.set_y(-10); self.faixa(291)
         self.set_y(-18); self.set_font("Arial", 'I', 7); self.set_text_color(100)
         self.cell(0, 10, tr(f"Página {self.page_no()}"), 0, 0, 'C')
 
 # ==========================================
-# 4. INTERFACE STREAMLIT
+# 4. INTERFACE
 # ==========================================
 st.set_page_config(page_title="Recebimento RS", layout="centered")
-st.title("📋 Checklist Recebimento Técnico RS")
-
 menu = st.tabs(["🔍 Operação", "📚 Biblioteca"])
 
 with menu[0]:
     if not st.session_state.items_lista:
-        st.subheader("Carregar Documento")
         pdf_file = st.file_uploader("Upload do PDF", type="pdf")
         col1, col2 = st.columns(2)
         
@@ -136,7 +132,7 @@ with menu[0]:
                     st.rerun()
 
         if col2.button("🖊️ Entrada Manual"):
-            if pdf_file: # Se tiver PDF, carrega texto pro chat mas deixa itens vazios
+            if pdf_file:
                 with pdfplumber.open(pdf_file) as pdf:
                     st.session_state.texto_pdf = "\n".join([(p.extract_text() or "") for p in pdf.pages[:6]])
             st.session_state.items_lista = [{"id": time.time(), "texto": "Novo Requisito"}]
@@ -144,24 +140,22 @@ with menu[0]:
 
     elif st.session_state.items_lista:
         if st.session_state.texto_pdf:
-            with st.expander("🤖 Chat Suporte (Dúvidas sobre o PDF)"):
-                p_user = st.text_input("Sua dúvida sobre o documento:")
+            with st.expander("🤖 Chat Suporte (PDF)"):
+                p_user = st.text_input("Sua dúvida:")
                 if st.button("Perguntar"): st.info(f"**IA:** {perguntar_ia(p_user, st.session_state.texto_pdf)}")
 
-        obj_label = st.session_state.cabecalho["objeto"].upper()
-        st.markdown(f'<div style="background-color:#639d31;color:white;padding:10px;border-radius:5px;font-weight:bold;text-align:center;margin-bottom:20px;">CONFERÊNCIA: {obj_label}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="background-color:#639d31;color:white;padding:10px;border-radius:5px;font-weight:bold;text-align:center;margin-bottom:20px;">ITEM: {st.session_state.cabecalho["objeto"].upper()}</div>', unsafe_allow_html=True)
 
         with st.container(border=True):
-            st.write("### 📝 Dados do Processo (Editáveis)")
             c1, c2 = st.columns(2)
             st.session_state.cabecalho["fornecedor"] = c1.text_input("Fornecedor:", value=st.session_state.cabecalho["fornecedor"])
             st.session_state.cabecalho["edital"] = c2.text_input("ARP/Edital:", value=st.session_state.cabecalho["edital"])
-            st.session_state.cabecalho["objeto"] = st.text_area("Descrição do Item:", value=st.session_state.cabecalho["objeto"], height=70)
+            st.session_state.cabecalho["objeto"] = st.text_area("Descrição:", value=st.session_state.cabecalho["objeto"], height=70)
             st.session_state.cabecalho["nf"] = c1.text_input("NF:", value=st.session_state.cabecalho.get("nf",""))
             st.session_state.cabecalho["qtd"] = c2.text_input("Qtd:", value=st.session_state.cabecalho.get("qtd",""))
             st.session_state.cabecalho["placa"] = c1.text_input("ID:", value=st.session_state.cabecalho.get("placa",""))
             st.session_state.cabecalho["unidade"] = c2.text_input("Unidade Destino:", value=st.session_state.cabecalho.get("unidade",""))
-            st.session_state.atesto_tipo = st.selectbox("Tipo de Atesto no PDF:", ["Definitivo", "Provisório"])
+            st.session_state.atesto_tipo = st.selectbox("Tipo de Atesto:", ["Definitivo", "Provisório"])
 
         st.write("### ✅ Checklist")
         todos_ok = True
@@ -171,7 +165,7 @@ with menu[0]:
                 col_ch, col_tx, col_ex = st.columns([0.15, 0.7, 0.15])
                 st.session_state.conferidos_status[uid] = col_ch.checkbox("OK", key=f"ch_{uid}", value=st.session_state.conferidos_status.get(uid, False))
                 if not st.session_state.conferidos_status.get(uid): todos_ok = False
-                itm["texto"] = col_tx.text_input(f"Item {i}", itm["texto"], key=f"in_{uid}", label_visibility="collapsed")
+                itm["texto"] = col_tx.text_input(f"Itm{uid}", itm["texto"], key=f"in_{uid}", label_visibility="collapsed")
                 if col_ex.button("🗑️", key=f"del_{uid}"): st.session_state.items_lista.pop(i); st.rerun()
                 
                 if uid not in st.session_state.registros_media:
@@ -191,10 +185,68 @@ with menu[0]:
         if st.button("➕ Adicionar Requisito"): st.session_state.items_lista.append({"id": time.time(), "texto": "Novo requisito"}); st.rerun()
         
         obs_geral = st.text_area("Justificativa / Obs:")
-        servidor = st.text_input("Responsável pelo Atesto:")
+        servidor = st.text_input("Responsável:")
 
-        if st.button("🚀 GERAR PDF"):
+        if st.button("🚀 GERAR RELATÓRIO FINAL"):
             if not servidor: st.error("Informe o servidor.")
             else:
                 try:
-                    pdf = PDFRS(status_geral=todos_ok); pdf.
+                    pdf = PDFRS(status_geral=todos_ok); pdf.alias_nb_pages(); pdf.set_margins(15, 10, 15); pdf.add_page()
+                    cab = st.session_state.cabecalho
+                    pdf.set_fill_color(99, 157, 49); pdf.set_text_color(255); pdf.set_font("Arial", 'B', 10)
+                    pdf.multi_cell(0, 8, tr(f" ITEM: {cab['objeto'].upper()}"), 1, 'L', fill=True)
+                    pdf.set_text_color(0); pdf.set_font("Arial", '', 9); pdf.set_fill_color(245)
+                    for l, v in [("FORNECEDOR", cab['fornecedor']), ("ARP", cab['edital']), ("NF", cab['nf']), ("QTD", cab['qtd']), ("ID", cab['placa']), ("UNIDADE DESTINO", cab['unidade'])]:
+                        if v: pdf.set_font("Arial", 'B', 9); pdf.write(7, tr(f" {l}: ")); pdf.set_font("Arial", '', 9); pdf.multi_cell(0, 7, tr(v.upper()), 'B', 'L', False)
+                    
+                    for it in st.session_state.items_lista:
+                        if pdf.get_y() > 240: pdf.add_page()
+                        desenhar_check(pdf, 17, pdf.get_y()+1, st.session_state.conferidos_status.get(it['id'], False))
+                        pdf.set_x(25); pdf.set_font("Arial", 'B', 10); pdf.multi_cell(165, 6, tr(it['texto']))
+                        if it['id'] in st.session_state.registros_media:
+                            img_p = processar_imagem_pdf(st.session_state.registros_media[it['id']])
+                            with Image.open(img_p) as im: p_h = 60 * (im.height/im.width)
+                            if pdf.get_y() + p_h > 275: pdf.add_page()
+                            pdf.image(img_p, x=75, y=pdf.get_y()+1, w=60); pdf.set_y(pdf.get_y() + p_h + 4); os.unlink(img_p)
+                        pdf.ln(2); pdf.set_draw_color(220); pdf.line(15, pdf.get_y(), 195, pdf.get_y()); pdf.ln(2)
+
+                    at_cor = (235, 245, 235) if todos_ok else (255, 230, 230)
+                    pdf.set_fill_color(*at_cor); pdf.set_font("Arial", 'B', 10)
+                    msg = f"ATESTO O RECEBIMENTO {st.session_state.atesto_tipo.upper()} por conformidade técnica." if todos_ok else "RELATÓRIO DE DESCONFORMIDADE TÉCNICA."
+                    pdf.multi_cell(0, 10, tr(msg), 1, 'C', fill=True)
+                    if obs_geral: pdf.ln(4); pdf.set_font("Arial", 'B', 9); pdf.cell(0, 6, tr("OBSERVAÇÕES:"), 0, 1); pdf.multi_cell(0, 5, tr(obs_geral), 1)
+                    pdf.ln(10); pdf.set_font("Arial", 'B', 11); pdf.cell(0, 6, tr(servidor.upper()), 0, 1, 'C')
+                    st.download_button("📥 Baixar PDF", data=pdf.output(dest='S').encode('latin-1'), file_name="Relatorio.pdf", mime="application/pdf")
+                except Exception as e: st.error(f"Erro no PDF: {e}")
+
+# ABA 2: BIBLIOTECA
+with menu[1]:
+    st.subheader("📁 Gerenciamento")
+    up_b = st.file_uploader("Salvar PDF no banco", type="pdf")
+    nome_b = st.text_input("Identificação (ex: ARP 123):")
+    if st.button("Salvar"):
+        if up_b and nome_b:
+            nome_limpo = re.sub(r'[\\/*?:"<>|]', "-", nome_b)
+            caminho_salvar = os.path.join(banco_atas, f"{nome_limpo}.pdf")
+            try:
+                with open(caminho_salvar, "wb") as f: f.write(up_b.getbuffer())
+                st.success(f"Salvo como: {nome_limpo}.pdf")
+            except Exception as e: st.error(f"Erro: {e}")
+    st.write("---")
+    if os.path.exists(banco_atas):
+        for f_name in [f for f in os.listdir(banco_atas) if f.endswith(".pdf")]:
+            c1, c2, c3 = st.columns([0.6, 0.2, 0.2])
+            c1.write(f"📄 {f_name}")
+            if c2.button("Abrir", key=f"l_{f_name}"):
+                caminho_full = os.path.join(banco_atas, f_name)
+                with pdfplumber.open(caminho_full) as pdf:
+                    st.session_state.texto_pdf = "\n".join([(p.extract_text() or "") for p in pdf.pages[:6]])
+                res = extrair_dados_ia(st.session_state.texto_pdf)
+                if res:
+                    st.session_state.cabecalho.update(res)
+                    st.session_state.items_lista = [{"id": time.time()+i, "texto": txt} for i, txt in enumerate(res['checklist'])]
+                    st.rerun()
+            if c3.button("🗑️", key=f"d_{f_name}"): 
+                os.remove(os.path.join(banco_atas, f_name)); st.rerun()
+
+if st.sidebar.button("Nova Inspeção"): st.session_state.clear(); st.rerun()
