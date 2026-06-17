@@ -13,25 +13,29 @@ import re
 from PIL import Image
 
 # ==========================================
-# 1. INICIALIZAÇÃO OBRIGATÓRIA (TOPO)
+# 1. INICIALIZAÇÃO OBRIGATÓRIA (TOPO ABSOLUTO)
 # ==========================================
+# Isso impede o erro "AttributeError" garantindo que as chaves existam sempre
 if "items_lista" not in st.session_state: st.session_state.items_lista = []
 if "cabecalho" not in st.session_state: 
     st.session_state.cabecalho = {"fornecedor": "", "edital": "", "objeto": "", "nf": "", "qtd": "", "placa": "", "unidade": ""}
-if "midia" not in st.session_state: st.session_state.midia = {}
+if "registros_media" not in st.session_state: st.session_state.registros_media = {}
 if "conferidos_status" not in st.session_state: st.session_state.conferidos_status = {}
 if "camera_ativa" not in st.session_state: st.session_state.camera_ativa = None
 if "atesto_tipo" not in st.session_state: st.session_state.atesto_tipo = "Definitivo"
 if "texto_pdf" not in st.session_state: st.session_state.texto_pdf = ""
 
-# CONFIGURAÇÃO DA IA
+# CONFIGURAÇÃO DA IA (GROQ)
 key = st.secrets.get("GROQ_API_KEY", "")
 client = Groq(api_key=key) if key else None
 
 # ==========================================
 # 2. FUNÇÕES DE APOIO
 # ==========================================
-def tr(t): return str(t).encode('latin-1', 'replace').decode('latin-1')
+def tr(texto):
+    """Trata acentuação para PDF Latin-1"""
+    if not texto: return ""
+    return str(texto).encode('latin-1', 'replace').decode('latin-1')
 
 def limpar_json_ia(texto):
     try:
@@ -74,7 +78,7 @@ def desenhar_check(pdf, x, y, status):
     pdf.set_line_width(0.2); pdf.set_draw_color(0, 0, 0)
 
 # ==========================================
-# 3. CLASSE PDF RS
+# 3. CLASSE PDF RS (LAYOUT PREMIUM)
 # ==========================================
 class PDFRS(FPDF):
     def __init__(self, status_geral=True):
@@ -103,7 +107,7 @@ st.title("📋 Checklist Recebimento Técnico RS")
 
 # --- CARGA (ESCOLHA DO MÉTODO) ---
 if not st.session_state.items_lista:
-    tabs_carga = st.tabs(["📄 Analisar PDF", "✍️ Colar Texto", "🖊️ Entrada Manual"])
+    tabs_carga = st.tabs(["📄 Analisar PDF", "✍️ Colar Especificações", "🖊️ Manual"])
     
     with tabs_carga[0]:
         pdf_file = st.file_uploader("Upload do PDF", type="pdf")
@@ -120,7 +124,8 @@ if not st.session_state.items_lista:
                     st.rerun()
 
     with tabs_carga[1]:
-        texto_colado = st.text_area("Cole aqui as especificações técnicas (do Word, E-mail, etc):", height=200)
+        # ESTA É A CAIXA DE TEXTO QUE VOCÊ PEDIU
+        texto_colado = st.text_area("Cole aqui o texto das especificações do item:", height=200, placeholder="Ex: Motor 33CV, Trifásico, Vazão 20.000 L/h...")
         if st.button("🔍 Gerar Checklist do Texto"):
             if texto_colado:
                 with st.spinner("IA organizando itens..."):
@@ -133,15 +138,14 @@ if not st.session_state.items_lista:
             else: st.warning("Cole o texto antes de analisar.")
 
     with tabs_carga[2]:
-        st.write("Comece um checklist do zero.")
         if st.button("🖊️ Iniciar Manualmente"):
             st.session_state.items_lista = [{"id": time.time(), "texto": "Novo Requisito"}]
             st.rerun()
 
-# --- TELA OPERACIONAL ---
+# --- TELA DE OPERAÇÃO ---
 elif st.session_state.items_lista:
-    obj_tit = st.session_state.cabecalho["objeto"].upper()
-    st.markdown(f'<div style="background-color:#639d31;color:white;padding:10px;border-radius:5px;font-weight:bold;text-align:center;margin-bottom:20px;">ITEM: {obj_tit}</div>', unsafe_allow_html=True)
+    obj_label = st.session_state.cabecalho["objeto"].upper()
+    st.markdown(f'<div style="background-color:#639d31;color:white;padding:10px;border-radius:5px;font-weight:bold;text-align:center;margin-bottom:20px;">ITEM: {obj_label}</div>', unsafe_allow_html=True)
 
     with st.container(border=True):
         st.write("### 📝 Dados do Processo (Editáveis)")
@@ -153,9 +157,9 @@ elif st.session_state.items_lista:
         qtd = c2.text_input("Qtd:", value=st.session_state.cabecalho.get("qtd",""))
         placa = c1.text_input("ID:", value=st.session_state.cabecalho.get("placa",""))
         unidade = c2.text_input("Destino:", value=st.session_state.cabecalho.get("unidade",""))
-        st.session_state.atesto_tipo = st.selectbox("Tipo de Atesto:", ["Definitivo", "Provisório"])
+        st.session_state.atesto_tipo = st.selectbox("Tipo de Atesto no PDF:", ["Definitivo", "Provisório"])
 
-    st.write("### ✅ Checklist")
+    st.write("### ✅ Itens de Conferência")
     todos_ok = True
     for i, itm in enumerate(st.session_state.items_lista):
         uid = itm["id"]
@@ -163,17 +167,17 @@ elif st.session_state.items_lista:
             col_ch, col_tx, col_ex = st.columns([0.15, 0.7, 0.15])
             st.session_state.conferidos_status[uid] = col_ch.checkbox("OK", key=f"ch_{uid}", value=st.session_state.conferidos_status.get(uid, False))
             if not st.session_state.conferidos_status.get(uid): todos_ok = False
-            itm["texto"] = col_tx.text_input(f"Itm{uid}", itm["texto"], key=f"in_{uid}", label_visibility="collapsed")
+            itm["texto"] = col_tx.text_input(f"Item {i}", itm["texto"], key=f"in_{uid}", label_visibility="collapsed")
             if col_ex.button("🗑️", key=f"del_{uid}"): st.session_state.items_lista.pop(i); st.rerun()
             
             if uid not in st.session_state.registros_media:
-                t_cam, t_gal = st.tabs(["📸 Câmera", "📁 Galeria"])
-                with t_cam:
+                t1, t2 = st.tabs(["📸 Câmera", "📁 Galeria"])
+                with t1:
                     if st.session_state.camera_ativa == uid:
                         f = st.camera_input("Foto", key=f"cam_{uid}")
                         if f: st.session_state.registros_media[uid] = f; st.session_state.camera_ativa = None; st.rerun()
                     elif st.button("Abrir Câmera", key=f"btn_c_{uid}"): st.session_state.camera_ativa = uid; st.rerun()
-                with t_gal:
+                with t2:
                     up = st.file_uploader("Upload", key=f"up_{uid}")
                     if up: st.session_state.registros_media[uid] = up; st.rerun()
             else:
