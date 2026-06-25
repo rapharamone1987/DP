@@ -103,7 +103,7 @@ class PDFRS(FPDF):
 # 4. INTERFACE STREAMLIT
 # ==========================================
 st.set_page_config(page_title="Recebimento RS", layout="centered")
-st.title("📋 Checklist Recebimento Técnico RS")
+st.title("📋 Checklist Recebimento Técnico SEAPI-RS")
 
 # --- CARGA (ESCOLHA DO MÉTODO) ---
 if not st.session_state.items_lista:
@@ -156,7 +156,7 @@ elif st.session_state.items_lista:
         nf = c1.text_input("NF:", value=st.session_state.cabecalho.get("nf",""))
         qtd = c2.text_input("Qtd:", value=st.session_state.cabecalho.get("qtd",""))
         placa = c1.text_input("ID:", value=st.session_state.cabecalho.get("placa",""))
-        unidade = c2.text_input("Destino:", value=st.session_state.cabecalho.get("unidade",""))
+        unidade = c2.text_input("CENTRO DE CUSTOS:", value=st.session_state.cabecalho.get("unidade",""))
         st.session_state.atesto_tipo = st.selectbox("Tipo de Atesto no PDF:", ["Definitivo", "Provisório"])
 
     st.write("### ✅ Itens de Conferência")
