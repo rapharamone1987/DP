@@ -151,7 +151,7 @@ elif st.session_state.items_lista:
         st.write("### 📝 Dados do Processo (Editáveis)")
         c1, c2 = st.columns(2)
         st.session_state.cabecalho["fornecedor"] = c1.text_input("Fornecedor:", value=st.session_state.cabecalho["fornecedor"])
-        st.session_state.cabecalho["edital"] = c2.text_input("ARP/Edital:", value=st.session_state.cabecalho["edital"])
+        st.session_state.cabecalho["edital"] = c2.text_input("ARP/PE:", value=st.session_state.cabecalho["edital"])
         st.session_state.cabecalho["objeto"] = st.text_area("Descrição:", value=st.session_state.cabecalho["objeto"], height=70)
         nf = c1.text_input("NF:", value=st.session_state.cabecalho.get("nf",""))
         qtd = c2.text_input("Qtd:", value=st.session_state.cabecalho.get("qtd",""))
