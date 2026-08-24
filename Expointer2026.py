@@ -2,96 +2,89 @@ import os
 import pandas as pd
 import streamlit as st
 
-# 1. Configuração Inicial do Serviço e da Página
+# 1. Configuração da Página
 st.set_page_config(
-    page_title="EXPOINTER 2026 — Grade Oficial",
+    page_title="EXPOINTER 2026 — Agenda Verde",
     page_icon="🌾",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# 2. Estilização CSS Personalizada (Custom Theme)
+# 2. Estilização CSS Personalizada (Base de Cores Verdes)
 custom_css = """
 <style>
-    /* Fundo da aplicação e tipografia */
+    /* Fundo suave e fontes */
     .stApp {
-        background-color: #f8fafc;
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background-color: #f4f7f5;
+        font-family: 'Segoe UI', system-ui, sans-serif;
     }
     
-    /* Cabeçalho principal com as cores da Expointer */
+    /* Cabeçalho Verde Expointer */
     .header-box {
-        background-color: #0f172a;
+        background: linear-gradient(135deg, #064e3b 0%, #15803d 100%);
         color: #ffffff;
         padding: 24px;
         border-radius: 12px;
-        border-bottom: 5px solid #16a34a;
-        margin-bottom: 25px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
     }
-    .header-title {
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin: 0;
-        letter-spacing: -0.5px;
-    }
-    .header-subtitle {
-        color: #94a3b8;
-        font-size: 0.95rem;
-        margin-top: 6px;
-        margin-bottom: 0;
-    }
+    .header-title { font-size: 1.8rem; font-weight: 800; margin: 0; }
+    .header-subtitle { color: #a7f3d0; font-size: 0.95rem; margin-top: 4px; }
 
-    /* Cards de Eventos */
+    /* Cards em Tom Verde */
     .event-card {
         background-color: #ffffff;
         border-radius: 10px;
-        padding: 16px;
+        padding: 14px;
         margin-bottom: 12px;
-        border-left: 5px solid #2563eb;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-        transition: transform 0.15s ease;
+        border-left: 5px solid #16a34a;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
     }
     .event-card-desfile {
         border-left-color: #d97706 !important;
         background-color: #fffbeb !important;
     }
-    .card-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 8px;
-    }
     .badge-space {
-        background-color: #e0f2fe;
-        color: #0369a1;
+        background-color: #e6f4ea;
+        color: #137333;
         padding: 3px 8px;
         border-radius: 6px;
         font-size: 0.75rem;
         font-weight: 700;
     }
     .badge-time {
-        background-color: #dcfce7;
-        color: #15803d;
+        background-color: #15803d;
+        color: #ffffff;
         padding: 3px 8px;
         border-radius: 6px;
         font-size: 0.75rem;
         font-weight: 700;
     }
-    .card-meta {
-        color: #64748b;
-        font-size: 0.8rem;
-        margin-top: 8px;
-        border-top: 1px dashed #e2e8f0;
-        padding-top: 8px;
+    
+    /* Estilo do Grid de Calendário */
+    .cal-cell {
+        background-color: #ffffff;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 10px;
+        min-height: 120px;
+    }
+    .cal-header {
+        background-color: #15803d;
+        color: white;
+        text-align: center;
+        padding: 8px;
+        font-weight: bold;
+        border-radius: 6px;
+        margin-bottom: 10px;
     }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
 
-# 3. Função com Cache para Carregar e Consolidar a Planilha
-@st.cache_data(ttl=300)  # Recarrega automaticamente a cada 5 minutos
+# 3. Processamento de Dados
+@st.cache_data(ttl=300)
 def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   space_mapping = {
       "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
@@ -115,13 +108,11 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   for sheet in xls.sheet_names:
     if sheet not in space_mapping:
       continue
-
     df = pd.read_excel(excel_path, sheet_name=sheet, header=None)
     current_date = "Outros"
 
     for idx, row in df.iterrows():
       row_str = " ".join([str(val) for val in row.values if pd.notna(val)])
-
       for day_code in [
           "29/08",
           "30/08",
@@ -191,7 +182,6 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   if df_events.empty:
     return df_events
 
-  # Consolidação de horários contínuos da mesma atividade
   consolidated = []
   for (space, date), group in df_events.groupby(
       ["Espaço", "Data"], sort=False
@@ -229,134 +219,98 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   return pd.DataFrame(consolidated)
 
 
-# Carrega os dados
 df_data = load_and_process_data()
 
-# 4. Cabeçalho Principal
+# Cabeçalho
 st.markdown(
     """
 <div class="header-box">
-    <div class="header-title">🌾 EXPOINTER 2026 — Programação Geral</div>
-    <div class="header-subtitle">Painel Interativo de Consulta e Filtro de Espaços e Atividades</div>
+    <div class="header-title">🌾 EXPOINTER 2026 — Programação Oficial</div>
+    <div class="header-subtitle">Painel de Eventos em Cores Verdes Institucionais</div>
 </div>
 """,
     unsafe_allow_html=True,
 )
 
 if df_data.empty:
-  st.warning(
-      "Nenhum dado encontrado na planilha 'Grade Expointer 2026.xlsx'."
-      " Certifique-se de que o arquivo está na mesma pasta do script."
-  )
+  st.warning("Carregando ou nenhum dado encontrado na planilha.")
   st.stop()
 
-# 5. Barra Lateral de Filtros (Sidebar)
-st.sidebar.header("🔍 Filtros da Agenda")
+# Filtros na Barra Lateral
+st.sidebar.header("🌲 Filtros da Agenda")
+busca = st.sidebar.text_input("Buscar palavra-chave:", "")
+dias = ["Todos os Dias"] + list(df_data["Data"].unique())
+dia_sel = st.sidebar.selectbox("Filtrar por Dia:", dias)
+espacos = ["Todos os Espaços"] + list(df_data["Espaço"].unique())
+espaco_sel = st.sidebar.selectbox("Filtrar por Espaço:", espacos)
 
-# Filtro de Busca por Texto
-busca = st.sidebar.text_input(
-    "Buscar por tema, palestrante ou palavra-chave:", ""
-)
-
-# Filtro de Data
-dias_disponiveis = ["Todos os Dias"] + list(df_data["Data"].unique())
-dia_selecionado = st.sidebar.selectbox("Filtrar por Dia:", dias_disponiveis)
-
-# Filtro de Espaço
-espacos_disponiveis = ["Todos os Espaços"] + list(df_data["Espaço"].unique())
-espaco_selecionado = st.sidebar.selectbox(
-    "Filtrar por Espaço / Auditório:", espacos_disponiveis
-)
-
-# Filtro de Secretaria
-secretarias = [s for s in df_data["Secretaria"].unique() if s]
-secretarias_disponiveis = ["Todas as Entidades"] + sorted(secretarias)
-sec_selecionada = st.sidebar.selectbox(
-    "Filtrar por Secretaria / Organização:", secretarias_disponiveis
-)
-
-# Botão para Resetar Filtros
-if st.sidebar.button("🧹 Limpar Filtros"):
-  st.rerun()
-
-# 6. Aplicação dos Filtros nos Dados
-df_filtrado = df_data.copy()
-
+# Aplicação dos Filtros
+df_filtered = df_data.copy()
 if busca:
-  termo = busca.lower()
-  df_filtrado = df_filtrado[
-      df_filtrado["Tema"].str.lower().str.contains(termo)
-      | df_filtrado["Responsável"].str.lower().str.contains(termo)
-      | df_filtrado["Secretaria"].str.lower().str.contains(termo)
-      | df_filtrado["Espaço"].str.lower().str.contains(termo)
+  t = busca.lower()
+  df_filtered = df_filtered[
+      df_filtered["Tema"].str.lower().str.contains(t)
+      | df_filtered["Espaço"].str.lower().str.contains(t)
   ]
+if dia_sel != "Todos os Dias":
+  df_filtered = df_filtered[df_filtered["Data"] == dia_sel]
+if espaco_sel != "Todos os Espaços":
+  df_filtered = df_filtered[df_filtered["Espaço"] == espaco_sel]
 
-if dia_selecionado != "Todos os Dias":
-  df_filtrado = df_filtrado[df_filtrado["Data"] == dia_selecionado]
-
-if espaco_selecionado != "Todos os Espaços":
-  df_filtrado = df_filtrado[df_filtrado["Espaço"] == espaco_selecionado]
-
-if sec_selecionada != "Todas as Entidades":
-  df_filtrado = df_filtrado[df_filtrado["Secretaria"] == sec_selecionada]
-
-# 7. Exibição de Estatísticas Rápidas
-col_m1, col_m2, col_m3 = st.columns(3)
-col_m1.metric("Total de Atividades", len(df_filtrado))
-col_m2.metric("Espaços Ativos", df_filtrado["Espaço"].nunique())
-col_m3.metric(
-    "Entidades Envolvidas",
-    df_filtrado["Secretaria"].replace("", None).nunique(),
+# Alternância de Visão por Abas
+tab_cards, tab_calendar = st.tabs(
+    ["📋 Visão em Lista / Cards", "📅 Visão Calendário (Grid)"]
 )
 
-st.divider()
-
-# 8. Renderização da Lista de Eventos em Cards
-if df_filtrado.empty:
-  st.info("Nenhuma atividade encontrada para os filtros selecionados.")
-else:
-  # Agrupa por data para exibição organizada
-  for data, grupo_dia in df_filtrado.groupby("Data", sort=False):
-    st.subheader(f"📅 {data}")
-
-    # Grid de 2 colunas para os cards
-    cols = st.columns(2)
-    idx = 0
-
-    for _, row in grupo_dia.iterrows():
-      is_desfile = "DESFILE" in str(row["Tema"]).upper()
-      card_class = (
-          "event-card event-card-desfile" if is_desfile else "event-card"
-      )
-
-      resp_str = (
-          f" | Resp.: {row['Responsável']}" if row["Responsável"] else ""
-      )
-      sec_str = f"🏢 {row['Secretaria']}" if row["Secretaria"] else ""
-      meta_str = f"{sec_str}{resp_str}".strip(" |")
-
-      card_html = f"""
-            <div class="{card_class}">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span class="badge-space">📍 {row['Espaço']}</span>
-                    <span class="badge-time">⏰ {row['Horário']}</span>
+# --- ABA 1: VISÃO EM CARDS ---
+with tab_cards:
+  if df_filtered.empty:
+    st.info("Nenhum evento encontrado.")
+  else:
+    for data, grupo in df_filtered.groupby("Data", sort=False):
+      st.markdown(f"### 📅 {data}")
+      cols = st.columns(2)
+      for idx, (_, row) in enumerate(grupo.iterrows()):
+        card_html = f"""
+                <div class="event-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span class="badge-space">📍 {row['Espaço']}</span>
+                        <span class="badge-time">⏰ {row['Horário']}</span>
+                    </div>
+                    <div style="font-weight:bold; color:#0f172a;">{row['Tema']}</div>
+                    <div style="color:#4b5563; font-size:0.8rem; margin-top:6px;">🏢 {row['Secretaria']} {f" | Resp: {row['Responsável']}" if row['Responsável'] else ""}</div>
                 </div>
-                <div class="card-title">{row['Tema']}</div>
-                {"<div class='card-meta'>" + meta_str + "</div>" if meta_str else ""}
-            </div>
-            """
+                """
+        cols[idx % 2].markdown(card_html, unsafe_allow_html=True)
 
-      cols[idx % 2].markdown(card_html, unsafe_allow_html=True)
-      idx += 1
+# --- ABA 2: VISÃO EM CALENDÁRIO GRID ---
+with tab_calendar:
+  st.markdown("#### Matriz de Eventos por Espaço")
+  if df_filtered.empty:
+    st.info("Nenhum evento para exibir na matriz.")
+  else:
+    dias_grid = (
+        list(df_filtered["Data"].unique())
+        if dia_sel == "Todos os Dias"
+        else [dia_sel]
+    )
 
-    st.write("")
+    # Exibe em colunas como dias de um calendário
+    grid_cols = st.columns(len(dias_grid))
 
-# 9. Opção para Download dos Dados Filtrados
-st.sidebar.divider()
-csv_data = df_filtrado.to_csv(index=False).encode("utf-8")
-st.sidebar.download_button(
-    label="📥 Baixar Agenda Filtrada (CSV)",
-    data=csv_data,
-    file_name="agenda_expointer_2026.csv",
-    mime="text/csv",
-)
+    for idx, d in enumerate(dias_grid):
+      with grid_cols[idx]:
+        st.markdown(f'<div class="cal-header">{d}</div>', unsafe_allow_html=True)
+        evs_dia = df_filtered[df_filtered["Data"] == d]
+
+        for _, ev in evs_dia.iterrows():
+          st.markdown(
+              f"""
+                    <div style="background:#ffffff; border-left:4px solid #16a34a; padding:8px; margin-bottom:8px; border-radius:4px; font-size:0.8rem; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                        <span style="color:#15803d; font-weight:bold;">{ev['Horário']}</span><br/>
+                        <span style="font-weight:600; color:#1e293b;">{ev['Tema']}</span><br/>
+                        <span style="color:#64748b; font-size:0.75rem;">📍 {ev['Espaço']}</span>
+                    </div>
+                    """,
+              unsafe_allow_html=True,
+          )
