@@ -10,12 +10,12 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# 2. Estilização CSS Personalizada (Alto Contraste e Leitura Clara)
+# 2. Estilização CSS Personalizada (Forçando Alto Contraste em TUDO)
 custom_css = """
 <style>
     /* Fundo suave e fontes */
     .stApp {
-        background-color: #f1f5f9;
+        background-color: #f1f5f9 !important;
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
     
@@ -31,6 +31,29 @@ custom_css = """
     .header-title { font-size: 1.8rem; font-weight: 800; margin: 0; color: #ffffff !important; }
     .header-subtitle { color: #dcfce7 !important; font-size: 0.95rem; margin-top: 4px; font-weight: 500; }
 
+    /* CORREÇÃO CRÍTICA DAS ABAS (TABS) DO STREAMLIT */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    .stTabs [data-baseweb="tab-list"] button {
+        background-color: #e2e8f0 !important;
+        color: #1e293b !important; /* Texto escuro bem visível nas abas inativas */
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+        border-radius: 8px 8px 0px 0px !important;
+        padding: 8px 16px !important;
+    }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        background-color: #15803d !important;
+        color: #ffffff !important; /* Texto branco apenas na aba ativa */
+    }
+
+    /* CORREÇÃO CRÍTICA DE TODOS OS TÍTULOS (H1, H2, H3, H4) */
+    h1, h2, h3, h4, h5, h6, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+        color: #0f172a !important; /* Força cor preta/azul escuro nos títulos dos dias */
+        font-weight: 800 !important;
+    }
+
     /* Cards em Tom Verde e Alto Contraste */
     .event-card {
         background-color: #ffffff !important;
@@ -38,9 +61,7 @@ custom_css = """
         padding: 14px;
         margin-bottom: 12px;
         border-left: 5px solid #15803d !important;
-        border-top: 1px solid #cbd5e1;
-        border-right: 1px solid #cbd5e1;
-        border-bottom: 1px solid #cbd5e1;
+        border: 1px solid #cbd5e1;
         box-shadow: 0 2px 4px rgba(0,0,0,0.06);
     }
     .badge-space {
@@ -70,7 +91,6 @@ custom_css = """
         border-radius: 6px;
         margin-bottom: 12px;
         font-size: 0.95rem;
-        letter-spacing: 0.3px;
     }
     .cal-event-box {
         background-color: #ffffff !important;
@@ -85,14 +105,12 @@ custom_css = """
     .cal-event-time {
         color: #15803d !important;
         font-weight: 800 !important;
-        font-size: 0.85rem !important;
         display: block;
         margin-bottom: 4px;
     }
     .cal-event-title {
         font-weight: 700 !important;
         color: #0f172a !important;
-        line-height: 1.25;
         margin-bottom: 6px;
     }
     .cal-event-meta {
@@ -248,7 +266,7 @@ st.markdown(
     """
 <div class="header-box">
     <div class="header-title">🌾 EXPOINTER 2026 — Programação Oficial</div>
-    <div class="header-subtitle">Painel de Eventos em Cores Verdes Institucionais</div>
+    <div class="header-subtitle">Painel Interativo de Eventos</div>
 </div>
 """,
     unsafe_allow_html=True,
@@ -316,8 +334,6 @@ with tab_calendar:
         if dia_sel == "Todos os Dias"
         else [dia_sel]
     )
-
-    # Exibe em colunas como dias de um calendário
     grid_cols = st.columns(len(dias_grid))
 
     for idx, d in enumerate(dias_grid):
@@ -335,5 +351,4 @@ with tab_calendar:
                     </div>
                     """,
               unsafe_allow_html=True,
-      )
-          
+          )
