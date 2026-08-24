@@ -1,5 +1,10 @@
+import io
 import os
 import pandas as pd
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
 import streamlit as st
 
 # 1. Configuração da Página
@@ -10,16 +15,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# 2. Estilização CSS Personalizada (Forçando Alto Contraste em TUDO)
+# 2. Estilização CSS Personalizada
 custom_css = """
 <style>
-    /* Fundo suave e fontes */
     .stApp {
         background-color: #f1f5f9 !important;
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
-    
-    /* Cabeçalho Verde Expointer */
     .header-box {
         background: linear-gradient(135deg, #064e3b 0%, #15803d 100%);
         color: #ffffff !important;
@@ -31,13 +33,10 @@ custom_css = """
     .header-title { font-size: 1.8rem; font-weight: 800; margin: 0; color: #ffffff !important; }
     .header-subtitle { color: #dcfce7 !important; font-size: 0.95rem; margin-top: 4px; font-weight: 500; }
 
-    /* CORREÇÃO CRÍTICA DAS ABAS (TABS) DO STREAMLIT */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-    }
+    .stTabs [data-baseweb="tab-list"] { gap: 8px; }
     .stTabs [data-baseweb="tab-list"] button {
         background-color: #e2e8f0 !important;
-        color: #1e293b !important; /* Texto escuro bem visível nas abas inativas */
+        color: #1e293b !important;
         font-weight: 700 !important;
         font-size: 0.95rem !important;
         border-radius: 8px 8px 0px 0px !important;
@@ -45,16 +44,14 @@ custom_css = """
     }
     .stTabs [data-baseweb="tab"][aria-selected="true"] {
         background-color: #15803d !important;
-        color: #ffffff !important; /* Texto branco apenas na aba ativa */
+        color: #ffffff !important;
     }
 
-    /* CORREÇÃO CRÍTICA DE TODOS OS TÍTULOS (H1, H2, H3, H4) */
     h1, h2, h3, h4, h5, h6, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: #0f172a !important; /* Força cor preta/azul escuro nos títulos dos dias */
+        color: #0f172a !important;
         font-weight: 800 !important;
     }
 
-    /* Cards em Tom Verde e Alto Contraste */
     .event-card {
         background-color: #ffffff !important;
         border-radius: 10px;
@@ -80,8 +77,6 @@ custom_css = """
         font-size: 0.75rem;
         font-weight: 700;
     }
-    
-    /* Card do Calendário Grid (Alto Contraste) */
     .cal-header {
         background-color: #064e3b !important;
         color: #ffffff !important;
@@ -259,6 +254,125 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   return pd.DataFrame(consolidated)
 
 
+# 4. Gerador de PDF Formatado por Espaço (ReportLab)
+def generate_pdf_for_space(df_space, space_name):
+  buffer = io.BytesIO()
+  doc = SimpleDocTemplate(
+      buffer,
+      pagesize=landscape(A4),
+      rightMargin=30,
+      leftMargin=30,
+      topMargin=30,
+      bottomMargin=30,
+  )
+  elements = []
+  styles = getSampleStyleSheet()
+
+  # Estilos customizados
+  title_style = ParagraphStyle(
+      "DocTitle",
+      parent=styles["Heading1"],
+      fontSize=18,
+      leading=22,
+      textColor=colors.HexColor("#064e3b"),
+      fontName="Helvetica-Bold",
+      spaceAfter=4,
+  )
+  subtitle_style = ParagraphStyle(
+      "DocSubtitle",
+      parent=styles["Normal"],
+      fontSize=11,
+      textColor=colors.HexColor("#15803d"),
+      fontName="Helvetica-Bold",
+      spaceAfter=15,
+  )
+  cell_header_style = ParagraphStyle(
+      "CellHeader",
+      parent=styles["Normal"],
+      fontSize=10,
+      textColor=colors.white,
+      fontName="Helvetica-Bold",
+      alignment=1,
+  )
+  cell_time_style = ParagraphStyle(
+      "CellTime",
+      parent=styles["Normal"],
+      fontSize=8,
+      textColor=colors.HexColor("#15803d"),
+      fontName="Helvetica-Bold",
+  )
+  cell_title_style = ParagraphStyle(
+      "CellTitle",
+      parent=styles["Normal"],
+      fontSize=9,
+      textColor=colors.HexColor("#0f172a"),
+      fontName="Helvetica-Bold",
+      leading=11,
+  )
+  cell_meta_style = ParagraphStyle(
+      "CellMeta",
+      parent=styles["Normal"],
+      fontSize=8,
+      textColor=colors.HexColor("#475569"),
+      fontName="Helvetica",
+  )
+
+  # Título do PDF
+  elements.append(
+      Paragraph("EXPOINTER 2026 — Programação Oficial", title_style)
+  )
+  elements.append(
+      Paragraph(f"Agenda do Espaço: <b>{space_name}</b>", subtitle_style)
+  )
+
+  # Tabela com dados
+  table_data = [[
+      Paragraph("Data", cell_header_style),
+      Paragraph("Horário", cell_header_style),
+      Paragraph("Atividade / Tema", cell_header_style),
+      Paragraph("Organização / Secretaria", cell_header_style),
+      Paragraph("Responsável", cell_header_style),
+  ]]
+
+  for _, row in df_space.iterrows():
+    table_data.append([
+        Paragraph(f"<b>{row['Data']}</b>", cell_meta_style),
+        Paragraph(row["Horário"], cell_time_style),
+        Paragraph(row["Tema"], cell_title_style),
+        Paragraph(
+            row["Secretaria"] if row["Secretaria"] else "-", cell_meta_style
+        ),
+        Paragraph(
+            row["Responsável"] if row["Responsável"] else "-", cell_meta_style
+        ),
+    ])
+
+  col_widths = [100, 90, 310, 150, 130]
+  t = Table(table_data, colWidths=col_widths, repeatRows=1)
+  t.setStyle(
+      TableStyle([
+          ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#064e3b")),
+          ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+          ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+          ("VALIGN", (0, 0), (-1, -1), "TOP"),
+          ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+          ("TOPPADDING", (0, 0), (-1, -1), 6),
+          ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+          (
+              "ROWBACKGROUNDS",
+              (0, 1),
+              (-1, -1),
+              [colors.white, colors.HexColor("#f8fafc")],
+          ),
+      ])
+  )
+
+  elements.append(t)
+  doc.build(elements)
+  buffer.seek(0)
+  return buffer
+
+
 df_data = load_and_process_data()
 
 # Cabeçalho
@@ -266,7 +380,7 @@ st.markdown(
     """
 <div class="header-box">
     <div class="header-title">🌾 EXPOINTER 2026 — Programação Oficial</div>
-    <div class="header-subtitle">Painel Interativo de Eventos</div>
+    <div class="header-subtitle">Painel Interativo de Eventos com Exportação em PDF</div>
 </div>
 """,
     unsafe_allow_html=True,
@@ -283,6 +397,26 @@ dias = ["Todos os Dias"] + list(df_data["Data"].unique())
 dia_sel = st.sidebar.selectbox("Filtrar por Dia:", dias)
 espacos = ["Todos os Espaços"] + list(df_data["Espaço"].unique())
 espaco_sel = st.sidebar.selectbox("Filtrar por Espaço:", espacos)
+
+# Exportação de PDF por Espaço
+st.sidebar.divider()
+st.sidebar.header("📄 Exportar Calendário PDF")
+espaco_pdf = st.sidebar.selectbox(
+    "Selecione o Espaço para PDF:", list(df_data["Espaço"].unique())
+)
+
+if st.sidebar.button("⚙️ Gerar PDF do Espaço"):
+  df_pdf = df_data[df_data["Espaço"] == espaco_pdf]
+  if not df_pdf.empty:
+    pdf_bytes = generate_pdf_for_space(df_pdf, espaco_pdf)
+    st.sidebar.download_button(
+        label=f"📥 Baixar PDF ({espaco_pdf})",
+        data=pdf_bytes,
+        file_name=f"agenda_{espaco_pdf.lower().replace(' ', '_')}.pdf",
+        mime="application/pdf",
+    )
+  else:
+    st.sidebar.error("Sem eventos para este espaço.")
 
 # Aplicação dos Filtros
 df_filtered = df_data.copy()
@@ -352,3 +486,4 @@ with tab_calendar:
                     """,
               unsafe_allow_html=True,
           )
+            
