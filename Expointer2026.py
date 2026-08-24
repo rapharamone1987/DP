@@ -10,73 +10,95 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# 2. Estilização CSS Personalizada (Base de Cores Verdes)
+# 2. Estilização CSS Personalizada (Alto Contraste e Leitura Clara)
 custom_css = """
 <style>
     /* Fundo suave e fontes */
     .stApp {
-        background-color: #f4f7f5;
+        background-color: #f1f5f9;
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
     
     /* Cabeçalho Verde Expointer */
     .header-box {
         background: linear-gradient(135deg, #064e3b 0%, #15803d 100%);
-        color: #ffffff;
+        color: #ffffff !important;
         padding: 24px;
         border-radius: 12px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
     }
-    .header-title { font-size: 1.8rem; font-weight: 800; margin: 0; }
-    .header-subtitle { color: #a7f3d0; font-size: 0.95rem; margin-top: 4px; }
+    .header-title { font-size: 1.8rem; font-weight: 800; margin: 0; color: #ffffff !important; }
+    .header-subtitle { color: #dcfce7 !important; font-size: 0.95rem; margin-top: 4px; font-weight: 500; }
 
-    /* Cards em Tom Verde */
+    /* Cards em Tom Verde e Alto Contraste */
     .event-card {
-        background-color: #ffffff;
+        background-color: #ffffff !important;
         border-radius: 10px;
         padding: 14px;
         margin-bottom: 12px;
-        border-left: 5px solid #16a34a;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-    }
-    .event-card-desfile {
-        border-left-color: #d97706 !important;
-        background-color: #fffbeb !important;
+        border-left: 5px solid #15803d !important;
+        border-top: 1px solid #cbd5e1;
+        border-right: 1px solid #cbd5e1;
+        border-bottom: 1px solid #cbd5e1;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.06);
     }
     .badge-space {
-        background-color: #e6f4ea;
-        color: #137333;
-        padding: 3px 8px;
+        background-color: #0369a1 !important;
+        color: #ffffff !important;
+        padding: 4px 10px;
         border-radius: 6px;
         font-size: 0.75rem;
         font-weight: 700;
     }
     .badge-time {
-        background-color: #15803d;
-        color: #ffffff;
-        padding: 3px 8px;
+        background-color: #15803d !important;
+        color: #ffffff !important;
+        padding: 4px 10px;
         border-radius: 6px;
         font-size: 0.75rem;
         font-weight: 700;
     }
     
-    /* Estilo do Grid de Calendário */
-    .cal-cell {
-        background-color: #ffffff;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        padding: 10px;
-        min-height: 120px;
-    }
+    /* Card do Calendário Grid (Alto Contraste) */
     .cal-header {
-        background-color: #15803d;
-        color: white;
+        background-color: #064e3b !important;
+        color: #ffffff !important;
         text-align: center;
-        padding: 8px;
-        font-weight: bold;
+        padding: 10px;
+        font-weight: 800;
         border-radius: 6px;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+    }
+    .cal-event-box {
+        background-color: #ffffff !important;
+        border: 1px solid #94a3b8 !important;
+        border-left: 5px solid #15803d !important;
+        padding: 10px;
         margin-bottom: 10px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .cal-event-time {
+        color: #15803d !important;
+        font-weight: 800 !important;
+        font-size: 0.85rem !important;
+        display: block;
+        margin-bottom: 4px;
+    }
+    .cal-event-title {
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        line-height: 1.25;
+        margin-bottom: 6px;
+    }
+    .cal-event-meta {
+        color: #334155 !important;
+        font-size: 0.78rem !important;
+        font-weight: 600 !important;
     }
 </style>
 """
@@ -277,8 +299,8 @@ with tab_cards:
                         <span class="badge-space">📍 {row['Espaço']}</span>
                         <span class="badge-time">⏰ {row['Horário']}</span>
                     </div>
-                    <div style="font-weight:bold; color:#0f172a;">{row['Tema']}</div>
-                    <div style="color:#4b5563; font-size:0.8rem; margin-top:6px;">🏢 {row['Secretaria']} {f" | Resp: {row['Responsável']}" if row['Responsável'] else ""}</div>
+                    <div style="font-weight:700; color:#0f172a; font-size:1.02rem; margin-top:4px;">{row['Tema']}</div>
+                    <div style="color:#334155; font-size:0.83rem; font-weight:600; margin-top:8px;">🏢 {row['Secretaria']} {f" | Resp: {row['Responsável']}" if row['Responsável'] else ""}</div>
                 </div>
                 """
         cols[idx % 2].markdown(card_html, unsafe_allow_html=True)
@@ -306,11 +328,12 @@ with tab_calendar:
         for _, ev in evs_dia.iterrows():
           st.markdown(
               f"""
-                    <div style="background:#ffffff; border-left:4px solid #16a34a; padding:8px; margin-bottom:8px; border-radius:4px; font-size:0.8rem; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
-                        <span style="color:#15803d; font-weight:bold;">{ev['Horário']}</span><br/>
-                        <span style="font-weight:600; color:#1e293b;">{ev['Tema']}</span><br/>
-                        <span style="color:#64748b; font-size:0.75rem;">📍 {ev['Espaço']}</span>
+                    <div class="cal-event-box">
+                        <span class="cal-event-time">⏰ {ev['Horário']}</span>
+                        <div class="cal-event-title">{ev['Tema']}</div>
+                        <div class="cal-event-meta">📍 {ev['Espaço']}</div>
                     </div>
                     """,
               unsafe_allow_html=True,
-          )
+      )
+          
