@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# 2. Estilização CSS Personalizada
+# 2. Estilização CSS Personalizada (Alto Contraste)
 custom_css = """
 <style>
     .stApp {
@@ -254,8 +254,8 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   return pd.DataFrame(consolidated)
 
 
-# 4. Gerador de PDF Formatado por Espaço (ReportLab)
-def generate_pdf_for_space(df_space, space_name):
+# 4. Gerador de PDF Formatado (ReportLab)
+def generate_pdf_report(df_export, doc_title_info):
   buffer = io.BytesIO()
   doc = SimpleDocTemplate(
       buffer,
@@ -268,7 +268,6 @@ def generate_pdf_for_space(df_space, space_name):
   elements = []
   styles = getSampleStyleSheet()
 
-  # Estilos customizados
   title_style = ParagraphStyle(
       "DocTitle",
       parent=styles["Heading1"],
@@ -317,37 +316,38 @@ def generate_pdf_for_space(df_space, space_name):
       fontName="Helvetica",
   )
 
-  # Título do PDF
   elements.append(
       Paragraph("EXPOINTER 2026 — Programação Oficial", title_style)
   )
   elements.append(
-      Paragraph(f"Agenda do Espaço: <b>{space_name}</b>", subtitle_style)
+      Paragraph(f"Filtro do Relatório: <b>{doc_title_info}</b>", subtitle_style)
   )
 
-  # Tabela com dados
   table_data = [[
       Paragraph("Data", cell_header_style),
       Paragraph("Horário", cell_header_style),
+      Paragraph("Espaço / Auditório", cell_header_style),
       Paragraph("Atividade / Tema", cell_header_style),
-      Paragraph("Organização / Secretaria", cell_header_style),
-      Paragraph("Responsável", cell_header_style),
+      Paragraph("Organização / Responsável", cell_header_style),
   ]]
 
-  for _, row in df_space.iterrows():
+  for _, row in df_export.iterrows():
+    resp_str = f" ({row['Responsável']})" if row["Responsável"] else ""
+    org_resp = (
+        f"{row['Secretaria']}{resp_str}"
+        if row["Secretaria"]
+        else row["Responsável"]
+    )
+
     table_data.append([
         Paragraph(f"<b>{row['Data']}</b>", cell_meta_style),
         Paragraph(row["Horário"], cell_time_style),
+        Paragraph(row["Espaço"], cell_meta_style),
         Paragraph(row["Tema"], cell_title_style),
-        Paragraph(
-            row["Secretaria"] if row["Secretaria"] else "-", cell_meta_style
-        ),
-        Paragraph(
-            row["Responsável"] if row["Responsável"] else "-", cell_meta_style
-        ),
+        Paragraph(org_resp if org_resp else "-", cell_meta_style),
     ])
 
-  col_widths = [100, 90, 310, 150, 130]
+  col_widths = [90, 80, 130, 320, 160]
   t = Table(table_data, colWidths=col_widths, repeatRows=1)
   t.setStyle(
       TableStyle([
@@ -380,7 +380,7 @@ st.markdown(
     """
 <div class="header-box">
     <div class="header-title">🌾 EXPOINTER 2026 — Programação Oficial</div>
-    <div class="header-subtitle">Painel Interativo de Eventos com Exportação em PDF</div>
+    <div class="header-subtitle">Painel Interativo com Seleção Múltipla e Exportação em PDF</div>
 </div>
 """,
     unsafe_allow_html=True,
@@ -390,46 +390,64 @@ if df_data.empty:
   st.warning("Carregando ou nenhum dado encontrado na planilha.")
   st.stop()
 
-# Filtros na Barra Lateral
-st.sidebar.header("🌲 Filtros da Agenda")
-busca = st.sidebar.text_input("Buscar palavra-chave:", "")
-dias = ["Todos os Dias"] + list(df_data["Data"].unique())
-dia_sel = st.sidebar.selectbox("Filtrar por Dia:", dias)
-espacos = ["Todos os Espaços"] + list(df_data["Espaço"].unique())
-espaco_sel = st.sidebar.selectbox("Filtrar por Espaço:", espacos)
+# Filtros na Barra Lateral (Multiselect)
+st.sidebar.header("🌲 Filtros com Seleção Múltipla")
 
-# Exportação de PDF por Espaço
-st.sidebar.divider()
-st.sidebar.header("📄 Exportar Calendário PDF")
-espaco_pdf = st.sidebar.selectbox(
-    "Selecione o Espaço para PDF:", list(df_data["Espaço"].unique())
+busca = st.sidebar.text_input("Buscar palavra-chave:", "")
+
+todos_dias = list(df_data["Data"].unique())
+dias_sel = st.sidebar.multiselect("Filtrar por Dia(s):", todos_dias, default=[])
+
+todos_espacos = list(df_data["Espaço"].unique())
+espacos_sel = st.sidebar.multiselect(
+    "Filtrar por Espaço(s):", todos_espacos, default=[]
 )
 
-if st.sidebar.button("⚙️ Gerar PDF do Espaço"):
-  df_pdf = df_data[df_data["Espaço"] == espaco_pdf]
-  if not df_pdf.empty:
-    pdf_bytes = generate_pdf_for_space(df_pdf, espaco_pdf)
-    st.sidebar.download_button(
-        label=f"📥 Baixar PDF ({espaco_pdf})",
-        data=pdf_bytes,
-        file_name=f"agenda_{espaco_pdf.lower().replace(' ', '_')}.pdf",
-        mime="application/pdf",
-    )
-  else:
-    st.sidebar.error("Sem eventos para este espaço.")
+todas_sec = sorted([s for s in df_data["Secretaria"].unique() if s])
+sec_sel = st.sidebar.multiselect(
+    "Filtrar por Secretaria(s):", todas_sec, default=[]
+)
 
-# Aplicação dos Filtros
+# Aplicação dos Filtros no DataFrame
 df_filtered = df_data.copy()
+
 if busca:
   t = busca.lower()
   df_filtered = df_filtered[
       df_filtered["Tema"].str.lower().str.contains(t)
       | df_filtered["Espaço"].str.lower().str.contains(t)
+      | df_filtered["Responsável"].str.lower().str.contains(t)
   ]
-if dia_sel != "Todos os Dias":
-  df_filtered = df_filtered[df_filtered["Data"] == dia_sel]
-if espaco_sel != "Todos os Espaços":
-  df_filtered = df_filtered[df_filtered["Espaço"] == espaco_sel]
+
+if dias_sel:
+  df_filtered = df_filtered[df_filtered["Data"].isin(dias_sel)]
+
+if espacos_sel:
+  df_filtered = df_filtered[df_filtered["Espaço"].isin(espacos_sel)]
+
+if sec_sel:
+  df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
+
+# Exportação de PDF
+st.sidebar.divider()
+st.sidebar.header("📄 Exportar Calendário PDF")
+if st.sidebar.button("⚙️ Gerar PDF com Filtros Atuais"):
+  if not df_filtered.empty:
+    info_str = "Seleção Personalizada"
+    if espacos_sel:
+      info_str = f"Espaços: {', '.join(espacos_sel)}"
+    elif dias_sel:
+      info_str = f"Dias: {', '.join(dias_sel)}"
+
+    pdf_bytes = generate_pdf_report(df_filtered, info_str)
+    st.sidebar.download_button(
+        label="📥 Baixar PDF Gerado",
+        data=pdf_bytes,
+        file_name="agenda_expointer_selecao.pdf",
+        mime="application/pdf",
+    )
+  else:
+    st.sidebar.error("Sem eventos para gerar o PDF.")
 
 # Alternância de Visão por Abas
 tab_cards, tab_calendar = st.tabs(
@@ -439,7 +457,7 @@ tab_cards, tab_calendar = st.tabs(
 # --- ABA 1: VISÃO EM CARDS ---
 with tab_cards:
   if df_filtered.empty:
-    st.info("Nenhum evento encontrado.")
+    st.info("Nenhum evento encontrado para os filtros selecionados.")
   else:
     for data, grupo in df_filtered.groupby("Data", sort=False):
       st.markdown(f"### 📅 {data}")
@@ -457,23 +475,31 @@ with tab_cards:
                 """
         cols[idx % 2].markdown(card_html, unsafe_allow_html=True)
 
-# --- ABA 2: VISÃO EM CALENDÁRIO GRID ---
+# --- ABA 2: VISÃO EM CALENDÁRIO GRID COM SELETOR DE DIA ---
 with tab_calendar:
-  st.markdown("#### Matriz de Eventos por Espaço")
-  if df_filtered.empty:
-    st.info("Nenhum evento para exibir na matriz.")
-  else:
-    dias_grid = (
-        list(df_filtered["Data"].unique())
-        if dia_sel == "Todos os Dias"
-        else [dia_sel]
-    )
-    grid_cols = st.columns(len(dias_grid))
+  st.markdown("#### Matriz de Eventos em Grade")
 
-    for idx, d in enumerate(dias_grid):
+  # Seletor interativo para navegação rápida de dia na aba de calendário
+  dias_grid_opts = list(df_data["Data"].unique())
+  dia_grid_sel = st.selectbox(
+      "📆 Selecione o dia para focar na matriz:",
+      ["Exibir Todos Selecionados"] + dias_grid_opts,
+  )
+
+  df_grid = df_filtered.copy()
+  if dia_grid_sel != "Exibir Todos Selecionados":
+    df_grid = df_grid[df_grid["Data"] == dia_grid_sel]
+
+  if df_grid.empty:
+    st.info("Nenhum evento para exibir nesta visão.")
+  else:
+    dias_para_exibir = list(df_grid["Data"].unique())
+    grid_cols = st.columns(len(dias_para_exibir))
+
+    for idx, d in enumerate(dias_para_exibir):
       with grid_cols[idx]:
         st.markdown(f'<div class="cal-header">{d}</div>', unsafe_allow_html=True)
-        evs_dia = df_filtered[df_filtered["Data"] == d]
+        evs_dia = df_grid[df_grid["Data"] == d]
 
         for _, ev in evs_dia.iterrows():
           st.markdown(
