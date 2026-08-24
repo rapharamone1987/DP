@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# 2. Estilização CSS Personalizada (Alto Contraste)
+# 2. Estilização CSS Personalizada (Forçando contraste absoluto nas Abas)
 custom_css = """
 <style>
     .stApp {
@@ -33,18 +33,24 @@ custom_css = """
     .header-title { font-size: 1.8rem; font-weight: 800; margin: 0; color: #ffffff !important; }
     .header-subtitle { color: #dcfce7 !important; font-size: 0.95rem; margin-top: 4px; font-weight: 500; }
 
-    .stTabs [data-baseweb="tab-list"] { gap: 8px; }
-    .stTabs [data-baseweb="tab-list"] button {
+    /* CORREÇÃO DEFINITIVA DO TEXTO DAS ABAS (TABS) NO MOBILE E DESKTOP */
+    div[data-baseweb="tab-highlight"] {
+        background-color: #15803d !important;
+    }
+    .stTabs button {
         background-color: #e2e8f0 !important;
-        color: #1e293b !important;
-        font-weight: 700 !important;
-        font-size: 0.95rem !important;
         border-radius: 8px 8px 0px 0px !important;
         padding: 8px 16px !important;
     }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        background-color: #15803d !important;
-        color: #ffffff !important;
+    /* Alvo direto em p, span e rótulos das abas */
+    .stTabs button p, .stTabs button span, .stTabs [data-baseweb="tab"] p, .stTabs [data-baseweb="tab"] span {
+        color: #0f172a !important; /* Cor escura garantida nas abas inativas */
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+    }
+    .stTabs [aria-selected="true"] p, .stTabs [aria-selected="true"] span {
+        color: #15803d !important; /* Verde destacado na aba selecionada */
+        font-weight: 800 !important;
     }
 
     h1, h2, h3, h4, h5, h6, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
@@ -119,7 +125,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 
 
 # 3. Processamento de Dados
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   space_mapping = {
       "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
@@ -380,7 +386,7 @@ st.markdown(
     """
 <div class="header-box">
     <div class="header-title">🌾 EXPOINTER 2026 — Programação Oficial</div>
-    <div class="header-subtitle">Painel Interativo com Seleção Múltipla e Exportação em PDF</div>
+    <div class="header-subtitle">Painel Interativo de Eventos e Edição de Dados</div>
 </div>
 """,
     unsafe_allow_html=True,
@@ -390,22 +396,33 @@ if df_data.empty:
   st.warning("Carregando ou nenhum dado encontrado na planilha.")
   st.stop()
 
-# Filtros na Barra Lateral (Multiselect)
-st.sidebar.header("🌲 Filtros com Seleção Múltipla")
+# Filtros na Barra Lateral (Com placeholder em Português)
+st.sidebar.header("🌲 Filtros de Busca")
 
 busca = st.sidebar.text_input("Buscar palavra-chave:", "")
 
 todos_dias = list(df_data["Data"].unique())
-dias_sel = st.sidebar.multiselect("Filtrar por Dia(s):", todos_dias, default=[])
+dias_sel = st.sidebar.multiselect(
+    "Filtrar por Dia(s):",
+    todos_dias,
+    default=[],
+    placeholder="Selecione uma ou mais opções...",
+)
 
 todos_espacos = list(df_data["Espaço"].unique())
 espacos_sel = st.sidebar.multiselect(
-    "Filtrar por Espaço(s):", todos_espacos, default=[]
+    "Filtrar por Espaço(s):",
+    todos_espacos,
+    default=[],
+    placeholder="Selecione uma ou mais opções...",
 )
 
 todas_sec = sorted([s for s in df_data["Secretaria"].unique() if s])
 sec_sel = st.sidebar.multiselect(
-    "Filtrar por Secretaria(s):", todas_sec, default=[]
+    "Filtrar por Secretaria(s):",
+    todas_sec,
+    default=[],
+    placeholder="Selecione uma ou mais opções...",
 )
 
 # Aplicação dos Filtros no DataFrame
@@ -449,9 +466,9 @@ if st.sidebar.button("⚙️ Gerar PDF com Filtros Atuais"):
   else:
     st.sidebar.error("Sem eventos para gerar o PDF.")
 
-# Alternância de Visão por Abas
-tab_cards, tab_calendar = st.tabs(
-    ["📋 Visão em Lista / Cards", "📅 Visão Calendário (Grid)"]
+# Alternância de Visão por Abas (Incluindo Editor de Dados)
+tab_cards, tab_calendar, tab_edit = st.tabs(
+    ["📋 Visão em Cards", "📅 Visão Calendário", "✏️ Editar Dados da Planilha"]
 )
 
 # --- ABA 1: VISÃO EM CARDS ---
@@ -475,11 +492,9 @@ with tab_cards:
                 """
         cols[idx % 2].markdown(card_html, unsafe_allow_html=True)
 
-# --- ABA 2: VISÃO EM CALENDÁRIO GRID COM SELETOR DE DIA ---
+# --- ABA 2: VISÃO EM CALENDÁRIO GRID ---
 with tab_calendar:
   st.markdown("#### Matriz de Eventos em Grade")
-
-  # Seletor interativo para navegação rápida de dia na aba de calendário
   dias_grid_opts = list(df_data["Data"].unique())
   dia_grid_sel = st.selectbox(
       "📆 Selecione o dia para focar na matriz:",
@@ -512,4 +527,50 @@ with tab_calendar:
                     """,
               unsafe_allow_html=True,
           )
-            
+
+# --- ABA 3: EDITAR DADOS DIRETO NO APP ---
+with tab_edit:
+  st.markdown("### ✏️ Edição Interativa da Agenda")
+  st.info(
+      "Altere dados, horários ou adicione novas linhas na tabela abaixo. Após"
+      " editar, clique no botão **Salvar Alterações**."
+  )
+
+  # Editor interativo
+  edited_df = st.data_editor(
+      df_data,
+      num_rows="dynamic",
+      use_container_width=True,
+      column_config={
+          "Espaço": st.column_config.SelectboxColumn(
+              "Espaço / Local", options=todos_espacos, required=True
+          ),
+          "Data": st.column_config.SelectboxColumn(
+              "Dia", options=todos_dias, required=True
+          ),
+          "Horário": st.column_config.TextColumn(
+              "Horário (ex: 09:00 - 10:00)", required=True
+          ),
+          "Tema": st.column_config.TextColumn(
+              "Atividade / Tema", required=True
+          ),
+          "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
+          "Responsável": st.column_config.TextColumn("Responsável"),
+      },
+  )
+
+  if st.button("💾 Salvar Alterações na Planilha"):
+    excel_path = "Grade Expointer 2026.xlsx"
+    with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
+      for space_name, group in edited_df.groupby("Espaço"):
+        sheet_title = f"Agenda {space_name}"
+        if len(sheet_title) > 31:
+          sheet_title = sheet_title[:31]
+        group.to_excel(writer, sheet_name=sheet_title, index=False)
+
+    st.success(
+        "✅ Alterações salvas com sucesso! Atualize a página para ver os novos"
+        " dados."
+    )
+    st.cache_data.clear()
+      
