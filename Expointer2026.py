@@ -37,50 +37,22 @@ custom_css = """
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
     
-    /* BANNER COM AS ESFERAS TRICOLORES E O TÍTULO ANTERIOR */
+    /* BANNER INSTITUCIONAL */
     .header-banner {
         background: linear-gradient(135deg, #15803d 0%, #064e3b 100%);
         border-radius: 16px;
-        padding: 28px 20px;
+        padding: 24px 20px;
         text-align: center;
         color: #ffffff !important;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         margin-bottom: 24px;
         border-bottom: 4px solid #eab308;
     }
-    
-    /* ILUSTRAÇÃO DAS ESFERAS SIMBOLICAS (VERDE, VERMELHO E AMARELO) */
-    .spheres-container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-        gap: 6px;
-        margin-bottom: 10px;
-    }
-    .sphere {
-        border-radius: 50%;
-        box-shadow: inset -3px -3px 6px rgba(0,0,0,0.3), 0 4px 6px rgba(0,0,0,0.2);
-    }
-    .sphere-green {
-        width: 22px;
-        height: 22px;
-        background: radial-gradient(circle at 30% 30%, #4ade80, #16a34a);
-    }
-    .sphere-red {
-        width: 32px;
-        height: 32px;
-        background: radial-gradient(circle at 30% 30%, #f87171, #dc2626);
-    }
-    .sphere-yellow {
-        width: 20px;
-        height: 20px;
-        background: radial-gradient(circle at 30% 30%, #fde047, #ca8a04);
-    }
 
     .header-logo-title {
         font-size: 2.2rem;
         font-weight: 900;
-        margin: 0;
+        margin: 10px 0 0 0;
         color: #ffffff !important;
         letter-spacing: -0.5px;
     }
@@ -91,7 +63,7 @@ custom_css = """
         font-weight: 600;
     }
 
-    /* ROTULOS DE CAMPOS E CONTRASTE */
+    /* CONTRASTE E ROTULOS */
     label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {
         color: #0f172a !important;
         font-weight: 700 !important;
@@ -437,15 +409,32 @@ def generate_pdf_report(df_export, doc_title_info):
 
 df_data = load_and_process_data()
 
-# 5. Banner Institucional com as Esferas e o Título Original
+# 5. Banner Institucional Suportando a Imagem Exata das Esferas
+image_path = "esferas.png"
+
+st.markdown('<div class="header-banner">', unsafe_allow_html=True)
+
+if os.path.exists(image_path):
+  st.image(image_path, width=140)
+elif os.path.exists("logo.png"):
+  st.image("logo.png", width=140)
+elif os.path.exists("esferas.jpg"):
+  st.image("esferas.jpg", width=140)
+else:
+  st.markdown(
+      """
+        <div style="margin-bottom: 8px;">
+            <img src="https://www.expointer.rs.gov.br/upload/recortes/202308/25134139_163820_GD.png" 
+                 alt="Esferas Expointer" 
+                 style="height: 65px; object-fit: contain;"
+                 onerror="this.style.display='none'">
+        </div>
+    """,
+      unsafe_allow_html=True,
+  )
+
 st.markdown(
     """
-<div class="header-banner">
-    <div class="spheres-container">
-        <div class="sphere sphere-green"></div>
-        <div class="sphere sphere-red"></div>
-        <div class="sphere sphere-yellow"></div>
-    </div>
     <div class="header-logo-title">EXPOINTER 2026 — Programação Oficial</div>
     <div class="header-subtitle">Painel Interativo de Eventos</div>
 </div>
@@ -648,3 +637,4 @@ with tab_edit:
     st.error("❌ Senha incorreta. Acesso negado.")
   else:
     st.warning("⚠️ Digite a senha para liberar a edição.")
+      
