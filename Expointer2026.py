@@ -10,7 +10,7 @@ import streamlit as st
 
 # 1. Configuração da Página
 st.set_page_config(
-    page_title="EXPOINTER 2026 — Agenda Oficial",
+    page_title="EXPOINTER 2026 — Agenda Institucional",
     page_icon="🌾",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -406,7 +406,7 @@ def generate_pdf_report(df_export, doc_title_info):
   )
 
   elements.append(
-      Paragraph("EXPOINTER 2026 — Programação Oficial", title_style)
+      Paragraph("EXPOINTER 2026 — Programação Institucional", title_style)
   )
   elements.append(
       Paragraph(f"Filtro do Relatório: <b>{doc_title_info}</b>", subtitle_style)
