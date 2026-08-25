@@ -32,7 +32,50 @@ ORDEM_DIAS = [
 ]
 
 
-# Função para extrair estritamente o padrão HH:MM
+# Função para extrair a imagem do banner em Base64 para usar também no fundo
+def get_banner_image_b64():
+  possible_images = [
+      "Screenshot_20260825-095320~2.jpg",
+      "esferas.jpg",
+      "esferas.jpeg",
+      "esferas.png",
+      "logo.jpg",
+      "logo.png",
+  ]
+  for img in possible_images:
+    if os.path.exists(img):
+      ext = img.split(".")[-1].lower()
+      mime_type = "image/jpeg" if ext in ["jpg", "jpeg"] else "image/png"
+      with open(img, "rb") as img_f:
+        b64_str = base64.b64encode(img_f.read()).decode()
+      return f"data:{mime_type};base64,{b64_str}", img
+  return None, None
+
+
+img_b64_url, found_img_path = get_banner_image_b64()
+
+# Define o CSS com a imagem de fundo usando alta opacidade/overlay
+if img_b64_url:
+  bg_style = f"""
+    .stApp {{
+        background: linear-gradient(rgba(248, 250, 252, 0.90), rgba(248, 250, 252, 0.92)), url("{img_b64_url}") !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        background-attachment: fixed !important;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }}
+    """
+else:
+  bg_style = """
+    .stApp {
+        background-color: #f8fafc !important;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    """
+
+
+# Função para limpar e extrair estritamente o padrão HH:MM
 def clean_time_string(time_str):
   if not time_str or pd.isna(time_str):
     return ""
@@ -51,15 +94,12 @@ def clean_time_string(time_str):
   return s
 
 
-# 2. Estilização CSS Personalizada com Foco em Alto Contraste
-custom_css = """
+# 2. Estilização CSS Personalizada
+custom_css = f"""
 <style>
-    .stApp {
-        background-color: #f8fafc !important;
-        font-family: 'Segoe UI', system-ui, sans-serif;
-    }
+    {bg_style}
     
-    .header-banner {
+    .header-banner {{
         background: linear-gradient(135deg, #064e3b 0%, #15803d 100%) !important;
         border-radius: 16px;
         padding: 28px 20px;
@@ -67,32 +107,32 @@ custom_css = """
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         margin-bottom: 24px;
         border-bottom: 5px solid #eab308;
-    }
+    }}
 
-    .spheres-box {
+    .spheres-box {{
         display: inline-flex;
         align-items: flex-end;
         justify-content: center;
         gap: 6px;
         margin-bottom: 12px;
-    }
-    .s-green {
+    }}
+    .s-green {{
         width: 20px; height: 20px; border-radius: 50%;
         background: radial-gradient(circle at 35% 35%, #4ade80, #15803d);
         box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    .s-red {
+    }}
+    .s-red {{
         width: 30px; height: 30px; border-radius: 50%;
         background: radial-gradient(circle at 35% 35%, #f87171, #b91c1c);
         box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    .s-yellow {
+    }}
+    .s-yellow {{
         width: 18px; height: 18px; border-radius: 50%;
         background: radial-gradient(circle at 35% 35%, #fde047, #a16207);
         box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
+    }}
 
-    .header-logo-title {
+    .header-logo-title {{
         font-size: 2.1rem !important;
         font-weight: 900 !important;
         color: #ffffff !important;
@@ -100,81 +140,80 @@ custom_css = """
         padding: 0 !important;
         letter-spacing: -0.5px;
         line-height: 1.2;
-    }
-    .header-subtitle {
+    }}
+    .header-subtitle {{
         color: #dcfce7 !important;
         font-size: 1.05rem !important;
         margin-top: 8px !important;
         font-weight: 600 !important;
-    }
+    }}
 
-    label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {
+    label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {{
         color: #0f172a !important;
         font-weight: 700 !important;
-    }
+    }}
 
-    div[data-baseweb="tab-highlight"] {
+    div[data-baseweb="tab-highlight"] {{
         background-color: #15803d !important;
-    }
-    .stTabs button {
-        background-color: #e2e8f0 !important;
+    }}
+    .stTabs button {{
+        background-color: rgba(226, 232, 240, 0.8) !important;
         border-radius: 8px 8px 0px 0px !important;
         padding: 10px 20px !important;
-    }
-    .stTabs button p, .stTabs button span, .stTabs [data-baseweb="tab"] * {
+    }}
+    .stTabs button p, .stTabs button span, .stTabs [data-baseweb="tab"] * {{
         color: #0f172a !important;
         font-weight: 700 !important;
         font-size: 1rem !important;
-    }
-    .stTabs [aria-selected="true"] p, .stTabs [aria-selected="true"] span, .stTabs [aria-selected="true"] * {
+    }}
+    .stTabs [aria-selected="true"] p, .stTabs [aria-selected="true"] span, .stTabs [aria-selected="true"] * {{
         color: #15803d !important;
         font-weight: 800 !important;
-    }
+    }}
 
     /* ESTILIZAÇÃO DOS CARDS */
-    .event-card {
-        background-color: #ffffff !important;
+    .event-card {{
+        background-color: rgba(255, 255, 255, 0.95) !important;
         border-radius: 10px;
         padding: 16px;
         margin-bottom: 12px;
         border-left: 6px solid #15803d !important;
         border: 1px solid #cbd5e1;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
+    }}
 
-    .event-card-vago {
-        background-color: #f8fafc !important;
+    .event-card-vago {{
+        background-color: rgba(248, 250, 252, 0.92) !important;
         border-radius: 10px;
         padding: 14px;
         margin-bottom: 12px;
         border-left: 6px solid #64748b !important;
         border: 1px dashed #94a3b8;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-    }
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }}
 
-    /* CONTRASTE ALTO */
-    .card-space-tag {
+    .card-space-tag {{
         color: #0369a1 !important;
         font-weight: 800 !important;
         font-size: 0.9rem !important;
-    }
-    .card-time-tag {
+    }}
+    .card-time-tag {{
         color: #15803d !important;
         font-weight: 800 !important;
         font-size: 0.9rem !important;
-    }
-    .card-time-vago {
+    }}
+    .card-time-vago {{
         color: #475569 !important;
         font-weight: 800 !important;
         font-size: 0.9rem !important;
-    }
-    .card-meta-text {
+    }}
+    .card-meta-text {{
         color: #1e293b !important;
         font-weight: 700 !important;
         font-size: 0.88rem !important;
-    }
+    }}
 
-    .cal-header {
+    .cal-header {{
         background-color: #064e3b !important;
         color: #ffffff !important;
         text-align: center;
@@ -183,26 +222,26 @@ custom_css = """
         border-radius: 8px;
         margin-bottom: 12px;
         font-size: 0.95rem;
-    }
-    .cal-event-box {
-        background-color: #ffffff !important;
+    }}
+    .cal-event-box {{
+        background-color: rgba(255, 255, 255, 0.95) !important;
         border: 1px solid #cbd5e1 !important;
         border-left: 5px solid #15803d !important;
         padding: 10px;
         margin-bottom: 10px;
         border-radius: 6px;
         font-size: 0.85rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-    }
-    .cal-event-vago {
-        background-color: #f8fafc !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }}
+    .cal-event-vago {{
+        background-color: rgba(248, 250, 252, 0.92) !important;
         border: 1px dashed #cbd5e1 !important;
         border-left: 5px solid #94a3b8 !important;
         padding: 10px;
         margin-bottom: 10px;
         border-radius: 6px;
         font-size: 0.85rem;
-    }
+    }}
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
@@ -477,29 +516,9 @@ def generate_pdf_report(df_export, doc_title_info):
 
 df_data = load_and_process_data()
 
-# 5. Banner Institucional com Novo Título
-image_html = ""
-possible_images = [
-    "Screenshot_20260825-095320~2.jpg",
-    "esferas.jpg",
-    "esferas.jpeg",
-    "esferas.png",
-    "logo.jpg",
-    "logo.png",
-]
-found_img = None
-
-for img in possible_images:
-  if os.path.exists(img):
-    found_img = img
-    break
-
-if found_img:
-  ext = found_img.split(".")[-1].lower()
-  mime_type = "image/jpeg" if ext in ["jpg", "jpeg"] else "image/png"
-  with open(found_img, "rb") as img_f:
-    b64_str = base64.b64encode(img_f.read()).decode()
-  image_html = f'<img src="data:{mime_type};base64,{b64_str}" style="max-height:75px; margin-bottom:10px; border-radius:6px;" />'
+# 5. Banner Institucional
+if img_b64_url:
+  image_html = f'<img src="{img_b64_url}" style="max-height:75px; margin-bottom:10px; border-radius:6px;" />'
 else:
   image_html = """
     <div class="spheres-box">
@@ -528,7 +547,7 @@ todas_sec = sorted(
     [s for s in df_data["Secretaria"].unique() if s and s != "🔓 HORÁRIO VAGO"]
 )
 
-# 6. Painel de Filtros
+# 6. Painel de Filtros Direto na Página Principal
 st.markdown("### 🔍 Pesquisar e Filtrar Eventos")
 with st.container():
   col_busca, col_dias, col_vagos = st.columns([2, 2, 1])
@@ -652,7 +671,7 @@ with tab_cards:
                 """
         cols[idx % 2].markdown(card_html, unsafe_allow_html=True)
 
-# --- ABA 2: VISÃO EM CALENDÁRIO GRID (COM SECRETARIA E RESPONSÁVEL) ---
+# --- ABA 2: VISÃO EM CALENDÁRIO GRID ---
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia específico na grade:",
@@ -685,8 +704,8 @@ with tab_calendar:
               else ""
           )
           resp_display = (
-              f"<div style='color:#475569; font-size:0.75rem;' font-weight:500;'>👤"
-              f" {ev['Responsável']}</div>"
+              f"<div style='color:#475569; font-size:0.75rem; font-weight:500;'>"
+              f"👤 {ev['Responsável']}</div>"
               if ev["Responsável"]
               else ""
           )
@@ -732,7 +751,7 @@ with tab_edit:
                 "Horário (ex: 09:00 - 10:00)", required=True
             ),
             "Tema": st.column_config.TextColumn(
-                "Atividade / Tema (or 🔓 HORÁRIO VAGO)", required=True
+                "Atividade / Tema (ou 🔓 HORÁRIO VAGO)", required=True
             ),
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
             "Responsável": st.column_config.TextColumn("Responsável"),
