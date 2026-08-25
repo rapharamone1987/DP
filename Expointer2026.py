@@ -642,4 +642,4 @@ with tab_edit:
   elif senha:
     st.error("❌ Senha incorreta. Acesso negado.")
   else:
-    st.warning("⚠️ Digite a senha para lib
+    st.warning("⚠️ Digite a senha para liberar a edição.")
