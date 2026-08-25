@@ -30,7 +30,7 @@ ORDEM_DIAS = [
     "Outros",
 ]
 
-# 2. Estilização CSS Personalizada
+# 2. Estilização CSS Personalizada com Foco Total em Alto Contraste
 custom_css = """
 <style>
     .stApp {
@@ -110,7 +110,7 @@ custom_css = """
         font-weight: 800 !important;
     }
 
-    /* CARDS NORMAIS */
+    /* ESTILIZAÇÃO DOS CARDS (TEXTOS ESCUROS E NÍTIDOS) */
     .event-card {
         background-color: #ffffff !important;
         border-radius: 10px;
@@ -121,9 +121,8 @@ custom_css = """
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    /* CARDS DE HORÁRIO VAGO / DISPONÍVEL */
     .event-card-vago {
-        background-color: #f1f5f9 !important;
+        background-color: #f8fafc !important;
         border-radius: 10px;
         padding: 14px;
         margin-bottom: 12px;
@@ -132,30 +131,28 @@ custom_css = """
         box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
 
-    .badge-space {
-        background-color: #0284c7 !important;
-        color: #ffffff !important;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.78rem;
-        font-weight: 700;
+    /* CORES DE CONTRASTE MÁXIMO */
+    .card-space-tag {
+        color: #0369a1 !important;
+        font-weight: 800 !important;
+        font-size: 0.9rem !important;
     }
-    .badge-time {
-        background-color: #15803d !important;
-        color: #ffffff !important;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.78rem;
-        font-weight: 700;
+    .card-time-tag {
+        color: #15803d !important;
+        font-weight: 800 !important;
+        font-size: 0.9rem !important;
     }
-    .badge-vago {
-        background-color: #64748b !important;
-        color: #ffffff !important;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.78rem;
-        font-weight: 700;
+    .card-time-vago {
+        color: #475569 !important;
+        font-weight: 800 !important;
+        font-size: 0.9rem !important;
     }
+    .card-meta-text {
+        color: #1e293b !important;
+        font-weight: 700 !important;
+        font-size: 0.88rem !important;
+    }
+
     .cal-header {
         background-color: #064e3b !important;
         color: #ffffff !important;
@@ -184,17 +181,6 @@ custom_css = """
         margin-bottom: 10px;
         border-radius: 6px;
         font-size: 0.85rem;
-    }
-    .cal-event-time {
-        color: #15803d !important;
-        font-weight: 800 !important;
-        display: block;
-        margin-bottom: 4px;
-    }
-    .cal-event-title {
-        font-weight: 700 !important;
-        color: #0f172a !important;
-        margin-bottom: 6px;
     }
 </style>
 """
@@ -292,10 +278,21 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
             "horário vago",
             "nan",
         ]
+
+        # Limpeza de prefixos residuais no horário
+        horario_limpo = (
+            horario.replace("Segun", "")
+            .replace("Sáb", "")
+            .replace("Dom", "")
+            .strip()
+        )
+        if not horario_limpo:
+          horario_limpo = horario
+
         raw_events.append({
             "Espaço": space_mapping[sheet],
             "Data": current_date,
-            "Horário": horario,
+            "Horário": horario_limpo,
             "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
             "Secretaria": "" if is_vago else (sec if sec != "nan" else ""),
             "Responsável": "" if is_vago else (resp if resp != "nan" else ""),
@@ -532,9 +529,7 @@ with st.container():
         placeholder="Selecione os dias...",
     )
   with col_vagos:
-    exibir_vagos = st.checkbox(
-        "🔓 Mostrar Horários Vagose Disponíveis", value=True
-    )
+    exibir_vagos = st.checkbox("🔓 Mostrar Horários Vagos", value=True)
 
   col_espaco, col_sec = st.columns(2)
   with col_espaco:
@@ -607,7 +602,7 @@ tab_cards, tab_calendar, tab_edit = st.tabs(
     ["📋 Visão em Cards", "📅 Visão Calendário (Grid)", "🔒 Área de Edição"]
 )
 
-# --- ABA 1: VISÃO EM CARDS ---
+# --- ABA 1: VISÃO EM CARDS COM CONTRASTE ESCURO GARANTIDO ---
 with tab_cards:
   if df_filtered.empty:
     st.info("Nenhum evento encontrado para os filtros selecionados acima.")
@@ -618,17 +613,25 @@ with tab_cards:
       for idx, (_, row) in enumerate(grupo.iterrows()):
         is_vago = row["Tema"] == "🔓 HORÁRIO VAGO"
         card_class = "event-card-vago" if is_vago else "event-card"
-        badge_class = "badge-vago" if is_vago else "badge-time"
+        time_class = "card-time-vago" if is_vago else "card-time-tag"
+
+        sec_info = f"🏢 {row['Secretaria']}" if row["Secretaria"] else ""
+        resp_info = (
+            f" | Resp: {row['Responsável']}" if row["Responsável"] else ""
+        )
+        meta_line = f"{sec_info}{resp_info}".strip()
 
         card_html = f"""
                 <div class="{card_class}">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <span class="badge-space">📍 {row['Espaço']}</span>
-                        <span class="{badge_class}">⏰ {row['Horário']}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <span class="{time_class}">⏰ {row['Horário']}</span>
                     </div>
-                    <div style="font-weight:700; color:{'#64748b' if is_vago else '#0f172a'}; font-size:1.02rem; margin-top:4px;">{row['Tema']}</div>
-                    <div style="color:#334155; font-size:0.83rem; font-weight:600; margin-top:8px;">
-                        {f"🏢 {row['Secretaria']}" if row['Secretaria'] else ""} {f" | Resp: {row['Responsável']}" if row['Responsável'] else ""}
+                    <div style="font-weight:800; font-size:1.02rem; color:{'#475569' if is_vago else '#0f172a'}; margin-bottom:8px;">
+                        {row['Tema']}
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="card-space-tag">📍 {row['Espaço']}</span>
+                        <span class="card-meta-text">{meta_line}</span>
                     </div>
                 </div>
                 """
@@ -662,9 +665,9 @@ with tab_calendar:
           st.markdown(
               f"""
                     <div class="{box_class}">
-                        <span class="cal-event-time">⏰ {ev['Horário']}</span>
-                        <div class="cal-event-title" style="color: {'#64748b' if is_vago else '#0f172a'};">{ev['Tema']}</div>
-                        <div class="cal-event-meta">📍 {ev['Espaço']}</div>
+                        <span style="color:#15803d; font-weight:800; display:block; margin-bottom:4px;">⏰ {ev['Horário']}</span>
+                        <div style="font-weight:700; color:{'#475569' if is_vago else '#0f172a'}; margin-bottom:6px;">{ev['Tema']}</div>
+                        <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
                     </div>
                     """,
               unsafe_allow_html=True,
@@ -679,8 +682,8 @@ with tab_edit:
     st.success("🔓 Acesso liberado!")
     st.info(
         "💡 **Como ajustar a agenda:** Para agendar um evento em um horário"
-        " livre, substitua `🔓 HORÁRIO VAGO` pelo nome/tema do evento e preencha"
-        " a Secretaria/Responsável."
+        " livre, substitua `🔓 HORÁRIO VAGO` pelo nome do evento e preencha a"
+        " Secretaria/Responsável."
     )
 
     edited_df = st.data_editor(
