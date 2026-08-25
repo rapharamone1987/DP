@@ -110,6 +110,7 @@ custom_css = """
         font-weight: 800 !important;
     }
 
+    /* CARDS NORMAIS */
     .event-card {
         background-color: #ffffff !important;
         border-radius: 10px;
@@ -119,6 +120,18 @@ custom_css = """
         border: 1px solid #cbd5e1;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
+
+    /* CARDS DE HORÁRIO VAGO / DISPONÍVEL */
+    .event-card-vago {
+        background-color: #f1f5f9 !important;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 12px;
+        border-left: 6px solid #64748b !important;
+        border: 1px dashed #94a3b8;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
     .badge-space {
         background-color: #0284c7 !important;
         color: #ffffff !important;
@@ -129,6 +142,14 @@ custom_css = """
     }
     .badge-time {
         background-color: #15803d !important;
+        color: #ffffff !important;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+    .badge-vago {
+        background-color: #64748b !important;
         color: #ffffff !important;
         padding: 4px 10px;
         border-radius: 6px;
@@ -154,6 +175,15 @@ custom_css = """
         border-radius: 6px;
         font-size: 0.85rem;
         box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .cal-event-vago {
+        background-color: #f8fafc !important;
+        border: 1px dashed #cbd5e1 !important;
+        border-left: 5px solid #94a3b8 !important;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        font-size: 0.85rem;
     }
     .cal-event-time {
         color: #15803d !important;
@@ -253,17 +283,22 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
       if (
           horario
           and horario.lower() != "horário"
-          and tema
-          and tema.lower() != "tema"
           and not ("características" in horario.lower())
       ):
+        is_vago = not tema or tema.lower() in [
+            "livre",
+            "vago",
+            "disponível",
+            "horário vago",
+            "nan",
+        ]
         raw_events.append({
             "Espaço": space_mapping[sheet],
             "Data": current_date,
             "Horário": horario,
-            "Tema": tema,
-            "Secretaria": sec if sec != "nan" else "",
-            "Responsável": resp if resp != "nan" else "",
+            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
+            "Secretaria": "" if is_vago else (sec if sec != "nan" else ""),
+            "Responsável": "" if is_vago else (resp if resp != "nan" else ""),
         })
 
   df_events = pd.DataFrame(raw_events)
@@ -430,7 +465,7 @@ def generate_pdf_report(df_export, doc_title_info):
 
 df_data = load_and_process_data()
 
-# 5. Detecção e Renderização da Imagem Local (.jpg, .jpeg, .png)
+# 5. Detecção e Renderização da Imagem Local
 image_html = ""
 possible_images = [
     "Screenshot_20260825-095320~2.jpg",
@@ -466,7 +501,7 @@ banner_complete = f"""
 <div class="header-banner">
     {image_html}
     <div class="header-logo-title">EXPOINTER 2026 — Programação Oficial</div>
-    <div class="header-subtitle">Painel Interativo de Eventos</div>
+    <div class="header-subtitle">Painel Interativo de Eventos & Gestão de Horários</div>
 </div>
 """
 st.markdown(banner_complete, unsafe_allow_html=True)
@@ -477,12 +512,14 @@ if df_data.empty:
 
 todos_dias = [d for d in ORDEM_DIAS if d in df_data["Data"].unique()]
 todos_espacos = sorted(list(df_data["Espaço"].unique()))
-todas_sec = sorted([s for s in df_data["Secretaria"].unique() if s])
+todas_sec = sorted(
+    [s for s in df_data["Secretaria"].unique() if s and s != "🔓 HORÁRIO VAGO"]
+)
 
 # 6. Painel de Filtros Direto na Página Principal
 st.markdown("### 🔍 Pesquisar e Filtrar Eventos")
 with st.container():
-  col_busca, col_dias = st.columns([1, 2])
+  col_busca, col_dias, col_vagos = st.columns([2, 2, 1])
   with col_busca:
     busca = st.text_input(
         "🔎 Palavra-chave:", "", placeholder="Digite tema, palavra ou local..."
@@ -493,6 +530,10 @@ with st.container():
         todos_dias,
         default=[],
         placeholder="Selecione os dias...",
+    )
+  with col_vagos:
+    exibir_vagos = st.checkbox(
+        "🔓 Mostrar Horários Vagose Disponíveis", value=True
     )
 
   col_espaco, col_sec = st.columns(2)
@@ -513,6 +554,10 @@ with st.container():
 
 # Aplicação dos Filtros
 df_filtered = df_data.copy()
+
+if not exibir_vagos:
+  df_filtered = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
+
 if busca:
   t = busca.lower()
   df_filtered = df_filtered[
@@ -571,14 +616,20 @@ with tab_cards:
       st.markdown(f"#### 📅 {data}")
       cols = st.columns(2)
       for idx, (_, row) in enumerate(grupo.iterrows()):
+        is_vago = row["Tema"] == "🔓 HORÁRIO VAGO"
+        card_class = "event-card-vago" if is_vago else "event-card"
+        badge_class = "badge-vago" if is_vago else "badge-time"
+
         card_html = f"""
-                <div class="event-card">
+                <div class="{card_class}">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span class="badge-space">📍 {row['Espaço']}</span>
-                        <span class="badge-time">⏰ {row['Horário']}</span>
+                        <span class="{badge_class}">⏰ {row['Horário']}</span>
                     </div>
-                    <div style="font-weight:700; color:#0f172a; font-size:1.02rem; margin-top:4px;">{row['Tema']}</div>
-                    <div style="color:#334155; font-size:0.83rem; font-weight:600; margin-top:8px;">🏢 {row['Secretaria']} {f" | Resp: {row['Responsável']}" if row['Responsável'] else ""}</div>
+                    <div style="font-weight:700; color:{'#64748b' if is_vago else '#0f172a'}; font-size:1.02rem; margin-top:4px;">{row['Tema']}</div>
+                    <div style="color:#334155; font-size:0.83rem; font-weight:600; margin-top:8px;">
+                        {f"🏢 {row['Secretaria']}" if row['Secretaria'] else ""} {f" | Resp: {row['Responsável']}" if row['Responsável'] else ""}
+                    </div>
                 </div>
                 """
         cols[idx % 2].markdown(card_html, unsafe_allow_html=True)
@@ -606,11 +657,13 @@ with tab_calendar:
         evs_dia = df_grid[df_grid["Data"] == d]
 
         for _, ev in evs_dia.iterrows():
+          is_vago = ev["Tema"] == "🔓 HORÁRIO VAGO"
+          box_class = "cal-event-vago" if is_vago else "cal-event-box"
           st.markdown(
               f"""
-                    <div class="cal-event-box">
+                    <div class="{box_class}">
                         <span class="cal-event-time">⏰ {ev['Horário']}</span>
-                        <div class="cal-event-title">{ev['Tema']}</div>
+                        <div class="cal-event-title" style="color: {'#64748b' if is_vago else '#0f172a'};">{ev['Tema']}</div>
                         <div class="cal-event-meta">📍 {ev['Espaço']}</div>
                     </div>
                     """,
@@ -619,14 +672,15 @@ with tab_calendar:
 
 # --- ABA 3: ÁREA DE EDIÇÃO PROTEGIDA ---
 with tab_edit:
-  st.markdown("### 🔒 Edição Restrita da Planilha")
+  st.markdown("### 🔒 Edição Restrita da Planilha (Ajuste de Horários & Vagas)")
   senha = st.text_input("Digite a senha de administrador:", type="password")
 
   if senha == "expointer2026":
     st.success("🔓 Acesso liberado!")
     st.info(
-        "Altere dados, horários ou adicione novas linhas na tabela abaixo. Após"
-        " editar, clique em **Salvar Alterações**."
+        "💡 **Como ajustar a agenda:** Para agendar um evento em um horário"
+        " livre, substitua `🔓 HORÁRIO VAGO` pelo nome/tema do evento e preencha"
+        " a Secretaria/Responsável."
     )
 
     edited_df = st.data_editor(
@@ -644,7 +698,7 @@ with tab_edit:
                 "Horário (ex: 09:00 - 10:00)", required=True
             ),
             "Tema": st.column_config.TextColumn(
-                "Atividade / Tema", required=True
+                "Atividade / Tema (ou 🔓 HORÁRIO VAGO)", required=True
             ),
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
             "Responsável": st.column_config.TextColumn("Responsável"),
@@ -660,7 +714,7 @@ with tab_edit:
             sheet_title = sheet_title[:31]
           group.to_excel(writer, sheet_name=sheet_title, index=False)
 
-      st.success("✅ Alterações salvas com sucesso!")
+      st.success("✅ Alterações e ajustes salvos com sucesso!")
       st.cache_data.clear()
   elif senha:
     st.error("❌ Senha incorreta. Acesso negado.")
