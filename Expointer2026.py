@@ -9,7 +9,7 @@ import streamlit as st
 
 # 1. Configuração da Página
 st.set_page_config(
-    page_title="49ª EXPOINTER 2026 — Agenda Oficial",
+    page_title="EXPOINTER 2026 — Agenda Oficial",
     page_icon="🌾",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -37,60 +37,61 @@ custom_css = """
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
     
-    /* BANNER INSTITUCIONAL OFICIAL DA 49ª EXPOINTER */
+    /* BANNER COM AS ESFERAS TRICOLORES E O TÍTULO ANTERIOR */
     .header-banner {
         background: linear-gradient(135deg, #15803d 0%, #064e3b 100%);
         border-radius: 16px;
-        padding: 32px 20px;
+        padding: 28px 20px;
         text-align: center;
         color: #ffffff !important;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         margin-bottom: 24px;
         border-bottom: 4px solid #eab308;
     }
-    .brand-badge {
-        display: inline-block;
-        background-color: #dc2626;
-        color: #ffffff !important;
-        font-weight: 800;
-        font-size: 0.85rem;
-        padding: 4px 12px;
-        border-radius: 20px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 8px;
+    
+    /* ILUSTRAÇÃO DAS ESFERAS SIMBOLICAS (VERDE, VERMELHO E AMARELO) */
+    .spheres-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 6px;
+        margin-bottom: 10px;
     }
+    .sphere {
+        border-radius: 50%;
+        box-shadow: inset -3px -3px 6px rgba(0,0,0,0.3), 0 4px 6px rgba(0,0,0,0.2);
+    }
+    .sphere-green {
+        width: 22px;
+        height: 22px;
+        background: radial-gradient(circle at 30% 30%, #4ade80, #16a34a);
+    }
+    .sphere-red {
+        width: 32px;
+        height: 32px;
+        background: radial-gradient(circle at 30% 30%, #f87171, #dc2626);
+    }
+    .sphere-yellow {
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(circle at 30% 30%, #fde047, #ca8a04);
+    }
+
     .header-logo-title {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
         font-weight: 900;
-        margin: 4px 0;
+        margin: 0;
         color: #ffffff !important;
         letter-spacing: -0.5px;
     }
-    .header-dates {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: #fef08a !important;
-        letter-spacing: 1px;
-        text-transform: uppercase;
+    .header-subtitle {
+        color: #dcfce7 !important;
+        font-size: 1.05rem;
         margin-top: 6px;
-        border-top: 1px solid rgba(255,255,255,0.2);
-        border-bottom: 1px solid rgba(255,255,255,0.2);
-        display: inline-block;
-        padding: 6px 20px;
+        font-weight: 600;
     }
 
-    /* CAIXA DE FILTROS NA PÁGINA PRINCIPAL */
-    .filter-card {
-        background-color: #ffffff !important;
-        padding: 20px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        margin-bottom: 24px;
-    }
-    
-    /* ROTULOS DE CAMPOS */
+    /* ROTULOS DE CAMPOS E CONTRASTE */
     label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {
         color: #0f172a !important;
         font-weight: 700 !important;
@@ -380,7 +381,7 @@ def generate_pdf_report(df_export, doc_title_info):
   )
 
   elements.append(
-      Paragraph("49ª EXPOINTER 2026 — Programação Oficial", title_style)
+      Paragraph("EXPOINTER 2026 — Programação Oficial", title_style)
   )
   elements.append(
       Paragraph(f"Filtro do Relatório: <b>{doc_title_info}</b>", subtitle_style)
@@ -436,13 +437,17 @@ def generate_pdf_report(df_export, doc_title_info):
 
 df_data = load_and_process_data()
 
-# 5. Banner Estilizado Oficial na Tela
+# 5. Banner Institucional com as Esferas e o Título Original
 st.markdown(
     """
 <div class="header-banner">
-    <div class="brand-badge">49ª EDIÇÃO</div>
-    <div class="header-logo-title">Expointer</div>
-    <div class="header-dates">29 DE AGOSTO A 06 DE SETEMBRO DE 2026</div>
+    <div class="spheres-container">
+        <div class="sphere sphere-green"></div>
+        <div class="sphere sphere-red"></div>
+        <div class="sphere sphere-yellow"></div>
+    </div>
+    <div class="header-logo-title">EXPOINTER 2026 — Programação Oficial</div>
+    <div class="header-subtitle">Painel Interativo de Eventos</div>
 </div>
 """,
     unsafe_allow_html=True,
@@ -456,7 +461,7 @@ todos_dias = [d for d in ORDEM_DIAS if d in df_data["Data"].unique()]
 todos_espacos = sorted(list(df_data["Espaço"].unique()))
 todas_sec = sorted([s for s in df_data["Secretaria"].unique() if s])
 
-# 6. PAINEL DE FILTROS DIRETO NA PÁGINA PRINCIPAL
+# 6. Painel de Filtros Direto na Página Principal
 st.markdown("### 🔍 Pesquisar e Filtrar Eventos")
 with st.container():
   col_busca, col_dias = st.columns([1, 2])
@@ -512,7 +517,7 @@ df_filtered["Data_Cat"] = pd.Categorical(
 )
 df_filtered = df_filtered.sort_values("Data_Cat").drop(columns=["Data_Cat"])
 
-# Botão de Exportar PDF e Login de Edição no Menu Lateral
+# Menu Lateral (Exportação & Gestão)
 st.sidebar.header("📄 Exportação & Gestão")
 if st.sidebar.button("⚙️ Gerar Relatório PDF"):
   if not df_filtered.empty:
