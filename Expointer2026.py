@@ -497,7 +497,7 @@ else:
 banner_complete = f"""
 <div class="header-banner">
     {image_html}
-    <div class="header-logo-title">EXPOINTER 2026 — Programação Insttucional</div>
+    <div class="header-logo-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
     <div class="header-subtitle">Painel Interativo de Eventos & Gestão de Horários</div>
 </div>
 """
