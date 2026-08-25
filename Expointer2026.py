@@ -1,3 +1,4 @@
+import base64
 import io
 import os
 import pandas as pd
@@ -37,39 +38,60 @@ custom_css = """
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
     
-    /* BANNER INSTITUCIONAL */
     .header-banner {
-        background: linear-gradient(135deg, #15803d 0%, #064e3b 100%);
+        background: linear-gradient(135deg, #064e3b 0%, #15803d 100%) !important;
         border-radius: 16px;
-        padding: 24px 20px;
+        padding: 28px 20px;
         text-align: center;
-        color: #ffffff !important;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         margin-bottom: 24px;
-        border-bottom: 4px solid #eab308;
+        border-bottom: 5px solid #eab308;
+    }
+
+    .spheres-box {
+        display: inline-flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+    .s-green {
+        width: 20px; height: 20px; border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #4ade80, #15803d);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .s-red {
+        width: 30px; height: 30px; border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #f87171, #b91c1c);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .s-yellow {
+        width: 18px; height: 18px; border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #fde047, #a16207);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
     .header-logo-title {
-        font-size: 2.2rem;
-        font-weight: 900;
-        margin: 10px 0 0 0;
+        font-size: 2.1rem !important;
+        font-weight: 900 !important;
         color: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
         letter-spacing: -0.5px;
+        line-height: 1.2;
     }
     .header-subtitle {
         color: #dcfce7 !important;
-        font-size: 1.05rem;
-        margin-top: 6px;
-        font-weight: 600;
+        font-size: 1.05rem !important;
+        margin-top: 8px !important;
+        font-weight: 600 !important;
     }
 
-    /* CONTRASTE E ROTULOS */
     label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {
         color: #0f172a !important;
         font-weight: 700 !important;
     }
 
-    /* ABAS (TABS) COM ALTO CONTRASTE */
     div[data-baseweb="tab-highlight"] {
         background-color: #15803d !important;
     }
@@ -88,7 +110,6 @@ custom_css = """
         font-weight: 800 !important;
     }
 
-    /* CARDS E GRADES DE EVENTOS */
     .event-card {
         background-color: #ffffff !important;
         border-radius: 10px;
@@ -409,38 +430,46 @@ def generate_pdf_report(df_export, doc_title_info):
 
 df_data = load_and_process_data()
 
-# 5. Banner Institucional Suportando a Imagem Exata das Esferas
-image_path = "esferas.png"
+# 5. Detecção e Renderização da Imagem Local (.jpg, .jpeg, .png)
+image_html = ""
+possible_images = [
+    "Screenshot_20260825-095320~2.jpg",
+    "esferas.jpg",
+    "esferas.jpeg",
+    "esferas.png",
+    "logo.jpg",
+    "logo.png",
+]
+found_img = None
 
-st.markdown('<div class="header-banner">', unsafe_allow_html=True)
+for img in possible_images:
+  if os.path.exists(img):
+    found_img = img
+    break
 
-if os.path.exists(image_path):
-  st.image(image_path, width=140)
-elif os.path.exists("logo.png"):
-  st.image("logo.png", width=140)
-elif os.path.exists("esferas.jpg"):
-  st.image("esferas.jpg", width=140)
+if found_img:
+  ext = found_img.split(".")[-1].lower()
+  mime_type = "image/jpeg" if ext in ["jpg", "jpeg"] else "image/png"
+  with open(found_img, "rb") as img_f:
+    b64_str = base64.b64encode(img_f.read()).decode()
+  image_html = f'<img src="data:{mime_type};base64,{b64_str}" style="max-height:75px; margin-bottom:10px; border-radius:6px;" />'
 else:
-  st.markdown(
-      """
-        <div style="margin-bottom: 8px;">
-            <img src="https://www.expointer.rs.gov.br/upload/recortes/202308/25134139_163820_GD.png" 
-                 alt="Esferas Expointer" 
-                 style="height: 65px; object-fit: contain;"
-                 onerror="this.style.display='none'">
-        </div>
-    """,
-      unsafe_allow_html=True,
-  )
-
-st.markdown(
+  image_html = """
+    <div class="spheres-box">
+        <div class="s-green"></div>
+        <div class="s-red"></div>
+        <div class="s-yellow"></div>
+    </div>
     """
+
+banner_complete = f"""
+<div class="header-banner">
+    {image_html}
     <div class="header-logo-title">EXPOINTER 2026 — Programação Oficial</div>
     <div class="header-subtitle">Painel Interativo de Eventos</div>
 </div>
-""",
-    unsafe_allow_html=True,
-)
+"""
+st.markdown(banner_complete, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning("Carregando ou nenhum dado encontrado na planilha.")
@@ -637,4 +666,3 @@ with tab_edit:
     st.error("❌ Senha incorreta. Acesso negado.")
   else:
     st.warning("⚠️ Digite a senha para liberar a edição.")
-      
