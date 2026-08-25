@@ -9,13 +9,13 @@ import streamlit as st
 
 # 1. Configuração da Página
 st.set_page_config(
-    page_title="EXPOINTER 2026 — Agenda Verde",
+    page_title="49ª EXPOINTER 2026 — Agenda Oficial",
     page_icon="🌾",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
-# Ordem Cronológica Oficial dos Dias da Expointer 2026
+# Ordem Cronológica Oficial dos Dias
 ORDEM_DIAS = [
     "Sábado 29/08",
     "Domingo 30/08",
@@ -29,69 +29,108 @@ ORDEM_DIAS = [
     "Outros",
 ]
 
-# 2. Estilização CSS Personalizada (Forçando contraste absoluto)
+# 2. Estilização CSS Personalizada
 custom_css = """
 <style>
     .stApp {
-        background-color: #f1f5f9 !important;
+        background-color: #f8fafc !important;
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
-    .header-box {
-        background: linear-gradient(135deg, #064e3b 0%, #15803d 100%);
+    
+    /* BANNER INSTITUCIONAL OFICIAL DA 49ª EXPOINTER */
+    .header-banner {
+        background: linear-gradient(135deg, #15803d 0%, #064e3b 100%);
+        border-radius: 16px;
+        padding: 32px 20px;
+        text-align: center;
         color: #ffffff !important;
-        padding: 24px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+        border-bottom: 4px solid #eab308;
     }
-    .header-title { font-size: 1.8rem; font-weight: 800; margin: 0; color: #ffffff !important; }
-    .header-subtitle { color: #dcfce7 !important; font-size: 0.95rem; margin-top: 4px; font-weight: 500; }
+    .brand-badge {
+        display: inline-block;
+        background-color: #dc2626;
+        color: #ffffff !important;
+        font-weight: 800;
+        font-size: 0.85rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+    .header-logo-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin: 4px 0;
+        color: #ffffff !important;
+        letter-spacing: -0.5px;
+    }
+    .header-dates {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #fef08a !important;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 6px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        display: inline-block;
+        padding: 6px 20px;
+    }
 
-    /* CONTRASTE DE RÓTULOS E TEXTOS DE LABELS DO STREAMLIT */
+    /* CAIXA DE FILTROS NA PÁGINA PRINCIPAL */
+    .filter-card {
+        background-color: #ffffff !important;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        margin-bottom: 24px;
+    }
+    
+    /* ROTULOS DE CAMPOS */
     label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {
         color: #0f172a !important;
         font-weight: 700 !important;
     }
 
-    /* CORREÇÃO DAS ABAS (TABS) EM QUALQUER DISPOSITIVO */
+    /* ABAS (TABS) COM ALTO CONTRASTE */
     div[data-baseweb="tab-highlight"] {
         background-color: #15803d !important;
     }
     .stTabs button {
         background-color: #e2e8f0 !important;
         border-radius: 8px 8px 0px 0px !important;
-        padding: 8px 16px !important;
+        padding: 10px 20px !important;
     }
-    .stTabs button p, .stTabs button span, .stTabs [data-baseweb="tab"] *, .stTabs button * {
+    .stTabs button p, .stTabs button span, .stTabs [data-baseweb="tab"] * {
         color: #0f172a !important;
         font-weight: 700 !important;
-        font-size: 0.95rem !important;
+        font-size: 1rem !important;
     }
     .stTabs [aria-selected="true"] p, .stTabs [aria-selected="true"] span, .stTabs [aria-selected="true"] * {
         color: #15803d !important;
         font-weight: 800 !important;
     }
 
-    h1, h2, h3, h4, h5, h6, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: #0f172a !important;
-        font-weight: 800 !important;
-    }
-
+    /* CARDS E GRADES DE EVENTOS */
     .event-card {
         background-color: #ffffff !important;
         border-radius: 10px;
-        padding: 14px;
+        padding: 16px;
         margin-bottom: 12px;
-        border-left: 5px solid #15803d !important;
+        border-left: 6px solid #15803d !important;
         border: 1px solid #cbd5e1;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     .badge-space {
-        background-color: #0369a1 !important;
+        background-color: #0284c7 !important;
         color: #ffffff !important;
         padding: 4px 10px;
         border-radius: 6px;
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         font-weight: 700;
     }
     .badge-time {
@@ -99,7 +138,7 @@ custom_css = """
         color: #ffffff !important;
         padding: 4px 10px;
         border-radius: 6px;
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         font-weight: 700;
     }
     .cal-header {
@@ -108,19 +147,19 @@ custom_css = """
         text-align: center;
         padding: 10px;
         font-weight: 800;
-        border-radius: 6px;
+        border-radius: 8px;
         margin-bottom: 12px;
         font-size: 0.95rem;
     }
     .cal-event-box {
         background-color: #ffffff !important;
-        border: 1px solid #94a3b8 !important;
+        border: 1px solid #cbd5e1 !important;
         border-left: 5px solid #15803d !important;
         padding: 10px;
         margin-bottom: 10px;
         border-radius: 6px;
         font-size: 0.85rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
     }
     .cal-event-time {
         color: #15803d !important;
@@ -133,17 +172,12 @@ custom_css = """
         color: #0f172a !important;
         margin-bottom: 6px;
     }
-    .cal-event-meta {
-        color: #334155 !important;
-        font-size: 0.78rem !important;
-        font-weight: 600 !important;
-    }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
 
-# 3. Processamento de Dados
+# 3. Carregamento e Processamento
 @st.cache_data(ttl=60)
 def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   space_mapping = {
@@ -277,14 +311,10 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
       i = j
 
   df_result = pd.DataFrame(consolidated)
-
-  # Ordenação Cronológica Garantida dos Dias
   df_result["Data_Cat"] = pd.Categorical(
       df_result["Data"], categories=ORDEM_DIAS, ordered=True
   )
-  df_result = df_result.sort_values("Data_Cat").drop(columns=["Data_Cat"])
-
-  return df_result
+  return df_result.sort_values("Data_Cat").drop(columns=["Data_Cat"])
 
 
 # 4. Gerador de PDF Formatado
@@ -350,7 +380,7 @@ def generate_pdf_report(df_export, doc_title_info):
   )
 
   elements.append(
-      Paragraph("EXPOINTER 2026 — Programação Oficial", title_style)
+      Paragraph("49ª EXPOINTER 2026 — Programação Oficial", title_style)
   )
   elements.append(
       Paragraph(f"Filtro do Relatório: <b>{doc_title_info}</b>", subtitle_style)
@@ -406,12 +436,13 @@ def generate_pdf_report(df_export, doc_title_info):
 
 df_data = load_and_process_data()
 
-# Cabeçalho
+# 5. Banner Estilizado Oficial na Tela
 st.markdown(
     """
-<div class="header-box">
-    <div class="header-title">🌾 EXPOINTER 2026 — Programação Oficial</div>
-    <div class="header-subtitle">Painel Interativo de Eventos</div>
+<div class="header-banner">
+    <div class="brand-badge">49ª EDIÇÃO</div>
+    <div class="header-logo-title">Expointer</div>
+    <div class="header-dates">29 DE AGOSTO A 06 DE SETEMBRO DE 2026</div>
 </div>
 """,
     unsafe_allow_html=True,
@@ -421,35 +452,41 @@ if df_data.empty:
   st.warning("Carregando ou nenhum dado encontrado na planilha.")
   st.stop()
 
-# Lista de dias ordenada cronologicamente
 todos_dias = [d for d in ORDEM_DIAS if d in df_data["Data"].unique()]
-
-# Filtros na Barra Lateral
-st.sidebar.header("🌲 Filtros de Busca")
-busca = st.sidebar.text_input("Buscar palavra-chave:", "")
-
-dias_sel = st.sidebar.multiselect(
-    "Filtrar por Dia(s):",
-    todos_dias,
-    default=[],
-    placeholder="Selecione uma ou mais opções...",
-)
-
 todos_espacos = sorted(list(df_data["Espaço"].unique()))
-espacos_sel = st.sidebar.multiselect(
-    "Filtrar por Espaço(s):",
-    todos_espacos,
-    default=[],
-    placeholder="Selecione uma ou mais opções...",
-)
-
 todas_sec = sorted([s for s in df_data["Secretaria"].unique() if s])
-sec_sel = st.sidebar.multiselect(
-    "Filtrar por Secretaria(s):",
-    todas_sec,
-    default=[],
-    placeholder="Selecione uma ou mais opções...",
-)
+
+# 6. PAINEL DE FILTROS DIRETO NA PÁGINA PRINCIPAL
+st.markdown("### 🔍 Pesquisar e Filtrar Eventos")
+with st.container():
+  col_busca, col_dias = st.columns([1, 2])
+  with col_busca:
+    busca = st.text_input(
+        "🔎 Palavra-chave:", "", placeholder="Digite tema, palavra ou local..."
+    )
+  with col_dias:
+    dias_sel = st.multiselect(
+        "📅 Filtrar por Dia(s):",
+        todos_dias,
+        default=[],
+        placeholder="Selecione os dias...",
+    )
+
+  col_espaco, col_sec = st.columns(2)
+  with col_espaco:
+    espacos_sel = st.multiselect(
+        "📍 Filtrar por Espaço / Auditório:",
+        todos_espacos,
+        default=[],
+        placeholder="Selecione os locais...",
+    )
+  with col_sec:
+    sec_sel = st.multiselect(
+        "🏢 Filtrar por Secretaria / Entidade:",
+        todas_sec,
+        default=[],
+        placeholder="Selecione as entidades...",
+    )
 
 # Aplicação dos Filtros
 df_filtered = df_data.copy()
@@ -470,16 +507,14 @@ if espacos_sel:
 if sec_sel:
   df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
 
-# Garantir ordenação cronológica no dataframe filtrado
 df_filtered["Data_Cat"] = pd.Categorical(
     df_filtered["Data"], categories=ORDEM_DIAS, ordered=True
 )
 df_filtered = df_filtered.sort_values("Data_Cat").drop(columns=["Data_Cat"])
 
-# Exportação de PDF
-st.sidebar.divider()
-st.sidebar.header("📄 Exportar Calendário PDF")
-if st.sidebar.button("⚙️ Gerar PDF com Filtros Atuais"):
+# Botão de Exportar PDF e Login de Edição no Menu Lateral
+st.sidebar.header("📄 Exportação & Gestão")
+if st.sidebar.button("⚙️ Gerar Relatório PDF"):
   if not df_filtered.empty:
     info_str = "Seleção Personalizada"
     if espacos_sel:
@@ -491,26 +526,26 @@ if st.sidebar.button("⚙️ Gerar PDF com Filtros Atuais"):
     st.sidebar.download_button(
         label="📥 Baixar PDF Gerado",
         data=pdf_bytes,
-        file_name="agenda_expointer_selecao.pdf",
+        file_name="agenda_expointer_2026.pdf",
         mime="application/pdf",
     )
   else:
-    st.sidebar.error("Sem eventos para gerar o PDF.")
+    st.sidebar.error("Nenhum evento selecionado.")
 
-# Alternância de Visão por Abas (Com Restrição de Acesso na Aba de Edição)
-tab_cards, tab_calendar, tab_edit = st.tabs([
-    "📋 Visão em Cards",
-    "📅 Visão Calendário",
-    "🔒 Editar Dados da Planilha",
-])
+st.sidebar.divider()
+
+# Alternância de Visão por Abas
+tab_cards, tab_calendar, tab_edit = st.tabs(
+    ["📋 Visão em Cards", "📅 Visão Calendário (Grid)", "🔒 Área de Edição"]
+)
 
 # --- ABA 1: VISÃO EM CARDS ---
 with tab_cards:
   if df_filtered.empty:
-    st.info("Nenhum evento encontrado para os filtros selecionados.")
+    st.info("Nenhum evento encontrado para os filtros selecionados acima.")
   else:
     for data, grupo in df_filtered.groupby("Data", sort=False):
-      st.markdown(f"### 📅 {data}")
+      st.markdown(f"#### 📅 {data}")
       cols = st.columns(2)
       for idx, (_, row) in enumerate(grupo.iterrows()):
         card_html = f"""
@@ -527,9 +562,8 @@ with tab_cards:
 
 # --- ABA 2: VISÃO EM CALENDÁRIO GRID ---
 with tab_calendar:
-  st.markdown("#### Matriz de Eventos em Grade")
   dia_grid_sel = st.selectbox(
-      "📆 Selecione o dia para focar na matriz:",
+      "📆 Destacar dia específico na grade:",
       ["Exibir Todos Selecionados"] + todos_dias,
   )
 
@@ -540,7 +574,6 @@ with tab_calendar:
   if df_grid.empty:
     st.info("Nenhum evento para exibir nesta visão.")
   else:
-    # Dias a exibir em ordem cronológica estrita
     dias_para_exibir = [d for d in ORDEM_DIAS if d in df_grid["Data"].unique()]
     grid_cols = st.columns(len(dias_para_exibir))
 
@@ -561,16 +594,11 @@ with tab_calendar:
               unsafe_allow_html=True,
           )
 
-# --- ABA 3: EDITAR DADOS DIRETO NO APP (COM RESTRIÇÃO / SENHA) ---
+# --- ABA 3: ÁREA DE EDIÇÃO PROTEGIDA ---
 with tab_edit:
-  st.markdown("### 🔒 Edição Restrita da Agenda")
+  st.markdown("### 🔒 Edição Restrita da Planilha")
+  senha = st.text_input("Digite a senha de administrador:", type="password")
 
-  # Campo de senha para restrição de acesso
-  senha = st.text_input(
-      "Digite a senha de administrador para liberar a edição:", type="password"
-  )
-
-  # Definir a senha desejada (ex: expointer2026)
   if senha == "expointer2026":
     st.success("🔓 Acesso liberado!")
     st.info(
@@ -614,4 +642,4 @@ with tab_edit:
   elif senha:
     st.error("❌ Senha incorreta. Acesso negado.")
   else:
-    st.warning("⚠️ Esta área é restrita. Digite a senha acima para continuar.")
+    st.warning("⚠️ Digite a senha para lib
