@@ -7,4 +7,3 @@ pdfplumber
 streamlit
 reportlab
 openpyxl
-weasyprint
