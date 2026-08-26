@@ -312,16 +312,23 @@ def load_merged_data():
   if not alteracoes:
     return df_base
 
+  linhas_para_remover = []
   for idx, row in df_base.iterrows():
     key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
     if key in alteracoes:
-      df_base.at[idx, "Tema"] = alteracoes[key].get("Tema", row["Tema"])
-      df_base.at[idx, "Secretaria"] = alteracoes[key].get(
-          "Secretaria", row["Secretaria"]
-      )
-      df_base.at[idx, "Responsável"] = alteracoes[key].get(
-          "Responsável", row["Responsável"]
-      )
+      if alteracoes[key].get("Excluido", False):
+        linhas_para_remover.append(idx)
+      else:
+        df_base.at[idx, "Tema"] = alteracoes[key].get("Tema", row["Tema"])
+        df_base.at[idx, "Secretaria"] = alteracoes[key].get(
+            "Secretaria", row["Secretaria"]
+        )
+        df_base.at[idx, "Responsável"] = alteracoes[key].get(
+            "Responsável", row["Responsável"]
+        )
+
+  if linhas_para_remover:
+    df_base = df_base.drop(linhas_para_remover).reset_index(drop=True)
 
   return df_base
 
@@ -510,7 +517,7 @@ with st.container():
         placeholder="Selecione as entidades...",
     )
 
-# Aplicação dos Filtros nos Eventos
+# Aplicação dos Filtros
 df_filtered = df_data.copy()
 
 if busca:
@@ -561,7 +568,7 @@ if st.sidebar.button("⚙️ Gerar Relatório PDF"):
 
 st.sidebar.divider()
 
-# Estrutura de Abas (Sem a aba de Cards)
+# Estrutura de Abas
 tab_calendar, tab_vagos, tab_edit = st.tabs([
     "📅 Visão Calendário",
     "🔓 Horários Livres / Vagos",
@@ -625,7 +632,7 @@ with tab_calendar:
               unsafe_allow_html=True,
           )
 
-# --- ABA 2: HORÁRIOS LIVRES / VAGOS (Ordenado por Horário Crescente) ---
+# --- ABA 2: HORÁRIOS LIVRES / VAGOS ---
 with tab_vagos:
   st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
   st.caption(
@@ -668,9 +675,8 @@ with tab_edit:
   senha = st.text_input("Digite a senha de administrador:", type="password")
 
   if senha == "expointer2026":
-    st.success("🔓 Acesso liberado! Você pode alterar qualquer campo abaixo.")
+    st.success("🔓 Acesso liberado! Você pode editar ou excluir linhas.")
 
-    # Exibe a tabela totalmente editável sem colunas bloqueadas
     edited_df = st.data_editor(
         df_data,
         use_container_width=True,
@@ -696,14 +702,14 @@ with tab_edit:
       try:
         alteracoes_atuais = load_alteracoes()
 
-        # Grava as modificações identificando cada evento pela combinação de Espaço + Data + Horário
+        chaves_atuais_na_tabela = set()
         for idx, row in edited_df.iterrows():
           espaco_val = str(row["Espaço"]).strip()
           data_val = str(row["Data"]).strip()
           horario_val = str(row["Horário"]).strip()
-
           key = f"{espaco_val}_{data_val}_{horario_val}"
 
+          chaves_atuais_na_tabela.add(key)
           alteracoes_atuais[key] = {
               "Tema": (
                   str(row["Tema"]).strip()
@@ -720,10 +726,16 @@ with tab_edit:
                   if pd.notna(row["Responsável"])
                   else ""
               ),
+              "Excluido": False,
           }
 
+        for idx, row in df_data.iterrows():
+          key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
+          if key not in chaves_atuais_na_tabela:
+            alteracoes_atuais[key] = {"Excluido": True}
+
         save_alteracoes(alteracoes_atuais)
-        st.success("✅ Alterações salvas com sucesso!")
+        st.success("✅ Alterações e exclusões salvas com sucesso!")
         st.cache_data.clear()
         st.rerun()
 
