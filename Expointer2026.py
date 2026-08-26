@@ -668,39 +668,57 @@ with tab_edit:
   senha = st.text_input("Digite a senha de administrador:", type="password")
 
   if senha == "expointer2026":
-    st.success("🔓 Acesso liberado!")
+    st.success("🔓 Acesso liberado! Você pode alterar qualquer campo abaixo.")
+
+    # Exibe a tabela totalmente editável sem colunas bloqueadas
     edited_df = st.data_editor(
         df_data,
         use_container_width=True,
+        num_rows="dynamic",
         column_config={
             "Espaço": st.column_config.SelectboxColumn(
-                "Espaço / Local", options=todos_espacos, disabled=True
+                "Espaço / Local", options=todos_espacos, required=True
             ),
             "Data": st.column_config.SelectboxColumn(
-                "Dia", options=todos_dias, disabled=True
+                "Dia", options=todos_dias, required=True
             ),
-            "Horário": st.column_config.TextColumn("Horário", disabled=True),
+            "Horário": st.column_config.TextColumn("Horário", required=True),
             "Tema": st.column_config.TextColumn(
                 "Atividade / Tema (ou 🔓 HORÁRIO VAGO)", required=True
             ),
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
             "Responsável": st.column_config.TextColumn("Responsável"),
         },
+        key="editor_admin",
     )
 
     if st.button("💾 Salvar Alterações"):
       try:
         alteracoes_atuais = load_alteracoes()
 
+        # Grava as modificações identificando cada evento pela combinação de Espaço + Data + Horário
         for idx, row in edited_df.iterrows():
-          key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
+          espaco_val = str(row["Espaço"]).strip()
+          data_val = str(row["Data"]).strip()
+          horario_val = str(row["Horário"]).strip()
+
+          key = f"{espaco_val}_{data_val}_{horario_val}"
+
           alteracoes_atuais[key] = {
-              "Tema": row["Tema"],
+              "Tema": (
+                  str(row["Tema"]).strip()
+                  if pd.notna(row["Tema"])
+                  else "🔓 HORÁRIO VAGO"
+              ),
               "Secretaria": (
-                  row["Secretaria"] if pd.notna(row["Secretaria"]) else ""
+                  str(row["Secretaria"]).strip()
+                  if pd.notna(row["Secretaria"])
+                  else ""
               ),
               "Responsável": (
-                  row["Responsável"] if pd.notna(row["Responsável"]) else ""
+                  str(row["Responsável"]).strip()
+                  if pd.notna(row["Responsável"])
+                  else ""
               ),
           }
 
@@ -708,7 +726,9 @@ with tab_edit:
         st.success("✅ Alterações salvas com sucesso!")
         st.cache_data.clear()
         st.rerun()
+
       except Exception as e:
         st.error(f"⚠️ Erro ao salvar alterações: {e}")
+
   elif senha:
     st.error("❌ Senha incorreta.")
