@@ -1,8 +1,12 @@
 import streamlit as st
 import pandas as pd
-from weasyprint import HTML
+import io
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, KeepTogether
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import mm
 
-# Configuração da página Streamlit
 st.set_page_config(
     page_title="Gestão de Cessões - CAGE",
     page_icon="📋",
@@ -10,7 +14,7 @@ st.set_page_config(
 )
 
 st.title("📋 Gestão de Cessões de Uso - Relatório Aguarda CAGE")
-st.write("Insira a planilha atualizada para filtrar os processos em 'Aguarda CAGE' e gerar o relatório no padrão visual oficial.")
+st.write("Insira a planilha atualizada para filtrar os processos e gerar o relatório no padrão visual oficial.")
 
 uploaded_file = st.file_uploader("Selecione a planilha (.csv ou .xlsx)", type=["csv", "xlsx"])
 
@@ -25,12 +29,147 @@ def format_patrimonio(val):
 def desc_or_empty(val):
     return str(val) if pd.notna(val) else ""
 
-def generate_pdf_html(df):
-    processes_html = ""
+def generate_pdf_reportlab(df):
+    buffer = io.BytesIO()
     
-    # Agrupa por PROA
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=8*mm,
+        rightMargin=8*mm,
+        topMargin=8*mm,
+        bottomMargin=10*mm
+    )
+    
+    story = []
+    
+    # Cores
+    VERDE_INST = colors.HexColor("#2E6B47")
+    CINZA_TEXTO = colors.HexColor("#1F2123")
+    CINZA_ZEBRA = colors.HexColor("#F4F5F7")
+    CINZA_BORDA = colors.HexColor("#E0E0E0")
+    CINZA_BARRA = colors.HexColor("#333333")
+    VERDE_RS = colors.HexColor("#009246")
+    VERMELHO_RS = colors.HexColor("#DA251D")
+    AMARELO_RS = colors.HexColor("#FFCC00")
+    
+    styles = getSampleStyleSheet()
+    
+    style_title = ParagraphStyle(
+        'HeaderTitle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=14,
+        textColor=VERDE_INST,
+        alignment=1,
+        spaceAfter=10
+    )
+    
+    style_proa_title = ParagraphStyle(
+        'ProaTitle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=9,
+        textColor=CINZA_TEXTO,
+        spaceAfter=1
+    )
+    
+    style_proa_sub = ParagraphStyle(
+        'ProaSub',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=7.5,
+        textColor=colors.HexColor("#555555"),
+        spaceAfter=6
+    )
+    
+    style_th = ParagraphStyle(
+        'TH',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=6.5,
+        textColor=colors.white,
+        alignment=1
+    )
+    
+    style_td_green = ParagraphStyle(
+        'TDGreen',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=7,
+        textColor=VERDE_INST
+    )
+    
+    style_td_dark = ParagraphStyle(
+        'TDDark',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=7,
+        textColor=CINZA_TEXTO,
+        alignment=1
+    )
+
+    style_td_text = ParagraphStyle(
+        'TDText',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=6.5,
+        textColor=CINZA_TEXTO
+    )
+    
+    style_check = ParagraphStyle(
+        'TDCheck',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=8,
+        textColor=VERDE_INST,
+        alignment=1
+    )
+
+    # 1. Listra do RS no Topo
+    stripe_table = Table(
+        [['', '', '']],
+        colWidths=[64*mm, 64*mm, 66*mm],
+        rowHeights=[2.5*mm]
+    )
+    stripe_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (0,0), VERDE_RS),
+        ('BACKGROUND', (1,0), (1,0), VERMELHO_RS),
+        ('BACKGROUND', (2,0), (2,0), AMARELO_RS),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 0),
+        ('TOPPADDING', (0,0), (-1,-1), 0),
+    ]))
+    story.append(stripe_table)
+    story.append(Spacer(1, 4*mm))
+    
+    # 2. Título Central
+    story.append(Paragraph("CESSÕES PARA ANÁLISE", style_title))
+    story.append(Spacer(1, 2*mm))
+
+    # Larguras das colunas
+    col_w = [33*mm, 48*mm, 18*mm, 33*mm, 16*mm, 11*mm, 11*mm, 11*mm]
+
+    # 3. Processos por PROA
     for proa, group in df.groupby('PROA', sort=False):
-        items_rows = ""
+        block_elements = []
+        
+        block_elements.append(Paragraph(f"PROA: {proa}", style_proa_title))
+        block_elements.append(Paragraph(f"&nbsp;&nbsp;&nbsp;&nbsp;Contagem: {len(group)}", style_proa_sub))
+        
+        table_data = [
+            [
+                Paragraph("ENTIDADE", style_th),
+                Paragraph("DESC BEM", style_th),
+                Paragraph("PAT BEM", style_th),
+                Paragraph("PROGRAMA / CONVÊNIO", style_th),
+                Paragraph("N° TERMO", style_th),
+                Paragraph("PARECER<br/>TÉCNICO", style_th),
+                Paragraph("PARECER<br/>AJUR", style_th),
+                Paragraph("ANUÊNCIA", style_th)
+            ]
+        ]
+        
         for idx, row in group.iterrows():
             entidade = desc_or_empty(row.get('ENTIDADE', '')).upper()
             desc_bem = desc_or_empty(row.get('DESC. BEM 1', '')).upper()
@@ -38,7 +177,6 @@ def generate_pdf_html(df):
             programa = desc_or_empty(row.get('PROGRAMA/CONVÊNIO', ''))
             termo = desc_or_empty(row.get('N° TERMO', row.get('N TERMO', '')))
             
-            # Suporte para múltiplos bens por linha
             bens = []
             if pd.notna(row.get('DESC. BEM 1')) and str(row.get('DESC. BEM 1')).strip() != '':
                 bens.append((str(row.get('DESC. BEM 1')).upper(), format_patrimonio(row.get('PAT. BEM 1', ''))))
@@ -51,201 +189,54 @@ def generate_pdf_html(df):
                 bens = [(desc_bem, pat_bem)]
 
             for desc, pat in bens:
-                items_rows += f"""
-                <tr>
-                    <td class="cell-green-highlight">{entidade}</td>
-                    <td class="cell-green-highlight">{desc}</td>
-                    <td style="text-align: center; color: #1F2123; font-weight: bold;">{pat}</td>
-                    <td style="text-align: left; color: #333333;">{programa}</td>
-                    <td style="text-align: center; color: #1F2123; font-weight: bold;">{termo}</td>
-                    <td style="text-align: center;"><div class="checkbox-box">✓</div></td>
-                    <td style="text-align: center;"><div class="checkbox-box">✓</div></td>
-                    <td style="text-align: center;"><div class="checkbox-box">✓</div></td>
-                </tr>
-                """
+                table_data.append([
+                    Paragraph(entidade, style_td_green),
+                    Paragraph(desc, style_td_green),
+                    Paragraph(pat, style_td_dark),
+                    Paragraph(programa, style_td_text),
+                    Paragraph(termo, style_td_dark),
+                    Paragraph("✓", style_check),
+                    Paragraph("✓", style_check),
+                    Paragraph("✓", style_check)
+                ])
 
-        processes_html += f"""
-        <div class="proa-block">
-            <div class="proa-sidebar"></div>
-            <div class="proa-content">
-                <div class="proa-header-text">
-                    <div class="proa-title">PROA: {proa}</div>
-                    <div class="proa-sub">Contagem: {len(group)}</div>
-                </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 18%;">ENTIDADE</th>
-                            <th style="width: 26%;">DESC BEM</th>
-                            <th style="width: 10%;">PAT BEM</th>
-                            <th style="width: 18%;">PROGRAMA / CONVÊNIO</th>
-                            <th style="width: 8%;">N° TERMO</th>
-                            <th style="width: 7%;">PARECER TÉCNICO</th>
-                            <th style="width: 7%;">PARECER AJUR</th>
-                            <th style="width: 6%;">ANUÊNCIA</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items_rows}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        """
-
-    html_content = f"""
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            @page {{
-                size: A4 portrait;
-                margin: 6mm 8mm 8mm 8mm;
-                @bottom-right {{
-                    content: "Página " counter(page) " de " counter(pages);
-                    font-family: Arial, sans-serif;
-                    font-size: 7.5pt;
-                    color: #555;
-                }}
-            }}
+        t = Table(table_data, colWidths=col_w)
+        
+        ts = [
+            ('BACKGROUND', (0,0), (-1,0), VERDE_INST),
+            ('ALIGN', (0,0), (-1,0), 'CENTER'),
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('GRID', (0,0), (-1,-1), 0.5, CINZA_BORDA),
+            ('TOPPADDING', (0,0), (-1,-1), 3),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+            ('LEFTPADDING', (0,0), (-1,-1), 2),
+            ('RIGHTPADDING', (0,0), (-1,-1), 2),
+        ]
+        
+        for r_idx in range(1, len(table_data)):
+            ts.append(('BACKGROUND', (0, r_idx), (-1, r_idx), CINZA_ZEBRA))
             
-            body {{
-                font-family: Arial, Helvetica, sans-serif;
-                margin: 0;
-                padding: 0;
-                font-size: 8pt;
-                color: #1F2123;
-            }}
+        t.setStyle(TableStyle(ts))
+        
+        # Tabela envelopadora com a barra lateral esquerda
+        proa_table = Table([[Paragraph("", style_td_text), t]], colWidths=[2*mm, 188*mm])
+        proa_table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (0,-1), CINZA_BARRA),
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
+            ('LEFTPADDING', (0,0), (-1,-1), 0),
+            ('RIGHTPADDING', (0,0), (-1,-1), 0),
+            ('TOPPADDING', (0,0), (-1,-1), 0),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 0),
+        ]))
+        
+        block_elements.append(proa_table)
+        block_elements.append(Spacer(1, 4*mm))
+        
+        story.append(KeepTogether(block_elements))
 
-            /* Listra RS no Topo */
-            .stripe-rs {{
-                display: table;
-                width: 100%;
-                height: 8px;
-                margin-bottom: 12px;
-            }}
-            .stripe-green {{ display: table-cell; background-color: #009246; width: 33.33%; }}
-            .stripe-red {{ display: table-cell; background-color: #DA251D; width: 33.33%; }}
-            .stripe-yellow {{ display: table-cell; background-color: #FFCC00; width: 33.34%; }}
-
-            .header-title {{
-                text-align: center;
-                margin-bottom: 14px;
-            }}
-            .header-title h1 {{
-                font-size: 15pt;
-                font-weight: bold;
-                margin: 0;
-                color: #2E6B47;
-                letter-spacing: 0.5px;
-            }}
-
-            /* Bloco Estruturado com Linha Lateral */
-            .proa-block {{
-                display: table;
-                width: 100%;
-                margin-bottom: 12px;
-                page-break-inside: avoid;
-            }}
-
-            .proa-sidebar {{
-                display: table-cell;
-                width: 4px;
-                background-color: #333333;
-            }}
-
-            .proa-content {{
-                display: table-cell;
-                padding-left: 8px;
-            }}
-
-            .proa-header-text {{
-                margin-bottom: 4px;
-            }}
-
-            .proa-title {{
-                font-size: 9.5pt;
-                font-weight: bold;
-                color: #1F2123;
-            }}
-
-            .proa-sub {{
-                font-size: 8pt;
-                color: #555555;
-                margin-left: 10px; /* Indentação */
-                margin-top: 1px;
-            }}
-
-            .data-table {{
-                width: 100%;
-                border-collapse: collapse;
-                table-layout: fixed;
-            }}
-
-            .data-table th, .data-table td {{
-                border: 1px solid #E0E0E0;
-                padding: 4px 3px;
-                vertical-align: middle;
-                word-wrap: break-word;
-            }}
-
-            /* Cabeçalho Verde Institucional (#2E6B47) com Texto Branco */
-            .data-table th {{
-                background-color: #2E6B47;
-                color: #FFFFFF;
-                font-weight: bold;
-                font-size: 7pt;
-                text-align: center;
-                text-transform: uppercase;
-                line-height: 1.1;
-            }}
-
-            /* Linhas com Fundo Cinza Claro Zebra (#F4F5F7) */
-            .data-table tbody tr {{
-                background-color: #F4F5F7;
-            }}
-
-            /* Texto Verde em Caixa Alta nas Colunas de Destaque */
-            .cell-green-highlight {{
-                text-align: left;
-                color: #2E6B47;
-                font-weight: bold;
-                font-size: 7.5pt;
-            }}
-
-            /* Caixa de Seleção com Check Verde Institucional */
-            .checkbox-box {{
-                width: 13px;
-                height: 13px;
-                border: 1.2px solid #2E6B47;
-                margin: 0 auto;
-                border-radius: 2px;
-                background-color: #FFFFFF;
-                line-height: 12px;
-                font-size: 9pt;
-                font-weight: bold;
-                color: #2E6B47;
-                text-align: center;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="stripe-rs">
-            <div class="stripe-green"></div>
-            <div class="stripe-red"></div>
-            <div class="stripe-yellow"></div>
-        </div>
-
-        <div class="header-title">
-            <h1>CESSÕES PARA ANÁLISE</h1>
-        </div>
-
-        {processes_html}
-    </body>
-    </html>
-    """
-    return html_content
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
 
 if uploaded_file is not None:
     try:
@@ -272,8 +263,7 @@ if uploaded_file is not None:
                     use_container_width=True
                 )
 
-                html_str = generate_pdf_html(filtered_df)
-                pdf_bytes = HTML(string=html_str).write_pdf()
+                pdf_bytes = generate_pdf_reportlab(filtered_df)
 
                 st.download_button(
                     label="📄 Baixar Relatório PDF Oficial",
