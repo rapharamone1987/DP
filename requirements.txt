@@ -8,3 +8,4 @@ reportlab
 openpyxl
 gspread
 google-auth
+st-gsheets-connection
