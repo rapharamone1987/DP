@@ -697,29 +697,31 @@ with tab_calendar:
           is_vago = ev["Tema"] == "🔓 HORÁRIO VAGO"
           box_class = "cal-event-vago" if is_vago else "cal-event-box"
 
+          # Limpeza de espaços em branco vazios da planilha
+          sec_val = str(ev["Secretaria"]).strip() if pd.notna(ev["Secretaria"]) else ""
+          resp_val = str(ev["Responsável"]).strip() if pd.notna(ev["Responsável"]) else ""
+
           sec_display = (
-              f"<div style='color:#334155; font-size:0.75rem; font-weight:600;"
-              f" margin-top:4px;'>🏢 {ev['Secretaria']}</div>"
-              if ev["Secretaria"]
+              f'<div style="color:#334155; font-size:0.75rem; font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
+              if sec_val and sec_val.lower() != "nan"
               else ""
           )
           resp_display = (
-              f"<div style='color:#475569; font-size:0.75rem; font-weight:500;'>"
-              f"👤 {ev['Responsável']}</div>"
-              if ev["Responsável"]
+              f'<div style="color:#475569; font-size:0.75rem; font-weight:500;">👤 {resp_val}</div>'
+              if resp_val and resp_val.lower() != "nan"
               else ""
           )
 
           st.markdown(
               f"""
-                    <div class="{box_class}">
-                        <span style="color:#15803d; font-weight:800; display:block; margin-bottom:4px;">⏰ {ev['Horário']}</span>
-                        <div style="font-weight:700; color:{'#475569' if is_vago else '#0f172a'}; margin-bottom:4px;">{ev['Tema']}</div>
-                        <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
-                        {sec_display}
-                        {resp_display}
-                    </div>
-                    """,
+              <div class="{box_class}">
+                  <span style="color:#15803d; font-weight:800; display:block; margin-bottom:4px;">⏰ {ev['Horário']}</span>
+                  <div style="font-weight:700; color:{'#475569' if is_vago else '#0f172a'}; margin-bottom:4px;">{ev['Tema']}</div>
+                  <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
+                  {sec_display}
+                  {resp_display}
+              </div>
+              """,
               unsafe_allow_html=True,
           )
 
