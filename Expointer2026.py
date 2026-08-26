@@ -763,26 +763,22 @@ with tab_edit:
       excel_path = "Grade Expointer 2026.xlsx"
 
       try:
+        # Mapeamento reverso para manter os nomes originais das abas
+        inv_map = {v.lower(): k for k, v in space_mapping.items()}
+
         with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
-          # Mapeamento invertido para recuperar os nomes originais das abas
-          inv_map = {v.lower(): k for k, v in space_mapping.items()}
+          sheets_written = 0
 
-          grouped = dict(list(edited_df.groupby("Espaço")))
+          # Percorre cada espaço para garantir a escrita de todas as abas
+          for space_name in todos_espacos:
+            group = edited_df[edited_df["Espaço"] == space_name]
 
-          # Se o dataframe estiver vazio por algum filtro, salva todas as chaves mapeadas
-          espacos_para_salvar = (
-              list(grouped.keys()) if grouped else list(space_mapping.values())
-          )
-
-          for space_name in espacos_para_salvar:
-            group = grouped.get(space_name, pd.DataFrame())
-
-            # Recupera o nome original da aba (ex: "Agenda Auditório ADMINISTRAÇÃO")
+            # Recupera o nome original da aba
             orig_sheet = inv_map.get(
                 str(space_name).lower(), f"Agenda {space_name}"
             )
 
-            # Limpa caracteres proibidos pelo Excel e limita a 31 caracteres
+            # Limpa caracteres proibidos no Excel (\ / ? * : [ ]) e limita a 31 caracteres
             clean_sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
 
             if not group.empty:
@@ -790,8 +786,8 @@ with tab_edit:
                   writer, sheet_name=clean_sheet_title, index=False
               )
             else:
-              # Garante que a aba não fique nula/invisível para o openpyxl
-              dummy_df = pd.DataFrame(
+              # Garante que a aba existe mesmo sem eventos para não quebrar o openpyxl
+              dummy = pd.DataFrame(
                   columns=[
                       "Horário",
                       "Atividade / Tema",
@@ -799,9 +795,15 @@ with tab_edit:
                       "Responsável",
                   ]
               )
-              dummy_df.to_excel(
-                  writer, sheet_name=clean_sheet_title, index=False
-              )
+              dummy.to_excel(writer, sheet_name=clean_sheet_title, index=False)
+
+            sheets_written += 1
+
+          # Trava de segurança: se por algum motivo nenhuma aba foi gravada, cria uma padrão
+          if sheets_written == 0:
+            pd.DataFrame({"Info": ["Agenda Vazia"]}).to_excel(
+                writer, sheet_name="Agenda General", index=False
+            )
 
         st.success("✅ Alterações salvas com sucesso!")
         st.cache_data.clear()
