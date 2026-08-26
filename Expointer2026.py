@@ -48,7 +48,6 @@ SPACE_MAPPING = {
 }
 
 
-# Conexão com Google Sheets via Streamlit Secrets
 @st.cache_resource
 def get_gspread_client():
   scope = [
@@ -96,20 +95,37 @@ def load_data_from_sheets():
 
     raw_events = []
 
+    # Tenta ler a aba principal compilada primeiro
+    ws_first = sh.sheet1
+    all_values_first = ws_first.get_all_values()
+
+    # Se a primeira aba já contiver os dados consolidados no formato de tabela simples
+    if len(all_values_first) > 1 and "Espaço" in all_values_first[0]:
+      df_direct = pd.DataFrame(
+          all_values_first[1:], columns=all_values_first[0]
+      )
+      return df_direct
+
+    # Caso contrário, varre todas as abas de espaços
     for worksheet in sh.worksheets():
-      sheet_title = worksheet.title
-      if sheet_title not in SPACE_MAPPING:
+      sheet_title = worksheet.title.strip()
+
+      if sheet_title not in SPACE_MAPPING and sheet_title not in list(
+          SPACE_MAPPING.values()
+      ):
         continue
 
-      space_name = SPACE_MAPPING[sheet_title]
+      space_name = SPACE_MAPPING.get(sheet_title, sheet_title)
       rows = worksheet.get_all_values()
 
       current_date = "Outros"
 
       for row in rows:
+        if not row:
+          continue
+
         row_str = " ".join([str(val) for val in row if val])
 
-        # Identifica mudança de dia na grade
         for day_code in [
             "29/08",
             "30/08",
@@ -159,7 +175,6 @@ def load_data_from_sheets():
         sec = str(row[2]).strip() if len(row) > 2 and row[2] else ""
         resp = str(row[3]).strip() if len(row) > 3 and row[3] else ""
 
-        # LIMPEZA DE CABEÇALHOS SUJOS E DUPLICADOS DE DATA
         if any(
             d.lower() in horario_raw.lower()
             for d in [
@@ -224,7 +239,16 @@ def load_data_from_sheets():
 
     df_events = pd.DataFrame(raw_events)
     if df_events.empty:
-      return df_events
+      return pd.DataFrame(
+          columns=[
+              "Espaço",
+              "Data",
+              "Horário",
+              "Tema",
+              "Secretaria",
+              "Responsável",
+          ]
+      )
 
     consolidated = []
     for (space, date), group in df_events.groupby(
@@ -279,8 +303,6 @@ def save_data_to_sheets(df_to_save):
   try:
     gc = get_gspread_client()
     sh = gc.open(GOOGLE_SHEET_NAME)
-
-    # Atualiza a primeira aba geral com a visualização editada
     worksheet = sh.sheet1
     worksheet.clear()
 
@@ -427,7 +449,7 @@ custom_css = """
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# 2. Execução do Carregamento de Dados
+# Carregamento de Dados
 df_data = load_data_from_sheets()
 
 # Banner
@@ -455,7 +477,7 @@ todas_sec = sorted(
     ]
 )
 
-# 3. Painel de Filtros Gerais
+# Filtros Gerais
 st.markdown("### 🔍 Pesquisar e Filtrar Programação")
 with st.container():
   col_busca, col_dias = st.columns([2, 2])
@@ -536,14 +558,14 @@ if st.sidebar.button("⚙️ Gerar Relatório PDF"):
 
 st.sidebar.divider()
 
-# Estrutura de Abas
+# Abas
 tab_calendar, tab_vagos, tab_edit = st.tabs([
     "📅 Visão Calendário",
     "🔓 Horários Livres / Vagos",
     "🔒 Área de Edição (Google Sheets)",
 ])
 
-# --- ABA 1: VISÃO CALENDÁRIO ---
+# ABA 1: CALENDÁRIO
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -600,7 +622,7 @@ with tab_calendar:
               unsafe_allow_html=True,
           )
 
-# --- ABA 2: HORÁRIOS LIVRES / VAGOS ---
+# ABA 2: HORÁRIOS VAGOS
 with tab_vagos:
   st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
   if df_vagos_totais.empty:
@@ -620,7 +642,7 @@ with tab_vagos:
                 """
         cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
-# --- ABA 3: ÁREA DE EDIÇÃO DIRETA NO GOOGLE SHEETS ---
+# ABA 3: EDIÇÃO GOOGLE SHEETS
 with tab_edit:
   st.markdown("### 🔒 Edição Direta no Google Sheets")
   senha = st.text_input("Digite a senha de administrador:", type="password")
