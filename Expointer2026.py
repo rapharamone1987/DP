@@ -225,6 +225,30 @@ def load_base_excel(excel_path="Grade Expointer 2026.xlsx"):
       sec = str(row[2]).strip() if len(row) > 2 and pd.notna(row[2]) else ""
       resp = str(row[3]).strip() if len(row) > 3 and pd.notna(row[3]) else ""
 
+      # FILTRO DE CABEÇALHOS SUJOS (Remove linhas onde o horário é o próprio nome do dia)
+      if any(
+          d.lower() in horario_raw.lower()
+          for d in [
+              "sábado",
+              "domingo",
+              "segunda",
+              "terça",
+              "quarta",
+              "quinta",
+              "sexta",
+              "29/08",
+              "30/08",
+              "31/08",
+              "01/09",
+              "02/09",
+              "03/09",
+              "04/09",
+              "05/09",
+              "06/09",
+          ]
+      ):
+        continue
+
       horario_limpo = clean_time_string(horario_raw)
 
       if (
@@ -534,7 +558,7 @@ if espacos_sel:
 if sec_sel:
   df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
 
-# Ordenação Cronológica (Data + Hora de Início Certa)
+# Ordenação Cronológica
 df_filtered["Hora_Sort"] = df_filtered["Horário"].apply(extract_start_time)
 df_filtered["Data_Cat"] = pd.Categorical(
     df_filtered["Data"], categories=ORDEM_DIAS, ordered=True
@@ -575,7 +599,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Área de Edição",
 ])
 
-# --- ABA 1: VISÃO EM CALENDÁRIO GRID (Ordenado por Horário Crescente) ---
+# --- ABA 1: VISÃO EM CALENDÁRIO GRID ---
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
