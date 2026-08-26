@@ -4,6 +4,7 @@ import pdfplumber
 import pandas as pd
 from fpdf import FPDF
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import tempfile
 import os
 import io
@@ -13,7 +14,7 @@ import re
 from PIL import Image
 
 # ==========================================
-# 1. INICIALIZAÇÃO OBRIGATÓRIA (PROTEÇÃO TOTAL)
+# 1. INICIALIZAÇÃO SEGURA (PREVINE ATTRIBUTEERROR)
 # ==========================================
 if "items_lista" not in st.session_state: st.session_state.items_lista = []
 if "cabecalho" not in st.session_state: 
@@ -24,10 +25,31 @@ if "camera_ativa" not in st.session_state: st.session_state.camera_ativa = None
 if "atesto_tipo" not in st.session_state: st.session_state.atesto_tipo = "Definitivo"
 if "texto_pdf" not in st.session_state: st.session_state.texto_pdf = ""
 
-# CONFIGURAÇÃO DA IA (MODELO 70B)
+# CONFIGURAÇÃO DA IA
 key = st.secrets.get("GROQ_API_KEY", "")
 client = Groq(api_key=key) if key else None
-MODELO_ID = "llama-3.3-70b-versatile" # ID técnico exigido pela API
+
+@st.cache_resource
+def obter_modelo_ativo():
+    """Descobre qual modelo 70B está disponível para evitar erro 404"""
+    if not client: return None
+    try:
+        modelos = client.models.list()
+        lista_nomes = [m.id for m in modelos.data]
+        # Ordem de preferência para modelos de 70 Bilhões (70B)
+        preferencia = [
+            "llama-3.3-70b-versatile",
+            "llama-3.1-70b-versatile",
+            "llama3-70b-8192"
+        ]
+        for p in preferencia:
+            if p in lista_nomes:
+                return p
+        return lista_nomes[0] # Fallback para o primeiro disponível
+    except:
+        return "llama-3.3-70b-versatile" # Fallback padrão
+
+MODELO_ID = obter_modelo_ativo()
 
 # ==========================================
 # 2. FUNÇÕES DE APOIO
@@ -45,19 +67,22 @@ def limpar_json_ia(texto):
 
 def extrair_dados_ia(texto_entrada):
     prompt = (
-        "Você é um Especialista em Recebimento do Setor Público. "
-        "Analise o texto e extraia detalhes técnicos reais (MARCA, MODELO, peças, cores, medidas, voltagem, hardware, pintura, etc). "
-        "Ignore cláusulas jurídicas e obrigações contratuais. Extraia o dado real do documento. "
-        "Responda APENAS JSON: "
+        "Você é um Especialista em Recebimento de bens e materiais no setor público. "
+        "Analise o texto e extraia detalhes técnicos reais (MARCA, MODELO, peças, cores, medidas, voltagem, etc). "
+        "Ignore cláusulas jurídicas. Responda APENAS JSON: "
         '{"fornecedor": "nome", "edital": "número", "objeto": "descrição", "checklist": ["item 1", "item 2"]}'
     )
     if client:
-        res = client.chat.completions.create(
-            model=MODELO_ID, 
-            messages=[{"role": "user", "content": prompt + "\n" + texto_entrada}], 
-            temperature=0.1
-        )
-        return limpar_json_ia(res.choices[0].message.content)
+        try:
+            res = client.chat.completions.create(
+                model=MODELO_ID,
+                messages=[{"role": "user", "content": prompt + "\n" + texto_entrada}],
+                temperature=0.1
+            )
+            return limpar_json_ia(res.choices[0].message.content)
+        except Exception as e:
+            st.error(f"Erro na IA: {e}")
+            return None
     return None
 
 def perguntar_ia(pergunta, contexto):
@@ -100,15 +125,15 @@ class PDFRS(FPDF):
         self.set_font("Arial", 'B', 10); self.set_text_color(0)
         self.cell(0, 6, tr("SECRETARIA DA AGRICULTURA, PECUÁRIA, PRODUÇÃO SUSTENTÁVEL E IRRIGAÇÃO"), 0, 1, 'C')
         self.set_font("Arial", 'B', 14)
-        titulo = "RELATÓRIO DE RECEBIMENTO TÉCNICO" if self.status_geral else "RELATÓRIO DE DESCONFORMIDADE TÉCNICA"
-        self.cell(0, 8, tr(titulo), 0, 1, 'C')
+        t = "RELATÓRIO DE RECEBIMENTO TÉCNICO" if self.status_geral else "RELATÓRIO DE DESCONFORMIDADE TÉCNICA"
+        self.cell(0, 8, tr(t), 0, 1, 'C')
     def footer(self):
         self.set_y(-10); self.faixa(291)
         self.set_y(-18); self.set_font("Arial", 'I', 7); self.set_text_color(100)
-        self.cell(0, 10, tr(f"Página {self.page_no()} / {{nb}}"), 0, 0, 'C')
+        self.cell(0, 10, tr(f"Página {self.page_no()}"), 0, 0, 'C')
 
 # ==========================================
-# 4. INTERFACE STREAMLIT
+# 4. INTERFACE
 # ==========================================
 st.set_page_config(page_title="Recebimento RS", layout="centered")
 st.title("📋 Checklist Recebimento Técnico RS")
@@ -119,7 +144,7 @@ if not st.session_state.items_lista:
     with tabs[0]:
         pdf_file = st.file_uploader("Upload do PDF", type="pdf")
         if pdf_file and st.button("🔍 Analisar PDF com IA"):
-            with st.spinner("IA extraindo dados..."):
+            with st.spinner("IA (70B) extraindo dados..."):
                 texto = ""
                 with pdfplumber.open(pdf_file) as pdf:
                     for pg in pdf.pages[:6]: texto += (pg.extract_text() or "") + "\n"
@@ -140,21 +165,21 @@ if not st.session_state.items_lista:
                 st.rerun()
     with tabs[2]:
         if st.button("🖊️ Iniciar em Branco"):
-            st.session_state.items_lista = [{"id": time.time(), "texto": "Novo Requisito"}]
+            st.session_state.items_lista = [{"id": time.time(), "texto": "Novo requisito de conferência"}]
             st.rerun()
 
 # --- OPERAÇÃO ---
 elif st.session_state.items_lista:
     if st.session_state.texto_pdf:
-        with st.expander("🤖 Chat Suporte (Dúvidas sobre o PDF)"):
-            p = st.text_input("Sua dúvida sobre o documento:")
+        with st.expander("🤖 Chat Suporte (Dúvidas sobre o documento)"):
+            p = st.text_input("Qual detalhe você quer confirmar?")
             if st.button("Perguntar"): st.info(f"**IA:** {perguntar_ia(p, st.session_state.texto_pdf)}")
 
     obj_tit = st.session_state.cabecalho["objeto"].upper()
     st.markdown(f'<div style="background-color:#639d31;color:white;padding:10px;border-radius:5px;font-weight:bold;text-align:center;margin-bottom:20px;">ITEM: {obj_tit}</div>', unsafe_allow_html=True)
 
     with st.container(border=True):
-        st.write("### 📝 Dados do Processo (Editáveis)")
+        st.write("### 📝 Dados Editáveis")
         c1, c2 = st.columns(2)
         st.session_state.cabecalho["fornecedor"] = c1.text_input("Fornecedor:", value=st.session_state.cabecalho["fornecedor"])
         st.session_state.cabecalho["edital"] = c2.text_input("ARP/Edital:", value=st.session_state.cabecalho["edital"])
@@ -162,7 +187,7 @@ elif st.session_state.items_lista:
         nf = c1.text_input("NF:", value=st.session_state.cabecalho.get("nf",""))
         qtd = c2.text_input("Qtd:", value=st.session_state.cabecalho.get("qtd",""))
         placa = c1.text_input("ID:", value=st.session_state.cabecalho.get("placa",""))
-        unidade = c2.text_input("Unidade Destino:", value=st.session_state.cabecalho.get("unidade",""))
+        unidade = c2.text_input("Destino:", value=st.session_state.cabecalho.get("unidade",""))
         st.session_state.atesto_tipo = st.selectbox("Tipo de Atesto:", ["Definitivo", "Provisório"])
 
     st.write("### ✅ Checklist")
@@ -172,7 +197,7 @@ elif st.session_state.items_lista:
         with st.container(border=True):
             col_ch, col_tx, col_ex = st.columns([0.15, 0.7, 0.15])
             st.session_state.conferidos_status[uid] = col_ch.checkbox("OK", key=f"ch_{uid}", value=st.session_state.conferidos_status.get(uid, False))
-            if not st.session_state.conferidos_status.get(uid): todos_ok = False
+            if not st.session_state.conferidos_status[uid]: todos_ok = False
             itm["texto"] = col_tx.text_input(f"Itm{uid}", itm["texto"], key=f"in_{uid}", label_visibility="collapsed")
             if col_ex.button("🗑️", key=f"del_{uid}"): st.session_state.items_lista.pop(i); st.rerun()
             
@@ -195,8 +220,7 @@ elif st.session_state.items_lista:
     obs_geral = st.text_area("Justificativa / Obs:")
     servidor = st.text_input("Responsável:")
 
-    # --- 5. GERAÇÃO DO PDF ---
-    if st.button("🚀 GERAR RELATÓRIO"):
+    if st.button("🚀 GERAR PDF"):
         if not servidor: st.error("Informe o servidor.")
         else:
             try:
@@ -205,7 +229,7 @@ elif st.session_state.items_lista:
                 pdf.set_fill_color(99, 157, 49); pdf.set_text_color(255); pdf.set_font("Arial", 'B', 10)
                 pdf.multi_cell(0, 8, tr(f" ITEM: {st.session_state.cabecalho['objeto'].upper()}"), 1, 'L', fill=True)
                 pdf.set_text_color(0); pdf.set_font("Arial", '', 9); pdf.set_fill_color(245)
-                for l, v in [("FORNECEDOR", cab['fornecedor']), ("ARP", cab['edital']), ("NF", nf), ("QTD", qtd), ("ID", placa), ("UNIDADE DESTINO", unidade)]:
+                for l, v in [("FORNECEDOR", cab['fornecedor']), ("ARP", cab['edital']), ("NF", nf), ("QTD", qtd), ("ID", placa), ("DESTINO", unidade)]:
                     if v: pdf.set_font("Arial", 'B', 9); pdf.write(7, tr(f" {l}: ")); pdf.set_font("Arial", '', 9); pdf.multi_cell(0, 7, tr(v.upper()), 'B', 'L', False)
                 
                 for it in st.session_state.items_lista:
