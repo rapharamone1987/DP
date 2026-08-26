@@ -733,9 +733,8 @@ with tab_edit:
   if senha == "expointer2026":
     st.success("🔓 Acesso liberado!")
     st.info(
-        "💡 **Como ajustar a agenda:** Para agendar um evento em um horário"
-        " livre, substitua `🔓 HORÁRIO VAGO` pelo nome do evento e preencha a"
-        " Secretaria/Responsável."
+        "💡 **Como ajustar a agenda:** Substitua `🔓 HORÁRIO VAGO` pelo nome do"
+        " evento e preencha a Secretaria/Responsável."
     )
 
     edited_df = st.data_editor(
@@ -761,26 +760,56 @@ with tab_edit:
     )
 
     if st.button("💾 Salvar Alterações na Planilha"):
-          excel_path = "Grade Expointer 2026.xlsx"
-          with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
-            # Mapeia cada espaco para sua respectiva aba original
-            for space_name, group in edited_df.groupby("Espaço"):
-              # Busca o nome original da aba ou gera um valido
-              orig_sheet = next(
-                  (
-                      k
-                      for k, v in space_mapping.items()
-                      if v.lower() == space_name.lower()
-                  ),
-                  f"Agenda {space_name}",
+      excel_path = "Grade Expointer 2026.xlsx"
+
+      try:
+        with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
+          # Mapeamento invertido para recuperar os nomes originais das abas
+          inv_map = {v.lower(): k for k, v in space_mapping.items()}
+
+          grouped = dict(list(edited_df.groupby("Espaço")))
+
+          # Se o dataframe estiver vazio por algum filtro, salva todas as chaves mapeadas
+          espacos_para_salvar = (
+              list(grouped.keys()) if grouped else list(space_mapping.values())
+          )
+
+          for space_name in espacos_para_salvar:
+            group = grouped.get(space_name, pd.DataFrame())
+
+            # Recupera o nome original da aba (ex: "Agenda Auditório ADMINISTRAÇÃO")
+            orig_sheet = inv_map.get(
+                str(space_name).lower(), f"Agenda {space_name}"
+            )
+
+            # Limpa caracteres proibidos pelo Excel e limita a 31 caracteres
+            clean_sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
+
+            if not group.empty:
+              group.to_excel(
+                  writer, sheet_name=clean_sheet_title, index=False
               )
-              sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
+            else:
+              # Garante que a aba não fique nula/invisível para o openpyxl
+              dummy_df = pd.DataFrame(
+                  columns=[
+                      "Horário",
+                      "Atividade / Tema",
+                      "Secretaria",
+                      "Responsável",
+                  ]
+              )
+              dummy_df.to_excel(
+                  writer, sheet_name=clean_sheet_title, index=False
+              )
 
-              group.to_excel(writer, sheet_name=sheet_title, index=False)
+        st.success("✅ Alterações salvas com sucesso!")
+        st.cache_data.clear()
+        st.rerun()
 
-          st.success("✅ Alterações salvas mantendo todas as abas e espaços!")
-          st.cache_data.clear()
-          st.rerun()
+      except Exception as e:
+        st.error(f"⚠️ Erro ao salvar planilha: {e}")
+
   elif senha:
     st.error("❌ Senha incorreta. Acesso negado.")
   else:
