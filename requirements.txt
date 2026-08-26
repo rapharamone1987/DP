@@ -6,3 +6,5 @@ Pillow
 pandas
 reportlab
 openpyxl
+gspread
+google-auth
