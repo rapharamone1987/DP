@@ -31,7 +31,7 @@ ORDEM_DIAS = [
     "Outros",
 ]
 
-# MAPEAMENTO GLOBAL (Deve ficar no topo para evitar NameError)
+# MAPEAMENTO GLOBAL (Definido no topo para evitar NameError)
 SPACE_MAPPING = {
     "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
     "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
@@ -156,20 +156,47 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
     for idx, row in df.iterrows():
       row_str = " ".join([str(val) for val in row.values if pd.notna(val)])
       for day_code in [
-          "29/08", "30/08", "31/08", "01/09", "02/09", "03/09", "04/09", "05/09", "06/09",
+          "29/08",
+          "30/08",
+          "31/08",
+          "01/09",
+          "02/09",
+          "03/09",
+          "04/09",
+          "05/09",
+          "06/09",
       ]:
         if day_code in row_str and any(
-            w in row_str for w in ["Sábado", "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "2026"]
+            w in row_str
+            for w in [
+                "Sábado",
+                "Domingo",
+                "Segunda",
+                "Terça",
+                "Quarta",
+                "Quinta",
+                "Sexta",
+                "2026",
+            ]
         ):
-          if "29/08" in day_code: current_date = "Sábado 29/08"
-          elif "30/08" in day_code: current_date = "Domingo 30/08"
-          elif "31/08" in day_code: current_date = "Segunda 31/08"
-          elif "01/09" in day_code: current_date = "Terça 01/09"
-          elif "02/09" in day_code: current_date = "Quarta 02/09"
-          elif "03/09" in day_code: current_date = "Quinta 03/09"
-          elif "04/09" in day_code: current_date = "Sexta 04/09"
-          elif "05/09" in day_code: current_date = "Sábado 05/09"
-          elif "06/09" in day_code: current_date = "Domingo 06/09"
+          if "29/08" in day_code:
+            current_date = "Sábado 29/08"
+          elif "30/08" in day_code:
+            current_date = "Domingo 30/08"
+          elif "31/08" in day_code:
+            current_date = "Segunda 31/08"
+          elif "01/09" in day_code:
+            current_date = "Terça 01/09"
+          elif "02/09" in day_code:
+            current_date = "Quarta 02/09"
+          elif "03/09" in day_code:
+            current_date = "Quinta 03/09"
+          elif "04/09" in day_code:
+            current_date = "Sexta 04/09"
+          elif "05/09" in day_code:
+            current_date = "Sábado 05/09"
+          elif "06/09" in day_code:
+            current_date = "Domingo 06/09"
           break
 
       horario_raw = str(row[0]).strip() if pd.notna(row[0]) else ""
@@ -183,7 +210,13 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
           and horario_raw.lower() != "horário"
           and not ("características" in horario_raw.lower())
       ):
-        is_vago = not tema or tema.lower() in ["livre", "vago", "disponível", "horário vago", "nan"]
+        is_vago = not tema or tema.lower() in [
+            "livre",
+            "vago",
+            "disponível",
+            "horário vago",
+            "nan",
+        ]
         raw_events.append({
             "Espaço": space_name,
             "Data": current_date,
@@ -203,7 +236,12 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
     i = 0
     while i < len(group):
       row = group.iloc[i]
-      title, time_start, org, resp = row["Tema"], row["Horário"], row["Secretaria"], row["Responsável"]
+      title, time_start, org, resp = (
+          row["Tema"],
+          row["Horário"],
+          row["Secretaria"],
+          row["Responsável"],
+      )
       j = i + 1
       time_end = time_start
       while j < len(group) and group.iloc[j]["Tema"] == title:
@@ -215,57 +253,108 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
         time_disp = f"{time_start} - {time_end}"
 
       consolidated.append({
-          "Espaço": space, "Data": date, "Horário": time_disp,
-          "Tema": title, "Secretaria": org, "Responsável": resp,
+          "Espaço": space,
+          "Data": date,
+          "Horário": time_disp,
+          "Tema": title,
+          "Secretaria": org,
+          "Responsável": resp,
       })
       i = j
 
   df_result = pd.DataFrame(consolidated)
-  df_result["Data_Cat"] = pd.Categorical(df_result["Data"], categories=ORDEM_DIAS, ordered=True)
+  df_result["Data_Cat"] = pd.Categorical(
+      df_result["Data"], categories=ORDEM_DIAS, ordered=True
+  )
   return df_result.sort_values("Data_Cat").drop(columns=["Data_Cat"])
 
 
 def generate_pdf_report(df_export, doc_title_info):
   buffer = io.BytesIO()
   doc = SimpleDocTemplate(
-      buffer, pagesize=landscape(A4), rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30
+      buffer,
+      pagesize=landscape(A4),
+      rightMargin=30,
+      leftMargin=30,
+      topMargin=30,
+      bottomMargin=30,
   )
   elements = []
   styles = getSampleStyleSheet()
 
   title_style = ParagraphStyle(
-      "DocTitle", parent=styles["Heading1"], fontSize=18, leading=22,
-      textColor=colors.HexColor("#064e3b"), fontName="Helvetica-Bold", spaceAfter=4,
+      "DocTitle",
+      parent=styles["Heading1"],
+      fontSize=18,
+      leading=22,
+      textColor=colors.HexColor("#064e3b"),
+      fontName="Helvetica-Bold",
+      spaceAfter=4,
   )
   subtitle_style = ParagraphStyle(
-      "DocSubtitle", parent=styles["Normal"], fontSize=11,
-      textColor=colors.HexColor("#15803d"), fontName="Helvetica-Bold", spaceAfter=15,
+      "DocSubtitle",
+      parent=styles["Normal"],
+      fontSize=11,
+      textColor=colors.HexColor("#15803d"),
+      fontName="Helvetica-Bold",
+      spaceAfter=15,
   )
   cell_header_style = ParagraphStyle(
-      "CellHeader", parent=styles["Normal"], fontSize=10, textColor=colors.white, fontName="Helvetica-Bold", alignment=1,
+      "CellHeader",
+      parent=styles["Normal"],
+      fontSize=10,
+      textColor=colors.white,
+      fontName="Helvetica-Bold",
+      alignment=1,
   )
   cell_time_style = ParagraphStyle(
-      "CellTime", parent=styles["Normal"], fontSize=8, textColor=colors.HexColor("#15803d"), fontName="Helvetica-Bold",
+      "CellTime",
+      parent=styles["Normal"],
+      fontSize=8,
+      textColor=colors.HexColor("#15803d"),
+      fontName="Helvetica-Bold",
   )
   cell_title_style = ParagraphStyle(
-      "CellTitle", parent=styles["Normal"], fontSize=9, textColor=colors.HexColor("#0f172a"), fontName="Helvetica-Bold", leading=11,
+      "CellTitle",
+      parent=styles["Normal"],
+      fontSize=9,
+      textColor=colors.HexColor("#0f172a"),
+      fontName="Helvetica-Bold",
+      leading=11,
   )
   cell_meta_style = ParagraphStyle(
-      "CellMeta", parent=styles["Normal"], fontSize=8, textColor=colors.HexColor("#475569"), fontName="Helvetica",
+      "CellMeta",
+      parent=styles["Normal"],
+      fontSize=8,
+      textColor=colors.HexColor("#475569"),
+      fontName="Helvetica",
   )
 
-  elements.append(Paragraph("EXPOINTER 2026 — Programação Institucional - Espaços Gov RS", title_style))
-  elements.append(Paragraph(f"Filtro do Relatório: <b>{doc_title_info}</b>", subtitle_style))
+  elements.append(
+      Paragraph(
+          "EXPOINTER 2026 — Programação Institucional - Espaços Gov RS",
+          title_style,
+      )
+  )
+  elements.append(
+      Paragraph(f"Filtro do Relatório: <b>{doc_title_info}</b>", subtitle_style)
+  )
 
   table_data = [[
-      Paragraph("Data", cell_header_style), Paragraph("Horário", cell_header_style),
-      Paragraph("Espaço / Auditório", cell_header_style), Paragraph("Atividade / Tema", cell_header_style),
+      Paragraph("Data", cell_header_style),
+      Paragraph("Horário", cell_header_style),
+      Paragraph("Espaço / Auditório", cell_header_style),
+      Paragraph("Atividade / Tema", cell_header_style),
       Paragraph("Organização / Responsável", cell_header_style),
   ]]
 
   for _, row in df_export.iterrows():
     resp_str = f" ({row['Responsável']})" if row["Responsável"] else ""
-    org_resp = f"{row['Secretaria']}{resp_str}" if row["Secretaria"] else row["Responsável"]
+    org_resp = (
+        f"{row['Secretaria']}{resp_str}"
+        if row["Secretaria"]
+        else row["Responsável"]
+    )
     table_data.append([
         Paragraph(f"<b>{row['Data']}</b>", cell_meta_style),
         Paragraph(row["Horário"], cell_time_style),
@@ -284,14 +373,22 @@ def generate_pdf_report(df_export, doc_title_info):
           ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
           ("TOPPADDING", (0, 0), (-1, -1), 6),
           ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
-          ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
+          (
+              "ROWBACKGROUNDS",
+              (0, 1),
+              (-1, -1),
+              [colors.white, colors.HexColor("#f8fafc")],
+          ),
       ])
   )
   elements.append(t)
   doc.build(elements)
   buffer.seek(0)
   return buffer
-  df_data = load_and_process_data()
+
+
+# 4. Execução do Carregamento de Dados
+df_data = load_and_process_data()
 
 # 5. Banner Institucional
 if img_b64_url:
@@ -314,40 +411,61 @@ banner_complete = f"""
 """
 st.markdown(banner_complete, unsafe_allow_html=True)
 
-if df_data.empty:
-  st.warning("Carregando ou nenhum dado encontrado na planilha.")
+if df_data is None or df_data.empty:
+  st.warning("⚠️ Carregando dados ou nenhum evento encontrado na planilha.")
   st.stop()
 
 todos_dias = [d for d in ORDEM_DIAS if d in df_data["Data"].unique()]
 todos_espacos = sorted(list(df_data["Espaço"].unique()))
-todas_sec = sorted([s for s in df_data["Secretaria"].unique() if s and s != "🔓 HORÁRIO VAGO"])
+todas_sec = sorted(
+    [s for s in df_data["Secretaria"].unique() if s and s != "🔓 HORÁRIO VAGO"]
+)
 
 # 6. Painel de Filtros Direto na Página Principal
 st.markdown("### 🔍 Pesquisar e Filtrar Eventos")
 with st.container():
   col_busca, col_dias, col_vagos = st.columns([2, 2, 1])
-  with col_busca: busca = st.text_input("🔎 Palavra-chave:", "", placeholder="Digite tema, palavra ou local...")
-  with col_dias: dias_sel = st.multiselect("📅 Filtrar por Dia(s):", todos_dias, default=[])
-  with col_vagos: exibir_vagos = st.checkbox("🔓 Mostrar Horários Vagos", value=True)
+  with col_busca:
+    busca = st.text_input(
+        "🔎 Palavra-chave:", "", placeholder="Digite tema, palavra ou local..."
+    )
+  with col_dias:
+    dias_sel = st.multiselect(
+        "📅 Filtrar por Dia(s):", todos_dias, default=[]
+    )
+  with col_vagos:
+    exibir_vagos = st.checkbox("🔓 Mostrar Horários Vagos", value=True)
 
   col_espaco, col_sec = st.columns(2)
-  with col_espaco: espacos_sel = st.multiselect("📍 Filtrar por Espaço / Auditório:", todos_espacos, default=[])
-  with col_sec: sec_sel = st.multiselect("🏢 Filtrar por Secretaria / Entidade:", todas_sec, default=[])
+  with col_espaco:
+    espacos_sel = st.multiselect(
+        "📍 Filtrar por Espaço / Auditório:", todos_espacos, default=[]
+    )
+  with col_sec:
+    sec_sel = st.multiselect(
+        "🏢 Filtrar por Secretaria / Entidade:", todas_sec, default=[]
+    )
 
 df_filtered = df_data.copy()
-if not exibir_vagos: df_filtered = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
+if not exibir_vagos:
+  df_filtered = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
 if busca:
   t = busca.lower()
   df_filtered = df_filtered[
-      df_filtered["Tema"].str.lower().str.contains(t) |
-      df_filtered["Espaço"].str.lower().str.contains(t) |
-      df_filtered["Responsável"].str.lower().str.contains(t)
+      df_filtered["Tema"].str.lower().str.contains(t)
+      | df_filtered["Espaço"].str.lower().str.contains(t)
+      | df_filtered["Responsável"].str.lower().str.contains(t)
   ]
-if dias_sel: df_filtered = df_filtered[df_filtered["Data"].isin(dias_sel)]
-if espacos_sel: df_filtered = df_filtered[df_filtered["Espaço"].isin(espacos_sel)]
-if sec_sel: df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
+if dias_sel:
+  df_filtered = df_filtered[df_filtered["Data"].isin(dias_sel)]
+if espacos_sel:
+  df_filtered = df_filtered[df_filtered["Espaço"].isin(espacos_sel)]
+if sec_sel:
+  df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
 
-df_filtered["Data_Cat"] = pd.Categorical(df_filtered["Data"], categories=ORDEM_DIAS, ordered=True)
+df_filtered["Data_Cat"] = pd.Categorical(
+    df_filtered["Data"], categories=ORDEM_DIAS, ordered=True
+)
 df_filtered = df_filtered.sort_values("Data_Cat").drop(columns=["Data_Cat"])
 
 # Menu Lateral
@@ -355,16 +473,25 @@ st.sidebar.header("📄 Exportação & Gestão")
 if st.sidebar.button("⚙️ Gerar Relatório PDF"):
   if not df_filtered.empty:
     info_str = "Seleção Personalizada"
-    if espacos_sel: info_str = f"Espaços: {', '.join(espacos_sel)}"
-    elif dias_sel: info_str = f"Dias: {', '.join(dias_sel)}"
+    if espacos_sel:
+      info_str = f"Espaços: {', '.join(espacos_sel)}"
+    elif dias_sel:
+      info_str = f"Dias: {', '.join(dias_sel)}"
     pdf_bytes = generate_pdf_report(df_filtered, info_str)
-    st.sidebar.download_button(label="📥 Baixar PDF", data=pdf_bytes, file_name="agenda_expointer.pdf", mime="application/pdf")
+    st.sidebar.download_button(
+        label="📥 Baixar PDF",
+        data=pdf_bytes,
+        file_name="agenda_expointer.pdf",
+        mime="application/pdf",
+    )
   else:
     st.sidebar.error("Nenhum evento selecionado.")
 
 st.sidebar.divider()
 
-tab_cards, tab_calendar, tab_edit = st.tabs(["📋 Visão em Cards", "📅 Visão Calendário", "🔒 Área de Edição"])
+tab_cards, tab_calendar, tab_edit = st.tabs(
+    ["📋 Visão em Cards", "📅 Visão Calendário", "🔒 Área de Edição"]
+)
 
 # --- ABA 1: VISÃO EM CARDS ---
 with tab_cards:
@@ -379,7 +506,9 @@ with tab_cards:
         card_class = "event-card-vago" if is_vago else "event-card"
         time_class = "card-time-vago" if is_vago else "card-time-tag"
         sec_info = f"🏢 {row['Secretaria']}" if row["Secretaria"] else ""
-        resp_info = f" | Resp: {row['Responsável']}" if row["Responsável"] else ""
+        resp_info = (
+            f" | Resp: {row['Responsável']}" if row["Responsável"] else ""
+        )
         meta_line = f"{sec_info}{resp_info}".strip()
 
         card_html = f"""
@@ -400,9 +529,12 @@ with tab_cards:
 
 # --- ABA 2: VISÃO EM CALENDÁRIO GRID ---
 with tab_calendar:
-  dia_grid_sel = st.selectbox("📆 Destacar dia na grade:", ["Exibir Todos Selecionados"] + todos_dias)
+  dia_grid_sel = st.selectbox(
+      "📆 Destacar dia na grade:", ["Exibir Todos Selecionados"] + todos_dias
+  )
   df_grid = df_filtered.copy()
-  if dia_grid_sel != "Exibir Todos Selecionados": df_grid = df_grid[df_grid["Data"] == dia_grid_sel]
+  if dia_grid_sel != "Exibir Todos Selecionados":
+    df_grid = df_grid[df_grid["Data"] == dia_grid_sel]
 
   if df_grid.empty:
     st.info("Nenhum evento para exibir.")
@@ -417,12 +549,29 @@ with tab_calendar:
         for _, ev in evs_dia.iterrows():
           is_vago = ev["Tema"] == "🔓 HORÁRIO VAGO"
           box_class = "cal-event-vago" if is_vago else "cal-event-box"
-          sec_val = str(ev["Secretaria"]).strip() if pd.notna(ev["Secretaria"]) else ""
-          resp_val = str(ev["Responsável"]).strip() if pd.notna(ev["Responsável"]) else ""
-          sec_display = f'<div style="color:#334155; font-size:0.75rem; font-weight:600; margin-top:4px;">🏢 {sec_val}</div>' if sec_val and sec_val.lower() != "nan" else ""
-          resp_display = f'<div style="color:#475569; font-size:0.75rem; font-weight:500;">👤 {resp_val}</div>' if resp_val and resp_val.lower() != "nan" else ""
+          sec_val = (
+              str(ev["Secretaria"]).strip() if pd.notna(ev["Secretaria"]) else ""
+          )
+          resp_val = (
+              str(ev["Responsável"]).strip()
+              if pd.notna(ev["Responsável"])
+              else ""
+          )
+          sec_display = (
+              f'<div style="color:#334155; font-size:0.75rem;'
+              f' font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
+              if sec_val and sec_val.lower() != "nan"
+              else ""
+          )
+          resp_display = (
+              f'<div style="color:#475569; font-size:0.75rem;'
+              f' font-weight:500;">👤 {resp_val}</div>'
+              if resp_val and resp_val.lower() != "nan"
+              else ""
+          )
 
-          st.markdown(f"""
+          st.markdown(
+              f"""
               <div class="{box_class}">
                   <span style="color:#15803d; font-weight:800; display:block; margin-bottom:4px;">⏰ {ev['Horário']}</span>
                   <div style="font-weight:700; color:{'#475569' if is_vago else '#0f172a'}; margin-bottom:4px;">{ev['Tema']}</div>
@@ -430,7 +579,9 @@ with tab_calendar:
                   {sec_display}
                   {resp_display}
               </div>
-              """, unsafe_allow_html=True)
+              """,
+              unsafe_allow_html=True,
+          )
 
 # --- ABA 3: ÁREA DE EDIÇÃO PROTEGIDA ---
 with tab_edit:
@@ -444,10 +595,16 @@ with tab_edit:
         num_rows="dynamic",
         use_container_width=True,
         column_config={
-            "Espaço": st.column_config.SelectboxColumn("Espaço / Local", options=todos_espacos, required=True),
-            "Data": st.column_config.SelectboxColumn("Dia", options=todos_dias, required=True),
+            "Espaço": st.column_config.SelectboxColumn(
+                "Espaço / Local", options=todos_espacos, required=True
+            ),
+            "Data": st.column_config.SelectboxColumn(
+                "Dia", options=todos_dias, required=True
+            ),
             "Horário": st.column_config.TextColumn("Horário", required=True),
-            "Tema": st.column_config.TextColumn("Atividade / Tema (ou 🔓 HORÁRIO VAGO)", required=True),
+            "Tema": st.column_config.TextColumn(
+                "Atividade / Tema (ou 🔓 HORÁRIO VAGO)", required=True
+            ),
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
             "Responsável": st.column_config.TextColumn("Responsável"),
         },
@@ -461,17 +618,30 @@ with tab_edit:
           sheets_written = 0
           for space_name in todos_espacos:
             group = edited_df[edited_df["Espaço"] == space_name]
-            orig_sheet = inv_map.get(str(space_name).lower(), f"Agenda {space_name}")
+            orig_sheet = inv_map.get(
+                str(space_name).lower(), f"Agenda {space_name}"
+            )
             clean_sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
 
             if not group.empty:
-              group.to_excel(writer, sheet_name=clean_sheet_title, index=False)
+              group.to_excel(
+                  writer, sheet_name=clean_sheet_title, index=False
+              )
             else:
-              pd.DataFrame(columns=["Horário", "Atividade / Tema", "Secretaria", "Responsável"]).to_excel(writer, sheet_name=clean_sheet_title, index=False)
+              pd.DataFrame(
+                  columns=[
+                      "Horário",
+                      "Atividade / Tema",
+                      "Secretaria",
+                      "Responsável",
+                  ]
+              ).to_excel(writer, sheet_name=clean_sheet_title, index=False)
             sheets_written += 1
 
           if sheets_written == 0:
-            pd.DataFrame({"Info": ["Vazia"]}).to_excel(writer, sheet_name="Geral", index=False)
+            pd.DataFrame({"Info": ["Vazia"]}).to_excel(
+                writer, sheet_name="Geral", index=False
+            )
 
         st.success("✅ Alterações salvas com sucesso!")
         st.cache_data.clear()
