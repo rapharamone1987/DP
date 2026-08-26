@@ -1,5 +1,6 @@
 import base64
 import io
+import json
 import os
 import re
 import pandas as pd
@@ -17,7 +18,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Ordem Cronológica Oficial dos Dias
 ORDEM_DIAS = [
     "Sábado 29/08",
     "Domingo 30/08",
@@ -31,7 +31,6 @@ ORDEM_DIAS = [
     "Outros",
 ]
 
-# MAPEAMENTO GLOBAL (No topo para evitar NameError)
 SPACE_MAPPING = {
     "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
     "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
@@ -45,8 +44,24 @@ SPACE_MAPPING = {
     "Agenda FUNDESA": "Agenda FUNDESA",
 }
 
+ALTERACOES_FILE = "alteracoes.json"
 
-# Função para extrair a imagem do banner em Base64
+
+def load_alteracoes():
+  if os.path.exists(ALTERACOES_FILE):
+    try:
+      with open(ALTERACOES_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+    except Exception:
+      return {}
+  return {}
+
+
+def save_alteracoes(data_dict):
+  with open(ALTERACOES_FILE, "w", encoding="utf-8") as f:
+    json.dump(data_dict, f, ensure_ascii=False, indent=2)
+
+
 def get_banner_image_b64():
   possible_images = [
       "Screenshot_20260825-095320~2.jpg",
@@ -106,7 +121,6 @@ def clean_time_string(time_str):
   return s
 
 
-# 2. Estilização CSS Personalizada
 custom_css = f"""
 <style>
     {bg_style}
@@ -136,9 +150,9 @@ custom_css = f"""
 st.markdown(custom_css, unsafe_allow_html=True)
 
 
-# 3. Carregamento e Processamento
+# 3. Leitura Segura da Planilha Base
 @st.cache_data(ttl=60)
-def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
+def load_base_excel(excel_path="Grade Expointer 2026.xlsx"):
   if not os.path.exists(excel_path):
     return pd.DataFrame()
 
@@ -146,10 +160,10 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   raw_events = []
 
   for sheet in xls.sheet_names:
-    if sheet not in SPACE_MAPPING and not sheet.startswith("Agenda "):
+    if sheet not in SPACE_MAPPING:
       continue
 
-    space_name = SPACE_MAPPING.get(sheet, sheet.replace("Agenda ", "").strip())
+    space_name = SPACE_MAPPING[sheet]
     df = pd.read_excel(excel_path, sheet_name=sheet, header=None)
     current_date = "Outros"
 
@@ -283,6 +297,30 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   return df_result.sort_values("Data_Cat").drop(columns=["Data_Cat"])
 
 
+def load_merged_data():
+  df_base = load_base_excel()
+  if df_base.empty:
+    return df_base
+
+  alteracoes = load_alteracoes()
+  if not alteracoes:
+    return df_base
+
+  # Aplica as alterações gravadas por chave de evento (Espaço + Data + Horário)
+  for idx, row in df_base.iterrows():
+    key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
+    if key in alteracoes:
+      df_base.at[idx, "Tema"] = alteracoes[key].get("Tema", row["Tema"])
+      df_base.at[idx, "Secretaria"] = alteracoes[key].get(
+          "Secretaria", row["Secretaria"]
+      )
+      df_base.at[idx, "Responsável"] = alteracoes[key].get(
+          "Responsável", row["Responsável"]
+      )
+
+  return df_base
+
+
 def generate_pdf_report(df_export, doc_title_info):
   buffer = io.BytesIO()
   doc = SimpleDocTemplate(
@@ -402,7 +440,7 @@ def generate_pdf_report(df_export, doc_title_info):
 
 
 # 4. Execução do Carregamento de Dados
-df_data = load_and_process_data()
+df_data = load_merged_data()
 
 # 5. Banner Institucional
 if img_b64_url:
@@ -605,16 +643,17 @@ with tab_edit:
     st.success("🔓 Acesso liberado!")
     edited_df = st.data_editor(
         df_data,
-        num_rows="dynamic",
         use_container_width=True,
         column_config={
             "Espaço": st.column_config.SelectboxColumn(
-                "Espaço / Local", options=todos_espacos, required=True
+                "Espaço / Local", options=todos_espacos, disabled=True
             ),
             "Data": st.column_config.SelectboxColumn(
-                "Dia", options=todos_dias, required=True
+                "Dia", options=todos_dias, disabled=True
             ),
-            "Horário": st.column_config.TextColumn("Horário", required=True),
+            "Horário": st.column_config.TextColumn(
+                "Horário", disabled=True
+            ),
             "Tema": st.column_config.TextColumn(
                 "Atividade / Tema (ou 🔓 HORÁRIO VAGO)", required=True
             ),
@@ -623,43 +662,29 @@ with tab_edit:
         },
     )
 
-    if st.button("💾 Salvar Alterações na Planilha"):
-      excel_path = "Grade Expointer 2026.xlsx"
+    if st.button("💾 Salvar Alterações"):
       try:
-        inv_map = {v.lower(): k for k, v in SPACE_MAPPING.items()}
-        with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
-          sheets_written = 0
-          for space_name in todos_espacos:
-            group = edited_df[edited_df["Espaço"] == space_name]
-            orig_sheet = inv_map.get(
-                str(space_name).lower(), f"Agenda {space_name}"
-            )
-            clean_sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
+        alteracoes_atuais = load_alteracoes()
 
-            if not group.empty:
-              group.to_excel(
-                  writer, sheet_name=clean_sheet_title, index=False
-              )
-            else:
-              pd.DataFrame(
-                  columns=[
-                      "Horário",
-                      "Atividade / Tema",
-                      "Secretaria",
-                      "Responsável",
-                  ]
-              ).to_excel(writer, sheet_name=clean_sheet_title, index=False)
-            sheets_written += 1
+        for idx, row in edited_df.iterrows():
+          key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
+          alteracoes_atuais[key] = {
+              "Tema": row["Tema"],
+              "Secretaria": (
+                  row["Secretaria"] if pd.notna(row["Secretaria"]) else ""
+              ),
+              "Responsável": (
+                  row["Responsável"] if pd.notna(row["Responsável"]) else ""
+              ),
+          }
 
-          if sheets_written == 0:
-            pd.DataFrame({"Info": ["Vazia"]}).to_excel(
-                writer, sheet_name="Geral", index=False
-            )
-
-        st.success("✅ Alterações salvas com sucesso!")
+        save_alteracoes(alteracoes_atuais)
+        st.success(
+            "✅ Alterações salvas com sucesso no banco de alterações!"
+        )
         st.cache_data.clear()
         st.rerun()
       except Exception as e:
-        st.error(f"⚠️ Erro ao salvar planilha: {e}")
+        st.error(f"⚠️ Erro ao salvar alterações: {e}")
   elif senha:
     st.error("❌ Senha incorreta.")
