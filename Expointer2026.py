@@ -1,8 +1,9 @@
-import base64
+
+  import base64
 import io
-import json
-import os
 import re
+from google.oauth2.service_account import Credentials
+import gspread
 import pandas as pd
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
@@ -17,6 +18,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+# NOME DA SUA PLANILHA NO GOOGLE DRIVE / SHEETS
+GOOGLE_SHEET_NAME = "Grade Expointer 2026"
 
 ORDEM_DIAS = [
     "Sábado 29/08",
@@ -44,63 +48,18 @@ SPACE_MAPPING = {
     "Agenda FUNDESA": "Agenda FUNDESA",
 }
 
-ALTERACOES_FILE = "alteracoes.json"
 
-
-def load_alteracoes():
-  if os.path.exists(ALTERACOES_FILE):
-    try:
-      with open(ALTERACOES_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
-    except Exception:
-      return {}
-  return {}
-
-
-def save_alteracoes(data_dict):
-  with open(ALTERACOES_FILE, "w", encoding="utf-8") as f:
-    json.dump(data_dict, f, ensure_ascii=False, indent=2)
-
-
-def get_banner_image_b64():
-  possible_images = [
-      "Screenshot_20260825-095320~2.jpg",
-      "esferas.jpg",
-      "esferas.jpeg",
-      "esferas.png",
-      "logo.jpg",
-      "logo.png",
+# Conexão com Google Sheets via Streamlit Secrets
+@st.cache_resource
+def get_gspread_client():
+  scope = [
+      "https://www.googleapis.com/auth/spreadsheets",
+      "https://www.googleapis.com/auth/drive",
   ]
-  for img in possible_images:
-    if os.path.exists(img):
-      ext = img.split(".")[-1].lower()
-      mime_type = "image/jpeg" if ext in ["jpg", "jpeg"] else "image/png"
-      with open(img, "rb") as img_f:
-        b64_str = base64.b64encode(img_f.read()).decode()
-      return f"data:{mime_type};base64,{b64_str}", img
-  return None, None
-
-
-img_b64_url, found_img_path = get_banner_image_b64()
-
-if img_b64_url:
-  bg_style = f"""
-    .stApp {{
-        background: linear-gradient(rgba(248, 250, 252, 0.30), rgba(248, 250, 252, 0.35)), url("{img_b64_url}") !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-repeat: no-repeat !important;
-        background-attachment: fixed !important;
-        font-family: 'Segoe UI', system-ui, sans-serif;
-    }}
-    """
-else:
-  bg_style = """
-    .stApp {
-        background-color: #f8fafc !important;
-        font-family: 'Segoe UI', system-ui, sans-serif;
-    }
-    """
+  credentials = Credentials.from_service_account_info(
+      st.secrets["gcp_service_account"], scopes=scope
+  )
+  return gspread.authorize(credentials)
 
 
 def clean_time_string(time_str):
@@ -131,255 +90,207 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-custom_css = f"""
-<style>
-    {bg_style}
-    .header-banner {{ background: linear-gradient(135deg, #064e3b 0%, #15803d 100%) !important; border-radius: 16px; padding: 28px 20px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); margin-bottom: 24px; border-bottom: 5px solid #eab308; }}
-    .spheres-box {{ display: inline-flex; align-items: flex-end; justify-content: center; gap: 6px; margin-bottom: 12px; }}
-    .s-green {{ width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #4ade80, #15803d); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }}
-    .s-red {{ width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f87171, #b91c1c); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }}
-    .s-yellow {{ width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fde047, #a16207); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }}
-    .header-logo-title {{ font-size: 2.1rem !important; font-weight: 900 !important; color: #ffffff !important; margin: 0 !important; padding: 0 !important; letter-spacing: -0.5px; line-height: 1.2; }}
-    .header-subtitle {{ color: #dcfce7 !important; font-size: 1.05rem !important; margin-top: 8px !important; font-weight: 600 !important; }}
-    label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {{ color: #0f172a !important; font-weight: 700 !important; }}
-    div[data-baseweb="tab-highlight"] {{ background-color: #15803d !important; }}
-    .stTabs button {{ background-color: rgba(226, 232, 240, 0.8) !important; border-radius: 8px 8px 0px 0px !important; padding: 10px 20px !important; }}
-    .stTabs button p, .stTabs button span, .stTabs [data-baseweb="tab"] * {{ color: #0f172a !important; font-weight: 700 !important; font-size: 1rem !important; }}
-    .stTabs [aria-selected="true"] p, .stTabs [aria-selected="true"] span, .stTabs [aria-selected="true"] * {{ color: #15803d !important; font-weight: 800 !important; }}
-    .event-card-vago {{ background-color: rgba(248, 250, 252, 0.95) !important; border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 6px solid #d97706 !important; border: 1px dashed #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }}
-    .card-space-tag {{ color: #0369a1 !important; font-weight: 800 !important; font-size: 0.9rem !important; }}
-    .card-time-vago {{ color: #d97706 !important; font-weight: 800 !important; font-size: 0.9rem !important; }}
-    .cal-header {{ background-color: #064e3b !important; color: #ffffff !important; text-align: center; padding: 10px; font-weight: 800; border-radius: 8px; margin-bottom: 12px; font-size: 0.95rem; }}
-    .cal-event-box {{ background-color: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1 !important; border-left: 5px solid #15803d !important; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }}
-</style>
-"""
-st.markdown(custom_css, unsafe_allow_html=True)
+def load_data_from_sheets():
+  try:
+    gc = get_gspread_client()
+    sh = gc.open(GOOGLE_SHEET_NAME)
 
+    raw_events = []
 
-# 2. Leitura Segura da Planilha Base
-@st.cache_data(ttl=60)
-def load_base_excel(excel_path="Grade Expointer 2026.xlsx"):
-  if not os.path.exists(excel_path):
-    return pd.DataFrame()
-
-  xls = pd.ExcelFile(excel_path)
-  raw_events = []
-
-  for sheet in xls.sheet_names:
-    if sheet not in SPACE_MAPPING:
-      continue
-
-    space_name = SPACE_MAPPING[sheet]
-    df = pd.read_excel(excel_path, sheet_name=sheet, header=None)
-    current_date = "Outros"
-
-    for idx, row in df.iterrows():
-      row_str = " ".join([str(val) for val in row.values if pd.notna(val)])
-
-      for day_code in [
-          "29/08",
-          "30/08",
-          "31/08",
-          "01/09",
-          "02/09",
-          "03/09",
-          "04/09",
-          "05/09",
-          "06/09",
-      ]:
-        if day_code in row_str and any(
-            w in row_str
-            for w in [
-                "Sábado",
-                "Domingo",
-                "Segunda",
-                "Terça",
-                "Quarta",
-                "Quinta",
-                "Sexta",
-                "2026",
-            ]
-        ):
-          if "29/08" in day_code:
-            current_date = "Sábado 29/08"
-          elif "30/08" in day_code:
-            current_date = "Domingo 30/08"
-          elif "31/08" in day_code:
-            current_date = "Segunda 31/08"
-          elif "01/09" in day_code:
-            current_date = "Terça 01/09"
-          elif "02/09" in day_code:
-            current_date = "Quarta 02/09"
-          elif "03/09" in day_code:
-            current_date = "Quinta 03/09"
-          elif "04/09" in day_code:
-            current_date = "Sexta 04/09"
-          elif "05/09" in day_code:
-            current_date = "Sábado 05/09"
-          elif "06/09" in day_code:
-            current_date = "Domingo 06/09"
-          break
-
-      horario_raw = str(row[0]).strip() if pd.notna(row[0]) else ""
-      tema = str(row[1]).strip() if len(row) > 1 and pd.notna(row[1]) else ""
-      sec = str(row[2]).strip() if len(row) > 2 and pd.notna(row[2]) else ""
-      resp = str(row[3]).strip() if len(row) > 3 and pd.notna(row[3]) else ""
-
-      # FILTRO DE CABEÇALHOS SUJOS (Exclui linhas onde o horário é a própria data)
-      if any(
-          d.lower() in horario_raw.lower()
-          for d in [
-              "sábado",
-              "domingo",
-              "segunda",
-              "terça",
-              "quarta",
-              "quinta",
-              "sexta",
-              "29/08",
-              "30/08",
-              "31/08",
-              "01/09",
-              "02/09",
-              "03/09",
-              "04/09",
-              "05/09",
-              "06/09",
-          ]
-      ):
+    for worksheet in sh.worksheets():
+      sheet_title = worksheet.title
+      if sheet_title not in SPACE_MAPPING:
         continue
 
-      horario_limpo = clean_time_string(horario_raw)
+      space_name = SPACE_MAPPING[sheet_title]
+      rows = worksheet.get_all_values()
 
-      if (
-          horario_limpo
-          and horario_raw.lower() != "horário"
-          and not ("características" in horario_raw.lower())
-      ):
-        is_vago = (
-            not tema
-            or tema.lower()
-            in ["livre", "vago", "disponível", "horário vago", "nan", "none", ""]
-            or tema.startswith("🔓")
+      current_date = "Outros"
+
+      for row in rows:
+        row_str = " ".join([str(val) for val in row if val])
+
+        # Identifica mudança de dia na grade
+        for day_code in [
+            "29/08",
+            "30/08",
+            "31/08",
+            "01/09",
+            "02/09",
+            "03/09",
+            "04/09",
+            "05/09",
+            "06/09",
+        ]:
+          if day_code in row_str and any(
+              w in row_str
+              for w in [
+                  "Sábado",
+                  "Domingo",
+                  "Segunda",
+                  "Terça",
+                  "Quarta",
+                  "Quinta",
+                  "Sexta",
+                  "2026",
+              ]
+          ):
+            if "29/08" in day_code:
+              current_date = "Sábado 29/08"
+            elif "30/08" in day_code:
+              current_date = "Domingo 30/08"
+            elif "31/08" in day_code:
+              current_date = "Segunda 31/08"
+            elif "01/09" in day_code:
+              current_date = "Terça 01/09"
+            elif "02/09" in day_code:
+              current_date = "Quarta 02/09"
+            elif "03/09" in day_code:
+              current_date = "Quinta 03/09"
+            elif "04/09" in day_code:
+              current_date = "Sexta 04/09"
+            elif "05/09" in day_code:
+              current_date = "Sábado 05/09"
+            elif "06/09" in day_code:
+              current_date = "Domingo 06/09"
+            break
+
+        horario_raw = str(row[0]).strip() if len(row) > 0 and row[0] else ""
+        tema = str(row[1]).strip() if len(row) > 1 and row[1] else ""
+        sec = str(row[2]).strip() if len(row) > 2 and row[2] else ""
+        resp = str(row[3]).strip() if len(row) > 3 and row[3] else ""
+
+        # LIMPEZA DE CABEÇALHOS SUJOS E DUPLICADOS DE DATA
+        if any(
+            d.lower() in horario_raw.lower()
+            for d in [
+                "sábado",
+                "domingo",
+                "segunda",
+                "terça",
+                "quarta",
+                "quinta",
+                "sexta",
+                "29/08",
+                "30/08",
+                "31/08",
+                "01/09",
+                "02/09",
+                "03/09",
+                "04/09",
+                "05/09",
+                "06/09",
+            ]
+        ):
+          continue
+
+        horario_limpo = clean_time_string(horario_raw)
+
+        if (
+            horario_limpo
+            and horario_raw.lower() != "horário"
+            and not ("características" in horario_raw.lower())
+        ):
+          is_vago = (
+              not tema
+              or tema.lower()
+              in [
+                  "livre",
+                  "vago",
+                  "disponível",
+                  "horário vago",
+                  "nan",
+                  "none",
+                  "",
+              ]
+              or tema.startswith("🔓")
+          )
+
+          raw_events.append({
+              "Espaço": space_name,
+              "Data": current_date,
+              "Horário": horario_limpo,
+              "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
+              "Secretaria": (
+                  ""
+                  if is_vago
+                  else (sec if sec.lower() not in ["nan", "none"] else "")
+              ),
+              "Responsável": (
+                  ""
+                  if is_vago
+                  else (resp if resp.lower() not in ["nan", "none"] else "")
+              ),
+          })
+
+    df_events = pd.DataFrame(raw_events)
+    if df_events.empty:
+      return df_events
+
+    consolidated = []
+    for (space, date), group in df_events.groupby(
+        ["Espaço", "Data"], sort=False
+    ):
+      group = group.reset_index(drop=True)
+      i = 0
+      while i < len(group):
+        row = group.iloc[i]
+        title, time_start, org, resp = (
+            row["Tema"],
+            row["Horário"],
+            row["Secretaria"],
+            row["Responsável"],
         )
+        j = i + 1
+        time_end = time_start
+        while (
+            j < len(group)
+            and group.iloc[j]["Tema"] == title
+            and title != "🔓 HORÁRIO VAGO"
+        ):
+          time_end = group.iloc[j]["Horário"]
+          j += 1
 
-        raw_events.append({
-            "Espaço": space_name,
-            "Data": current_date,
-            "Horário": horario_limpo,
-            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-            "Secretaria": (
-                ""
-                if is_vago
-                else (sec if sec.lower() not in ["nan", "none"] else "")
-            ),
-            "Responsável": (
-                ""
-                if is_vago
-                else (resp if resp.lower() not in ["nan", "none"] else "")
-            ),
+        time_disp = time_start
+        if time_end != time_start and "-" not in time_start:
+          time_disp = f"{time_start} - {time_end}"
+
+        consolidated.append({
+            "Espaço": space,
+            "Data": date,
+            "Horário": time_disp,
+            "Tema": title,
+            "Secretaria": org,
+            "Responsável": resp,
         })
+        i = j
 
-  df_events = pd.DataFrame(raw_events)
-  if df_events.empty:
-    return df_events
+    df_result = pd.DataFrame(consolidated)
+    df_result["Data_Cat"] = pd.Categorical(
+        df_result["Data"], categories=ORDEM_DIAS, ordered=True
+    )
+    return df_result.sort_values("Data_Cat").drop(columns=["Data_Cat"])
 
-  consolidated = []
-  for (space, date), group in df_events.groupby(["Espaço", "Data"], sort=False):
-    group = group.reset_index(drop=True)
-    i = 0
-    while i < len(group):
-      row = group.iloc[i]
-      title, time_start, org, resp = (
-          row["Tema"],
-          row["Horário"],
-          row["Secretaria"],
-          row["Responsável"],
-      )
-      j = i + 1
-      time_end = time_start
-      while (
-          j < len(group)
-          and group.iloc[j]["Tema"] == title
-          and title != "🔓 HORÁRIO VAGO"
-      ):
-        time_end = group.iloc[j]["Horário"]
-        j += 1
-
-      time_disp = time_start
-      if time_end != time_start and "-" not in time_start:
-        time_disp = f"{time_start} - {time_end}"
-
-      consolidated.append({
-          "Espaço": space,
-          "Data": date,
-          "Horário": time_disp,
-          "Tema": title,
-          "Secretaria": org,
-          "Responsável": resp,
-      })
-      i = j
-
-  df_result = pd.DataFrame(consolidated)
-  df_result["Data_Cat"] = pd.Categorical(
-      df_result["Data"], categories=ORDEM_DIAS, ordered=True
-  )
-  return df_result.sort_values("Data_Cat").drop(columns=["Data_Cat"])
+  except Exception as e:
+    st.error(f"⚠️ Erro ao carregar dados do Google Sheets: {e}")
+    return pd.DataFrame()
 
 
-def load_merged_data():
-  df_base = load_base_excel()
-  alteracoes = load_alteracoes()
+def save_data_to_sheets(df_to_save):
+  try:
+    gc = get_gspread_client()
+    sh = gc.open(GOOGLE_SHEET_NAME)
 
-  if not alteracoes:
-    return df_base
+    # Atualiza a primeira aba geral com a visualização editada
+    worksheet = sh.sheet1
+    worksheet.clear()
 
-  linhas_para_remover = []
-  chaves_existentes = set()
-
-  if not df_base.empty:
-    for idx, row in df_base.iterrows():
-      key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
-      chaves_existentes.add(key)
-
-      if key in alteracoes:
-        if alteracoes[key].get("Excluido", False):
-          linhas_para_remover.append(idx)
-        else:
-          df_base.at[idx, "Tema"] = alteracoes[key].get("Tema", row["Tema"])
-          df_base.at[idx, "Secretaria"] = alteracoes[key].get(
-              "Secretaria", row["Secretaria"]
-          )
-          df_base.at[idx, "Responsável"] = alteracoes[key].get(
-              "Responsável", row["Responsável"]
-          )
-
-    if linhas_para_remover:
-      df_base = df_base.drop(linhas_para_remover).reset_index(drop=True)
-
-  # Adiciona os novos registros inseridos pelo botão "+"
-  novos_registros = []
-  for key, dados in alteracoes.items():
-    if key not in chaves_existentes and not dados.get("Excluido", False):
-      partes = key.split("_")
-      if len(partes) >= 3:
-        espaco = partes[0]
-        data = partes[1]
-        horario = "_".join(partes[2:])
-        novos_registros.append({
-            "Espaço": espaco,
-            "Data": data,
-            "Horário": horario,
-            "Tema": dados.get("Tema", "🔓 HORÁRIO VAGO"),
-            "Secretaria": dados.get("Secretaria", ""),
-            "Responsável": dados.get("Responsável", ""),
-        })
-
-  if novos_registros:
-    df_novos = pd.DataFrame(novos_registros)
-    df_base = pd.concat([df_base, df_novos], ignore_index=True)
-
-  return df_base
+    data = [df_to_save.columns.values.tolist()] + df_to_save.values.tolist()
+    worksheet.update(data)
+    return True
+  except Exception as e:
+    st.error(f"⚠️ Erro ao salvar alterações no Google Sheets: {e}")
+    return False
 
 
 def generate_pdf_report(df_export, doc_title_info):
@@ -500,41 +411,52 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# 3. Execução do Carregamento de Dados
-df_data = load_merged_data()
+# Estilização CSS
+custom_css = """
+<style>
+    .stApp { background-color: #f8fafc !important; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .header-banner { background: linear-gradient(135deg, #064e3b 0%, #15803d 100%) !important; border-radius: 16px; padding: 28px 20px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); margin-bottom: 24px; border-bottom: 5px solid #eab308; }
+    .header-logo-title { font-size: 2.1rem !important; font-weight: 900 !important; color: #ffffff !important; margin: 0 !important; }
+    .header-subtitle { color: #dcfce7 !important; font-size: 1.05rem !important; margin-top: 8px !important; font-weight: 600 !important; }
+    label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p { color: #0f172a !important; font-weight: 700 !important; }
+    div[data-baseweb="tab-highlight"] { background-color: #15803d !important; }
+    .event-card-vago { background-color: rgba(248, 250, 252, 0.95) !important; border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 6px solid #d97706 !important; border: 1px dashed #f59e0b; }
+    .card-time-vago { color: #d97706 !important; font-weight: 800 !important; font-size: 0.9rem !important; }
+    .cal-header { background-color: #064e3b !important; color: #ffffff !important; text-align: center; padding: 10px; font-weight: 800; border-radius: 8px; margin-bottom: 12px; font-size: 0.95rem; }
+    .cal-event-box { background-color: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1 !important; border-left: 5px solid #15803d !important; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 0.85rem; }
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
 
-# 4. Banner Institucional
-if img_b64_url:
-  image_html = f'<img src="{img_b64_url}" style="max-height:75px; margin-bottom:10px; border-radius:6px;" />'
-else:
-  image_html = """
-    <div class="spheres-box">
-        <div class="s-green"></div>
-        <div class="s-red"></div>
-        <div class="s-yellow"></div>
-    </div>
-    """
+# 2. Execução do Carregamento de Dados
+df_data = load_data_from_sheets()
 
-banner_complete = f"""
+# Banner
+banner_html = """
 <div class="header-banner">
-    {image_html}
     <div class="header-logo-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
-    <div class="header-subtitle">Painel Interativo de Eventos & Gestão de Horários</div>
+    <div class="header-subtitle">Painel Interativo de Eventos & Gestão Conectado ao Google Sheets</div>
 </div>
 """
-st.markdown(banner_complete, unsafe_allow_html=True)
+st.markdown(banner_html, unsafe_allow_html=True)
 
-if df_data is None or df_data.empty:
-  st.warning("⚠️ Carregando dados ou nenhum evento encontrado na planilha.")
+if df_data.empty:
+  st.warning(
+      "⚠️ Nenhum dado carregado. Verifique a conexão com o Google Sheets."
+  )
   st.stop()
 
 todos_dias = [d for d in ORDEM_DIAS if d in df_data["Data"].unique()]
 todos_espacos = sorted(list(df_data["Espaço"].unique()))
 todas_sec = sorted(
-    [s for s in df_data["Secretaria"].unique() if s and s != "🔓 HORÁRIO VAGO"]
+    [
+        s
+        for s in df_data["Secretaria"].unique()
+        if s and str(s).strip() != "🔓 HORÁRIO VAGO"
+    ]
 )
 
-# 5. Painel de Filtros Gerais
+# 3. Painel de Filtros Gerais
 st.markdown("### 🔍 Pesquisar e Filtrar Programação")
 with st.container():
   col_busca, col_dias = st.columns([2, 2])
@@ -547,7 +469,7 @@ with st.container():
         "📅 Filtrar por Dia(s):",
         todos_dias,
         default=[],
-        placeholder="Selecione um ou mais dias...",
+        placeholder="Selecione os dias...",
     )
 
   col_espaco, col_sec = st.columns(2)
@@ -571,9 +493,9 @@ df_filtered = df_data.copy()
 if busca:
   t = busca.lower()
   df_filtered = df_filtered[
-      df_filtered["Tema"].str.lower().str.contains(t)
-      | df_filtered["Espaço"].str.lower().str.contains(t)
-      | df_filtered["Responsável"].str.lower().str.contains(t)
+      df_filtered["Tema"].astype(str).str.lower().str.contains(t)
+      | df_filtered["Espaço"].astype(str).str.lower().str.contains(t)
+      | df_filtered["Responsável"].astype(str).str.lower().str.contains(t)
   ]
 if dias_sel:
   df_filtered = df_filtered[df_filtered["Data"].isin(dias_sel)]
@@ -619,10 +541,10 @@ st.sidebar.divider()
 tab_calendar, tab_vagos, tab_edit = st.tabs([
     "📅 Visão Calendário",
     "🔓 Horários Livres / Vagos",
-    "🔒 Área de Edição",
+    "🔒 Área de Edição (Google Sheets)",
 ])
 
-# --- ABA 1: VISÃO EM CALENDÁRIO GRID ---
+# --- ABA 1: VISÃO CALENDÁRIO ---
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -682,48 +604,32 @@ with tab_calendar:
 # --- ABA 2: HORÁRIOS LIVRES / VAGOS ---
 with tab_vagos:
   st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
-  st.caption(
-      "Utilize os filtros principais no topo da página para refinar por dia ou"
-      " espaço."
-  )
-
   if df_vagos_totais.empty:
-    st.success(
-        "🎉 Não há horários vagos para os filtros selecionados (todos os"
-        " espaços estão ocupados)!"
-    )
+    st.success("🎉 Todos os espaços estão ocupados para o filtro selecionado!")
   else:
-    col_v1, col_v2 = st.columns([1, 1])
-    with col_v1:
-      st.metric("Total de Horários Disponíveis", len(df_vagos_totais))
-
+    st.metric("Total de Horários Disponíveis", len(df_vagos_totais))
     for data, grupo in df_vagos_totais.groupby("Data", sort=False):
       st.markdown(f"#### 📅 {data}")
       cols_vago = st.columns(3)
       for idx, (_, row) in enumerate(grupo.iterrows()):
         vago_html = f"""
                 <div class="event-card-vago">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                        <span class="card-time-vago">⏰ {row['Horário']}</span>
-                    </div>
-                    <div style="font-weight:800; font-size:0.95rem; color:#b45309; margin-bottom:6px;">
-                        🔓 HORÁRIO DISPONÍVEL
-                    </div>
-                    <div style="color:#0369a1; font-weight:800; font-size:0.88rem;">
-                        📍 {row['Espaço']}
-                    </div>
+                    <span class="card-time-vago">⏰ {row['Horário']}</span>
+                    <div style="font-weight:800; font-size:0.95rem; color:#b45309; margin-top:4px;">🔓 HORÁRIO DISPONÍVEL</div>
+                    <div style="color:#0369a1; font-weight:800; font-size:0.88rem; margin-top:2px;">📍 {row['Espaço']}</div>
                 </div>
                 """
         cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
-# --- ABA 3: ÁREA DE EDIÇÃO PROTEGIDA ---
+# --- ABA 3: ÁREA DE EDIÇÃO DIRETA NO GOOGLE SHEETS ---
 with tab_edit:
-  st.markdown("### 🔒 Edição Restrita da Planilha")
+  st.markdown("### 🔒 Edição Direta no Google Sheets")
   senha = st.text_input("Digite a senha de administrador:", type="password")
 
   if senha == "expointer2026":
     st.success(
-        "🔓 Acesso liberado! Você pode editar, adicionar (+) ou excluir linhas."
+        "🔓 Acesso liberado! Edições salvas aqui serão gravadas diretamente no"
+        " Google Sheets."
     )
 
     edited_df = st.data_editor(
@@ -744,80 +650,14 @@ with tab_edit:
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
             "Responsável": st.column_config.TextColumn("Responsável"),
         },
-        key="editor_admin",
+        key="editor_sheets",
     )
 
-    if st.button("💾 Salvar Alterações"):
-      try:
-        alteracoes_atuais = load_alteracoes()
-        editor_state = st.session_state.get("editor_admin", {})
-
-        chaves_atuais_na_tabela = set()
-
-        # 1. Processa linhas visíveis na tabela editada
-        for idx, row in edited_df.iterrows():
-          espaco_val = str(row["Espaço"]).strip()
-          data_val = str(row["Data"]).strip()
-          horario_val = str(row["Horário"]).strip()
-
-          if espaco_val and data_val and horario_val and horario_val != "nan":
-            key = f"{espaco_val}_{data_val}_{horario_val}"
-            chaves_atuais_na_tabela.add(key)
-
-            alteracoes_atuais[key] = {
-                "Tema": (
-                    str(row["Tema"]).strip()
-                    if pd.notna(row["Tema"]) and str(row["Tema"]).strip() != ""
-                    else "🔓 HORÁRIO VAGO"
-                ),
-                "Secretaria": (
-                    str(row["Secretaria"]).strip()
-                    if pd.notna(row["Secretaria"])
-                    else ""
-                ),
-                "Responsável": (
-                    str(row["Responsável"]).strip()
-                    if pd.notna(row["Responsável"])
-                    else ""
-                ),
-                "Excluido": False,
-            }
-
-        # 2. Processa novas linhas adicionadas via botão "+"
-        added_rows = editor_state.get("added_rows", [])
-        for new_row in added_rows:
-          espaco_val = str(new_row.get("Espaço", "")).strip()
-          data_val = str(new_row.get("Data", "")).strip()
-          horario_val = str(new_row.get("Horário", "")).strip()
-
-          if espaco_val and data_val and horario_val:
-            key = f"{espaco_val}_{data_val}_{horario_val}"
-            chaves_atuais_na_tabela.add(key)
-
-            alteracoes_atuais[key] = {
-                "Tema": (
-                    str(new_row.get("Tema", "")).strip()
-                    or "🔓 HORÁRIO VAGO"
-                ),
-                "Secretaria": str(new_row.get("Secretaria", "")).strip(),
-                "Responsável": str(new_row.get("Responsável", "")).strip(),
-                "Excluido": False,
-            }
-
-        # 3. Processa exclusões de linhas
-        for idx, row in df_data.iterrows():
-          key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
-          if key not in chaves_atuais_na_tabela:
-            if key in alteracoes_atuais:
-              alteracoes_atuais[key]["Excluido"] = True
-
-        save_alteracoes(alteracoes_atuais)
-        st.success("✅ Novos registros e alterações salvos com sucesso!")
-        st.cache_data.clear()
+    if st.button("💾 Salvar Diretamente no Google Sheets"):
+      if save_data_to_sheets(edited_df):
+        st.success("✅ Google Sheets atualizado com sucesso!")
+        st.cache_resource.clear()
         st.rerun()
-
-      except Exception as e:
-        st.error(f"⚠️ Erro ao salvar alterações: {e}")
 
   elif senha:
     st.error("❌ Senha incorreta.")
