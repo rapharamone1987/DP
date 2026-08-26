@@ -761,16 +761,22 @@ with tab_edit:
     )
 
     if st.button("💾 Salvar Alterações na Planilha"):
-      excel_path = "Grade Expointer 2026.xlsx"
-      with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
-        for space_name, group in edited_df.groupby("Espaço"):
-          sheet_title = f"Agenda {space_name}"
-          if len(sheet_title) > 31:
-            sheet_title = sheet_title[:31]
-          group.to_excel(writer, sheet_name=sheet_title, index=False)
+          excel_path = "Grade Expointer 2026.xlsx"
+          with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
+            for space_name, group in edited_df.groupby("Espaço"):
+              sheet_title = f"Agenda {space_name}"
 
-      st.success("✅ Alterações e ajustes salvos com sucesso!")
-      st.cache_data.clear()
+              # Remove caracteres proibidos pelo Excel em nomes de abas
+              sheet_title = re.sub(r"[\\/*?:\[\]]", "_", sheet_title)
+
+              # Garante o limite máximo de 31 caracteres do Excel
+              if len(sheet_title) > 31:
+                sheet_title = sheet_title[:31]
+
+              group.to_excel(writer, sheet_name=sheet_title, index=False)
+
+          st.success("✅ Alterações e ajustes salvos com sucesso!")
+          st.cache_data.clear()
   elif senha:
     st.error("❌ Senha incorreta. Acesso negado.")
   else:
