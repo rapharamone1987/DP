@@ -1,7 +1,8 @@
-groq
-pdfplumber
 streamlit
 groq
+pdfplumber
+fpdf
+Pillow
 pandas
 reportlab
 openpyxl
