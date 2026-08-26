@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import io
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, KeepTogether
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 st.title("📋 Gestão de Cessões de Uso - Relatório Aguarda CAGE")
-st.write("Insira a planilha atualizada para filtrar os processos e gerar o relatório no padrão visual oficial.")
+st.write("Insira a planilha atualizada para filtrar os processos e gerar o relatório no padrão visual oficial (A4 Paisagem).")
 
 uploaded_file = st.file_uploader("Selecione a planilha (.csv ou .xlsx)", type=["csv", "xlsx"])
 
@@ -32,9 +32,10 @@ def desc_or_empty(val):
 def generate_pdf_reportlab(df):
     buffer = io.BytesIO()
     
+    # Orientação Paisagem (Landscape)
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=A4,
+        pagesize=landscape(A4),
         leftMargin=8*mm,
         rightMargin=8*mm,
         topMargin=8*mm,
@@ -43,7 +44,7 @@ def generate_pdf_reportlab(df):
     
     story = []
     
-    # Cores
+    # Cores Oficiais
     VERDE_INST = colors.HexColor("#2E6B47")
     CINZA_TEXTO = colors.HexColor("#1F2123")
     CINZA_ZEBRA = colors.HexColor("#F4F5F7")
@@ -61,15 +62,15 @@ def generate_pdf_reportlab(df):
         fontName='Helvetica-Bold',
         fontSize=14,
         textColor=VERDE_INST,
-        alignment=1,
-        spaceAfter=10
+        alignment=1, # Centralizado
+        spaceAfter=8
     )
     
     style_proa_title = ParagraphStyle(
         'ProaTitle',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=9,
+        fontSize=8.5,
         textColor=CINZA_TEXTO,
         spaceAfter=1
     )
@@ -78,9 +79,9 @@ def generate_pdf_reportlab(df):
         'ProaSub',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=7.5,
+        fontSize=7,
         textColor=colors.HexColor("#555555"),
-        spaceAfter=6
+        spaceAfter=4
     )
     
     style_th = ParagraphStyle(
@@ -89,22 +90,24 @@ def generate_pdf_reportlab(df):
         fontName='Helvetica-Bold',
         fontSize=6.5,
         textColor=colors.white,
-        alignment=1
+        alignment=1 # Centralizado
     )
     
+    # Todos os estilos de conteúdo centralizados (alignment=1)
     style_td_green = ParagraphStyle(
         'TDGreen',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=7,
-        textColor=VERDE_INST
+        fontSize=6.5,
+        textColor=VERDE_INST,
+        alignment=1
     )
     
     style_td_dark = ParagraphStyle(
         'TDDark',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=7,
+        fontSize=6.5,
         textColor=CINZA_TEXTO,
         alignment=1
     )
@@ -114,41 +117,37 @@ def generate_pdf_reportlab(df):
         parent=styles['Normal'],
         fontName='Helvetica',
         fontSize=6.5,
-        textColor=CINZA_TEXTO
+        textColor=CINZA_TEXTO,
+        alignment=1
     )
     
     style_check = ParagraphStyle(
         'TDCheck',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=8,
+        fontSize=7.5,
         textColor=VERDE_INST,
         alignment=1
     )
 
-    # 1. Listra do RS no Topo
-    stripe_table = Table(
-        [['', '', '']],
-        colWidths=[64*mm, 64*mm, 66*mm],
-        rowHeights=[2.5*mm]
-    )
+    # 1. Listra RS no Topo
+    stripe_table = Table([['', '', '']], colWidths=[93*mm, 93*mm, 94*mm], rowHeights=[2.5*mm])
     stripe_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (0,0), VERDE_RS),
         ('BACKGROUND', (1,0), (1,0), VERMELHO_RS),
         ('BACKGROUND', (2,0), (2,0), AMARELO_RS),
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('BOTTOMPADDING', (0,0), (-1,-1), 0),
         ('TOPPADDING', (0,0), (-1,-1), 0),
     ]))
     story.append(stripe_table)
-    story.append(Spacer(1, 4*mm))
+    story.append(Spacer(1, 3*mm))
     
     # 2. Título Central
     story.append(Paragraph("CESSÕES PARA ANÁLISE", style_title))
     story.append(Spacer(1, 2*mm))
 
-    # Larguras das colunas
-    col_w = [33*mm, 48*mm, 18*mm, 33*mm, 16*mm, 11*mm, 11*mm, 11*mm]
+    # Larguras expandidas para Paisagem (Total ~280mm)
+    col_w = [52*mm, 75*mm, 26*mm, 52*mm, 22*mm, 18*mm, 18*mm, 16*mm]
 
     # 3. Processos por PROA
     for proa, group in df.groupby('PROA', sort=False):
@@ -157,18 +156,16 @@ def generate_pdf_reportlab(df):
         block_elements.append(Paragraph(f"PROA: {proa}", style_proa_title))
         block_elements.append(Paragraph(f"&nbsp;&nbsp;&nbsp;&nbsp;Contagem: {len(group)}", style_proa_sub))
         
-        table_data = [
-            [
-                Paragraph("ENTIDADE", style_th),
-                Paragraph("DESC BEM", style_th),
-                Paragraph("PAT BEM", style_th),
-                Paragraph("PROGRAMA / CONVÊNIO", style_th),
-                Paragraph("N° TERMO", style_th),
-                Paragraph("PARECER<br/>TÉCNICO", style_th),
-                Paragraph("PARECER<br/>AJUR", style_th),
-                Paragraph("ANUÊNCIA", style_th)
-            ]
-        ]
+        table_data = [[
+            Paragraph("ENTIDADE", style_th),
+            Paragraph("DESC BEM", style_th),
+            Paragraph("PAT BEM", style_th),
+            Paragraph("PROGRAMA / CONVÊNIO", style_th),
+            Paragraph("N° TERMO", style_th),
+            Paragraph("PARECER TÉCNICO", style_th),
+            Paragraph("PARECER AJUR", style_th),
+            Paragraph("ANUÊNCIA", style_th)
+        ]]
         
         for idx, row in group.iterrows():
             entidade = desc_or_empty(row.get('ENTIDADE', '')).upper()
@@ -204,13 +201,11 @@ def generate_pdf_reportlab(df):
         
         ts = [
             ('BACKGROUND', (0,0), (-1,0), VERDE_INST),
-            ('ALIGN', (0,0), (-1,0), 'CENTER'),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
             ('GRID', (0,0), (-1,-1), 0.5, CINZA_BORDA),
             ('TOPPADDING', (0,0), (-1,-1), 3),
             ('BOTTOMPADDING', (0,0), (-1,-1), 3),
-            ('LEFTPADDING', (0,0), (-1,-1), 2),
-            ('RIGHTPADDING', (0,0), (-1,-1), 2),
         ]
         
         for r_idx in range(1, len(table_data)):
@@ -218,8 +213,7 @@ def generate_pdf_reportlab(df):
             
         t.setStyle(TableStyle(ts))
         
-        # Tabela envelopadora com a barra lateral esquerda
-        proa_table = Table([[Paragraph("", style_td_text), t]], colWidths=[2*mm, 188*mm])
+        proa_table = Table([[Paragraph("", style_td_text), t]], colWidths=[2*mm, 279*mm])
         proa_table.setStyle(TableStyle([
             ('BACKGROUND', (0,0), (0,-1), CINZA_BARRA),
             ('VALIGN', (0,0), (-1,-1), 'TOP'),
@@ -230,7 +224,7 @@ def generate_pdf_reportlab(df):
         ]))
         
         block_elements.append(proa_table)
-        block_elements.append(Spacer(1, 4*mm))
+        block_elements.append(Spacer(1, 3*mm))
         
         story.append(KeepTogether(block_elements))
 
@@ -266,7 +260,7 @@ if uploaded_file is not None:
                 pdf_bytes = generate_pdf_reportlab(filtered_df)
 
                 st.download_button(
-                    label="📄 Baixar Relatório PDF Oficial",
+                    label="📄 Baixar Relatório PDF Oficial (Paisagem)",
                     data=pdf_bytes,
                     file_name="Cessoes_Aguarda_CAGE.pdf",
                     mime="application/pdf"
