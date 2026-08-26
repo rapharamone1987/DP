@@ -58,7 +58,7 @@ img_b64_url, found_img_path = get_banner_image_b64()
 if img_b64_url:
   bg_style = f"""
     .stApp {{
-        background: linear-gradient(rgba(248, 250, 252, 0.90), rgba(248, 250, 252, 0.92)), url("{img_b64_url}") !important;
+        background: linear-gradient(rgba(248, 250, 252, 0.45), rgba(248, 250, 252, 0.55)), url("{img_b64_url}") !important;
         background-size: cover !important;
         background-position: center !important;
         background-repeat: no-repeat !important;
