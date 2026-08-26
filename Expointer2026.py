@@ -250,19 +250,6 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # 3. Carregamento e Processamento
 @st.cache_data(ttl=60)
 def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
-  SPACE_MAPPING = {
-    'Agenda Auditório ADMINISTRAÇÃO': 'Auditório Administração',
-    'Agenda Auditório ESPAÇO GOV': 'Auditório Espaço Gov',
-    'Agenda Arena ESPAÇO GOV': 'Arena Espaço Gov',
-    'Agenda Bancada ESPAÇO GOV': 'Bancada Espaço Gov',
-    'Agenda Estande FIERGS': 'Estande FIERGS',
-    'Sala de reunião 1 ESPAÇO GOV ': 'Sala Reunião 1',
-    'Sala de reunião 2 ESPAÇO GOV': 'Sala Reunião 2',
-    'Sala de reunião 3 ESPAÇO GOV': 'Sala Reunião 3',
-    'ESTANDE SEAPI E SEMA': 'Estande SEAPI/SEMA',
-    'Agenda FUNDESA': 'Agenda FUNDESA',
-  }
-
   if not os.path.exists(excel_path):
     return pd.DataFrame()
 
@@ -270,8 +257,12 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
   raw_events = []
 
   for sheet in xls.sheet_names:
-    if sheet not in space_mapping:
+    # Ajuste: busca no dicionário global SPACE_MAPPING ou trata nome de aba salva
+    if sheet not in SPACE_MAPPING and not sheet.startswith("Agenda "):
       continue
+
+    space_name = SPACE_MAPPING.get(sheet, sheet.replace("Agenda ", "").strip())
+
     df = pd.read_excel(excel_path, sheet_name=sheet, header=None)
     current_date = "Outros"
 
@@ -342,7 +333,7 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
         ]
 
         raw_events.append({
-            "Espaço": space_mapping[sheet],
+            "Espaço": space_name,
             "Data": current_date,
             "Horário": horario_limpo,
             "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
