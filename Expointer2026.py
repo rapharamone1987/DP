@@ -763,20 +763,24 @@ with tab_edit:
     if st.button("💾 Salvar Alterações na Planilha"):
           excel_path = "Grade Expointer 2026.xlsx"
           with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
+            # Mapeia cada espaco para sua respectiva aba original
             for space_name, group in edited_df.groupby("Espaço"):
-              sheet_title = f"Agenda {space_name}"
-
-              # Remove caracteres proibidos pelo Excel em nomes de abas
-              sheet_title = re.sub(r"[\\/*?:\[\]]", "_", sheet_title)
-
-              # Garante o limite máximo de 31 caracteres do Excel
-              if len(sheet_title) > 31:
-                sheet_title = sheet_title[:31]
+              # Busca o nome original da aba ou gera um valido
+              orig_sheet = next(
+                  (
+                      k
+                      for k, v in space_mapping.items()
+                      if v.lower() == space_name.lower()
+                  ),
+                  f"Agenda {space_name}",
+              )
+              sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
 
               group.to_excel(writer, sheet_name=sheet_title, index=False)
 
-          st.success("✅ Alterações e ajustes salvos com sucesso!")
+          st.success("✅ Alterações salvas mantendo todas as abas e espaços!")
           st.cache_data.clear()
+          st.rerun()
   elif senha:
     st.error("❌ Senha incorreta. Acesso negado.")
   else:
