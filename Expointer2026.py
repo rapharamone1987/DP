@@ -31,7 +31,7 @@ ORDEM_DIAS = [
     "Outros",
 ]
 
-# MAPEAMENTO GLOBAL (Definido no topo para evitar NameError)
+# MAPEAMENTO GLOBAL (No topo para evitar NameError)
 SPACE_MAPPING = {
     "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
     "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
@@ -155,6 +155,7 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
 
     for idx, row in df.iterrows():
       row_str = " ".join([str(val) for val in row.values if pd.notna(val)])
+
       for day_code in [
           "29/08",
           "30/08",
@@ -203,6 +204,7 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
       tema = str(row[1]).strip() if len(row) > 1 and pd.notna(row[1]) else ""
       sec = str(row[2]).strip() if len(row) > 2 and pd.notna(row[2]) else ""
       resp = str(row[3]).strip() if len(row) > 3 and pd.notna(row[3]) else ""
+
       horario_limpo = clean_time_string(horario_raw)
 
       if (
@@ -210,20 +212,28 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
           and horario_raw.lower() != "horário"
           and not ("características" in horario_raw.lower())
       ):
-        is_vago = not tema or tema.lower() in [
-            "livre",
-            "vago",
-            "disponível",
-            "horário vago",
-            "nan",
-        ]
+        is_vago = (
+            not tema
+            or tema.lower()
+            in ["livre", "vago", "disponível", "horário vago", "nan", "none", ""]
+            or tema.startswith("🔓")
+        )
+
         raw_events.append({
             "Espaço": space_name,
             "Data": current_date,
             "Horário": horario_limpo,
             "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-            "Secretaria": "" if is_vago else (sec if sec != "nan" else ""),
-            "Responsável": "" if is_vago else (resp if resp != "nan" else ""),
+            "Secretaria": (
+                ""
+                if is_vago
+                else (sec if sec.lower() not in ["nan", "none"] else "")
+            ),
+            "Responsável": (
+                ""
+                if is_vago
+                else (resp if resp.lower() not in ["nan", "none"] else "")
+            ),
         })
 
   df_events = pd.DataFrame(raw_events)
@@ -244,7 +254,11 @@ def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
       )
       j = i + 1
       time_end = time_start
-      while j < len(group) and group.iloc[j]["Tema"] == title:
+      while (
+          j < len(group)
+          and group.iloc[j]["Tema"] == title
+          and title != "🔓 HORÁRIO VAGO"
+      ):
         time_end = group.iloc[j]["Horário"]
         j += 1
 
@@ -430,9 +444,7 @@ with st.container():
         "🔎 Palavra-chave:", "", placeholder="Digite tema, palavra ou local..."
     )
   with col_dias:
-    dias_sel = st.multiselect(
-        "📅 Filtrar por Dia(s):", todos_dias, default=[]
-    )
+    dias_sel = st.multiselect("📅 Filtrar por Dia(s):", todos_dias, default=[])
   with col_vagos:
     exibir_vagos = st.checkbox("🔓 Mostrar Horários Vagos", value=True)
 
@@ -557,16 +569,17 @@ with tab_calendar:
               if pd.notna(ev["Responsável"])
               else ""
           )
+
           sec_display = (
               f'<div style="color:#334155; font-size:0.75rem;'
               f' font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
-              if sec_val and sec_val.lower() != "nan"
+              if sec_val and sec_val.lower() not in ["nan", "none", ""]
               else ""
           )
           resp_display = (
               f'<div style="color:#475569; font-size:0.75rem;'
               f' font-weight:500;">👤 {resp_val}</div>'
-              if resp_val and resp_val.lower() != "nan"
+              if resp_val and resp_val.lower() not in ["nan", "none", ""]
               else ""
           )
 
