@@ -156,7 +156,7 @@ custom_css = f"""
 st.markdown(custom_css, unsafe_allow_html=True)
 
 
-# 3. Leitura Segura da Planilha Base
+# 2. Leitura Segura da Planilha Base
 @st.cache_data(ttl=60)
 def load_base_excel(excel_path="Grade Expointer 2026.xlsx"):
   if not os.path.exists(excel_path):
@@ -225,7 +225,7 @@ def load_base_excel(excel_path="Grade Expointer 2026.xlsx"):
       sec = str(row[2]).strip() if len(row) > 2 and pd.notna(row[2]) else ""
       resp = str(row[3]).strip() if len(row) > 3 and pd.notna(row[3]) else ""
 
-      # FILTRO DE CABEÇALHOS SUJOS (Remove linhas onde o horário é o próprio nome do dia)
+      # FILTRO DE CABEÇALHOS SUJOS (Exclui linhas onde o horário é a própria data)
       if any(
           d.lower() in horario_raw.lower()
           for d in [
@@ -329,30 +329,55 @@ def load_base_excel(excel_path="Grade Expointer 2026.xlsx"):
 
 def load_merged_data():
   df_base = load_base_excel()
-  if df_base.empty:
-    return df_base
-
   alteracoes = load_alteracoes()
+
   if not alteracoes:
     return df_base
 
   linhas_para_remover = []
-  for idx, row in df_base.iterrows():
-    key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
-    if key in alteracoes:
-      if alteracoes[key].get("Excluido", False):
-        linhas_para_remover.append(idx)
-      else:
-        df_base.at[idx, "Tema"] = alteracoes[key].get("Tema", row["Tema"])
-        df_base.at[idx, "Secretaria"] = alteracoes[key].get(
-            "Secretaria", row["Secretaria"]
-        )
-        df_base.at[idx, "Responsável"] = alteracoes[key].get(
-            "Responsável", row["Responsável"]
-        )
+  chaves_existentes = set()
 
-  if linhas_para_remover:
-    df_base = df_base.drop(linhas_para_remover).reset_index(drop=True)
+  if not df_base.empty:
+    for idx, row in df_base.iterrows():
+      key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
+      chaves_existentes.add(key)
+
+      if key in alteracoes:
+        if alteracoes[key].get("Excluido", False):
+          linhas_para_remover.append(idx)
+        else:
+          df_base.at[idx, "Tema"] = alteracoes[key].get("Tema", row["Tema"])
+          df_base.at[idx, "Secretaria"] = alteracoes[key].get(
+              "Secretaria", row["Secretaria"]
+          )
+          df_base.at[idx, "Responsável"] = alteracoes[key].get(
+              "Responsável", row["Responsável"]
+          )
+
+    if linhas_para_remover:
+      df_base = df_base.drop(linhas_para_remover).reset_index(drop=True)
+
+  # Adiciona os novos registros inseridos pelo botão "+"
+  novos_registros = []
+  for key, dados in alteracoes.items():
+    if key not in chaves_existentes and not dados.get("Excluido", False):
+      partes = key.split("_")
+      if len(partes) >= 3:
+        espaco = partes[0]
+        data = partes[1]
+        horario = "_".join(partes[2:])
+        novos_registros.append({
+            "Espaço": espaco,
+            "Data": data,
+            "Horário": horario,
+            "Tema": dados.get("Tema", "🔓 HORÁRIO VAGO"),
+            "Secretaria": dados.get("Secretaria", ""),
+            "Responsável": dados.get("Responsável", ""),
+        })
+
+  if novos_registros:
+    df_novos = pd.DataFrame(novos_registros)
+    df_base = pd.concat([df_base, df_novos], ignore_index=True)
 
   return df_base
 
@@ -475,10 +500,10 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# 4. Execução do Carregamento de Dados
+# 3. Execução do Carregamento de Dados
 df_data = load_merged_data()
 
-# 5. Banner Institucional
+# 4. Banner Institucional
 if img_b64_url:
   image_html = f'<img src="{img_b64_url}" style="max-height:75px; margin-bottom:10px; border-radius:6px;" />'
 else:
@@ -509,7 +534,7 @@ todas_sec = sorted(
     [s for s in df_data["Secretaria"].unique() if s and s != "🔓 HORÁRIO VAGO"]
 )
 
-# 6. Painel de Filtros Gerais
+# 5. Painel de Filtros Gerais
 st.markdown("### 🔍 Pesquisar e Filtrar Programação")
 with st.container():
   col_busca, col_dias = st.columns([2, 2])
@@ -541,7 +566,6 @@ with st.container():
         placeholder="Selecione as entidades...",
     )
 
-# Aplicação dos Filtros
 df_filtered = df_data.copy()
 
 if busca:
@@ -567,7 +591,6 @@ df_filtered = df_filtered.sort_values(
     by=["Data_Cat", "Hora_Sort"]
 ).drop(columns=["Data_Cat", "Hora_Sort"])
 
-# Separação entre Agendados e Vagos
 df_agendados = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
 df_vagos_totais = df_filtered[df_filtered["Tema"] == "🔓 HORÁRIO VAGO"]
 
@@ -699,7 +722,9 @@ with tab_edit:
   senha = st.text_input("Digite a senha de administrador:", type="password")
 
   if senha == "expointer2026":
-    st.success("🔓 Acesso liberado! Você pode editar ou excluir linhas.")
+    st.success(
+        "🔓 Acesso liberado! Você pode editar, adicionar (+) ou excluir linhas."
+    )
 
     edited_df = st.data_editor(
         df_data,
@@ -725,41 +750,69 @@ with tab_edit:
     if st.button("💾 Salvar Alterações"):
       try:
         alteracoes_atuais = load_alteracoes()
+        editor_state = st.session_state.get("editor_admin", {})
 
         chaves_atuais_na_tabela = set()
+
+        # 1. Processa linhas visíveis na tabela editada
         for idx, row in edited_df.iterrows():
           espaco_val = str(row["Espaço"]).strip()
           data_val = str(row["Data"]).strip()
           horario_val = str(row["Horário"]).strip()
-          key = f"{espaco_val}_{data_val}_{horario_val}"
 
-          chaves_atuais_na_tabela.add(key)
-          alteracoes_atuais[key] = {
-              "Tema": (
-                  str(row["Tema"]).strip()
-                  if pd.notna(row["Tema"])
-                  else "🔓 HORÁRIO VAGO"
-              ),
-              "Secretaria": (
-                  str(row["Secretaria"]).strip()
-                  if pd.notna(row["Secretaria"])
-                  else ""
-              ),
-              "Responsável": (
-                  str(row["Responsável"]).strip()
-                  if pd.notna(row["Responsável"])
-                  else ""
-              ),
-              "Excluido": False,
-          }
+          if espaco_val and data_val and horario_val and horario_val != "nan":
+            key = f"{espaco_val}_{data_val}_{horario_val}"
+            chaves_atuais_na_tabela.add(key)
 
+            alteracoes_atuais[key] = {
+                "Tema": (
+                    str(row["Tema"]).strip()
+                    if pd.notna(row["Tema"]) and str(row["Tema"]).strip() != ""
+                    else "🔓 HORÁRIO VAGO"
+                ),
+                "Secretaria": (
+                    str(row["Secretaria"]).strip()
+                    if pd.notna(row["Secretaria"])
+                    else ""
+                ),
+                "Responsável": (
+                    str(row["Responsável"]).strip()
+                    if pd.notna(row["Responsável"])
+                    else ""
+                ),
+                "Excluido": False,
+            }
+
+        # 2. Processa novas linhas adicionadas via botão "+"
+        added_rows = editor_state.get("added_rows", [])
+        for new_row in added_rows:
+          espaco_val = str(new_row.get("Espaço", "")).strip()
+          data_val = str(new_row.get("Data", "")).strip()
+          horario_val = str(new_row.get("Horário", "")).strip()
+
+          if espaco_val and data_val and horario_val:
+            key = f"{espaco_val}_{data_val}_{horario_val}"
+            chaves_atuais_na_tabela.add(key)
+
+            alteracoes_atuais[key] = {
+                "Tema": (
+                    str(new_row.get("Tema", "")).strip()
+                    or "🔓 HORÁRIO VAGO"
+                ),
+                "Secretaria": str(new_row.get("Secretaria", "")).strip(),
+                "Responsável": str(new_row.get("Responsável", "")).strip(),
+                "Excluido": False,
+            }
+
+        # 3. Processa exclusões de linhas
         for idx, row in df_data.iterrows():
           key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
           if key not in chaves_atuais_na_tabela:
-            alteracoes_atuais[key] = {"Excluido": True}
+            if key in alteracoes_atuais:
+              alteracoes_atuais[key]["Excluido"] = True
 
         save_alteracoes(alteracoes_atuais)
-        st.success("✅ Alterações e exclusões salvas com sucesso!")
+        st.success("✅ Novos registros e alterações salvos com sucesso!")
         st.cache_data.clear()
         st.rerun()
 
