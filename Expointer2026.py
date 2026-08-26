@@ -137,14 +137,14 @@ custom_css = f"""
     .stTabs button p, .stTabs button span, .stTabs [data-baseweb="tab"] * {{ color: #0f172a !important; font-weight: 700 !important; font-size: 1rem !important; }}
     .stTabs [aria-selected="true"] p, .stTabs [aria-selected="true"] span, .stTabs [aria-selected="true"] * {{ color: #15803d !important; font-weight: 800 !important; }}
     .event-card {{ background-color: rgba(255, 255, 255, 0.95) !important; border-radius: 10px; padding: 16px; margin-bottom: 12px; border-left: 6px solid #15803d !important; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08); }}
-    .event-card-vago {{ background-color: rgba(248, 250, 252, 0.92) !important; border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 6px solid #64748b !important; border: 1px dashed #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }}
+    .event-card-vago {{ background-color: rgba(248, 250, 252, 0.95) !important; border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 6px solid #d97706 !important; border: 1px dashed #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }}
     .card-space-tag {{ color: #0369a1 !important; font-weight: 800 !important; font-size: 0.9rem !important; }}
     .card-time-tag {{ color: #15803d !important; font-weight: 800 !important; font-size: 0.9rem !important; }}
-    .card-time-vago {{ color: #475569 !important; font-weight: 800 !important; font-size: 0.9rem !important; }}
+    .card-time-vago {{ color: #d97706 !important; font-weight: 800 !important; font-size: 0.9rem !important; }}
     .card-meta-text {{ color: #1e293b !important; font-weight: 700 !important; font-size: 0.88rem !important; }}
     .cal-header {{ background-color: #064e3b !important; color: #ffffff !important; text-align: center; padding: 10px; font-weight: 800; border-radius: 8px; margin-bottom: 12px; font-size: 0.95rem; }}
     .cal-event-box {{ background-color: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1 !important; border-left: 5px solid #15803d !important; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }}
-    .cal-event-vago {{ background-color: rgba(248, 250, 252, 0.92) !important; border: 1px dashed #cbd5e1 !important; border-left: 5px solid #94a3b8 !important; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 0.85rem; }}
+    .cal-event-vago {{ background-color: rgba(248, 250, 252, 0.95) !important; border: 1px dashed #f59e0b !important; border-left: 5px solid #d97706 !important; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 0.85rem; }}
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
@@ -306,7 +306,6 @@ def load_merged_data():
   if not alteracoes:
     return df_base
 
-  # Aplica as alterações gravadas por chave de evento (Espaço + Data + Horário)
   for idx, row in df_base.iterrows():
     key = f"{row['Espaço']}_{row['Data']}_{row['Horário']}"
     if key in alteracoes:
@@ -473,32 +472,41 @@ todas_sec = sorted(
     [s for s in df_data["Secretaria"].unique() if s and s != "🔓 HORÁRIO VAGO"]
 )
 
-# 6. Painel de Filtros Direto na Página Principal
-st.markdown("### 🔍 Pesquisar e Filtrar Eventos")
+# 6. Painel de Filtros Gerais (Totalmente em Português)
+st.markdown("### 🔍 Pesquisar e Filtrar Programação")
 with st.container():
-  col_busca, col_dias, col_vagos = st.columns([2, 2, 1])
+  col_busca, col_dias = st.columns([2, 2])
   with col_busca:
     busca = st.text_input(
-        "🔎 Palavra-chave:", "", placeholder="Digite tema, palavra ou local..."
+        "🔎 Palavra-chave:", "", placeholder="Digite um tema ou termo..."
     )
   with col_dias:
-    dias_sel = st.multiselect("📅 Filtrar por Dia(s):", todos_dias, default=[])
-  with col_vagos:
-    exibir_vagos = st.checkbox("🔓 Mostrar Horários Vagos", value=True)
+    dias_sel = st.multiselect(
+        "📅 Filtrar por Dia(s):",
+        todos_dias,
+        default=[],
+        placeholder="Selecione um ou mais dias...",
+    )
 
   col_espaco, col_sec = st.columns(2)
   with col_espaco:
     espacos_sel = st.multiselect(
-        "📍 Filtrar por Espaço / Auditório:", todos_espacos, default=[]
+        "📍 Filtrar por Espaço / Auditório:",
+        todos_espacos,
+        default=[],
+        placeholder="Selecione os locais...",
     )
   with col_sec:
     sec_sel = st.multiselect(
-        "🏢 Filtrar por Secretaria / Entidade:", todas_sec, default=[]
+        "🏢 Filtrar por Secretaria / Entidade:",
+        todas_sec,
+        default=[],
+        placeholder="Selecione as entidades...",
     )
 
+# Aplicação dos Filtros nos Eventos Agendados
 df_filtered = df_data.copy()
-if not exibir_vagos:
-  df_filtered = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
+
 if busca:
   t = busca.lower()
   df_filtered = df_filtered[
@@ -518,43 +526,48 @@ df_filtered["Data_Cat"] = pd.Categorical(
 )
 df_filtered = df_filtered.sort_values("Data_Cat").drop(columns=["Data_Cat"])
 
+# Separação Estrita entre Agendados e Vagos
+df_agendados = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
+df_vagos_totais = df_filtered[df_filtered["Tema"] == "🔓 HORÁRIO VAGO"]
+
 # Menu Lateral
 st.sidebar.header("📄 Exportação & Gestão")
 if st.sidebar.button("⚙️ Gerar Relatório PDF"):
-  if not df_filtered.empty:
+  if not df_agendados.empty:
     info_str = "Seleção Personalizada"
     if espacos_sel:
       info_str = f"Espaços: {', '.join(espacos_sel)}"
     elif dias_sel:
       info_str = f"Dias: {', '.join(dias_sel)}"
-    pdf_bytes = generate_pdf_report(df_filtered, info_str)
+    pdf_bytes = generate_pdf_report(df_agendados, info_str)
     st.sidebar.download_button(
-        label="📥 Baixar PDF",
+        label="📥 Baixar PDF da Programação",
         data=pdf_bytes,
         file_name="agenda_expointer.pdf",
         mime="application/pdf",
     )
   else:
-    st.sidebar.error("Nenhum evento selecionado.")
+    st.sidebar.error("Nenhum evento agendado selecionado.")
 
 st.sidebar.divider()
 
-tab_cards, tab_calendar, tab_edit = st.tabs(
-    ["📋 Visão em Cards", "📅 Visão Calendário", "🔒 Área de Edição"]
-)
+# Estrutura de Abas Reformulada
+tab_cards, tab_calendar, tab_vagos, tab_edit = st.tabs([
+    "📋 Visão em Cards",
+    "📅 Visão Calendário",
+    "🔓 Horários Livres / Vagos",
+    "🔒 Área de Edição",
+])
 
-# --- ABA 1: VISÃO EM CARDS ---
+# --- ABA 1: VISÃO EM CARDS (Apenas Agendados) ---
 with tab_cards:
-  if df_filtered.empty:
-    st.info("Nenhum evento encontrado.")
+  if df_agendados.empty:
+    st.info("Nenhum evento agendado encontrado para os filtros selecionados.")
   else:
-    for data, grupo in df_filtered.groupby("Data", sort=False):
+    for data, grupo in df_agendados.groupby("Data", sort=False):
       st.markdown(f"#### 📅 {data}")
       cols = st.columns(2)
       for idx, (_, row) in enumerate(grupo.iterrows()):
-        is_vago = row["Tema"] == "🔓 HORÁRIO VAGO"
-        card_class = "event-card-vago" if is_vago else "event-card"
-        time_class = "card-time-vago" if is_vago else "card-time-tag"
         sec_info = f"🏢 {row['Secretaria']}" if row["Secretaria"] else ""
         resp_info = (
             f" | Resp: {row['Responsável']}" if row["Responsável"] else ""
@@ -562,11 +575,11 @@ with tab_cards:
         meta_line = f"{sec_info}{resp_info}".strip()
 
         card_html = f"""
-                <div class="{card_class}">
+                <div class="event-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <span class="{time_class}">⏰ {row['Horário']}</span>
+                        <span class="card-time-tag">⏰ {row['Horário']}</span>
                     </div>
-                    <div style="font-weight:800; font-size:1.02rem; color:{'#475569' if is_vago else '#0f172a'}; margin-bottom:8px;">
+                    <div style="font-weight:800; font-size:1.02rem; color:#0f172a; margin-bottom:8px;">
                         {row['Tema']}
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
@@ -577,17 +590,19 @@ with tab_cards:
                 """
         cols[idx % 2].markdown(card_html, unsafe_allow_html=True)
 
-# --- ABA 2: VISÃO EM CALENDÁRIO GRID ---
+# --- ABA 2: VISÃO EM CALENDÁRIO GRID (Apenas Agendados) ---
 with tab_calendar:
   dia_grid_sel = st.selectbox(
-      "📆 Destacar dia na grade:", ["Exibir Todos Selecionados"] + todos_dias
+      "📆 Destacar dia na grade:",
+      ["Exibir Todos Selecionados"] + todos_dias,
+      index=0,
   )
-  df_grid = df_filtered.copy()
+  df_grid = df_agendados.copy()
   if dia_grid_sel != "Exibir Todos Selecionados":
     df_grid = df_grid[df_grid["Data"] == dia_grid_sel]
 
   if df_grid.empty:
-    st.info("Nenhum evento para exibir.")
+    st.info("Nenhum evento agendado para exibir nesta visão.")
   else:
     dias_para_exibir = [d for d in ORDEM_DIAS if d in df_grid["Data"].unique()]
     grid_cols = st.columns(len(dias_para_exibir))
@@ -597,8 +612,6 @@ with tab_calendar:
         st.markdown(f'<div class="cal-header">{d}</div>', unsafe_allow_html=True)
         evs_dia = df_grid[df_grid["Data"] == d]
         for _, ev in evs_dia.iterrows():
-          is_vago = ev["Tema"] == "🔓 HORÁRIO VAGO"
-          box_class = "cal-event-vago" if is_vago else "cal-event-box"
           sec_val = (
               str(ev["Secretaria"]).strip() if pd.notna(ev["Secretaria"]) else ""
           )
@@ -623,9 +636,9 @@ with tab_calendar:
 
           st.markdown(
               f"""
-              <div class="{box_class}">
+              <div class="cal-event-box">
                   <span style="color:#15803d; font-weight:800; display:block; margin-bottom:4px;">⏰ {ev['Horário']}</span>
-                  <div style="font-weight:700; color:{'#475569' if is_vago else '#0f172a'}; margin-bottom:4px;">{ev['Tema']}</div>
+                  <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">{ev['Tema']}</div>
                   <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
                   {sec_display}
                   {resp_display}
@@ -634,7 +647,44 @@ with tab_calendar:
               unsafe_allow_html=True,
           )
 
-# --- ABA 3: ÁREA DE EDIÇÃO PROTEGIDA ---
+# --- ABA 3: ABA EXCLUSIVA DE HORÁRIOS LIVRES / VAGOS ---
+with tab_vagos:
+  st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
+  st.caption(
+      "Utilize os filtros principais no topo da página para refinar por dia ou"
+      " espaço."
+  )
+
+  if df_vagos_totais.empty:
+    st.success(
+        "🎉 Não há horários vagos para os filtros selecionados (todos os"
+        " espaços estão ocupados)!"
+    )
+  else:
+    col_v1, col_v2 = st.columns([1, 1])
+    with col_v1:
+      st.metric("Total de Horários Disponíveis", len(df_vagos_totais))
+
+    for data, grupo in df_vagos_totais.groupby("Data", sort=False):
+      st.markdown(f"#### 📅 {data}")
+      cols_vago = st.columns(3)
+      for idx, (_, row) in enumerate(grupo.iterrows()):
+        vago_html = f"""
+                <div class="event-card-vago">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span class="card-time-vago">⏰ {row['Horário']}</span>
+                    </div>
+                    <div style="font-weight:800; font-size:0.95rem; color:#b45309; margin-bottom:6px;">
+                        🔓 HORÁRIO DISPONÍVEL
+                    </div>
+                    <div style="color:#0369a1; font-weight:800; font-size:0.88rem;">
+                        📍 {row['Espaço']}
+                    </div>
+                </div>
+                """
+        cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
+
+# --- ABA 4: ÁREA DE EDIÇÃO PROTEGIDA ---
 with tab_edit:
   st.markdown("### 🔒 Edição Restrita da Planilha")
   senha = st.text_input("Digite a senha de administrador:", type="password")
@@ -651,9 +701,7 @@ with tab_edit:
             "Data": st.column_config.SelectboxColumn(
                 "Dia", options=todos_dias, disabled=True
             ),
-            "Horário": st.column_config.TextColumn(
-                "Horário", disabled=True
-            ),
+            "Horário": st.column_config.TextColumn("Horário", disabled=True),
             "Tema": st.column_config.TextColumn(
                 "Atividade / Tema (ou 🔓 HORÁRIO VAGO)", required=True
             ),
@@ -679,9 +727,7 @@ with tab_edit:
           }
 
         save_alteracoes(alteracoes_atuais)
-        st.success(
-            "✅ Alterações salvas com sucesso no banco de alterações!"
-        )
+        st.success("✅ Alterações salvas com sucesso!")
         st.cache_data.clear()
         st.rerun()
       except Exception as e:
