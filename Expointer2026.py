@@ -250,17 +250,17 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # 3. Carregamento e Processamento
 @st.cache_data(ttl=60)
 def load_and_process_data(excel_path="Grade Expointer 2026.xlsx"):
-  space_mapping = {
-      "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
-      "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
-      "Agenda Arena ESPAÇO GOV": "Arena Espaço Gov",
-      "Agenda Bancada ESPAÇO GOV": "Bancada Espaço Gov",
-      "Agenda Estande FIERGS": "Estande FIERGS",
-      "Sala de reunião 1 ESPAÇO GOV ": "Sala Reunião 1",
-      "Sala de reunião 2 ESPAÇO GOV": "Sala Reunião 2",
-      "Sala de reunião 3 ESPAÇO GOV": "Sala Reunião 3",
-      "ESTANDE SEAPI E SEMA": "Estande SEAPI/SEMA",
-      "Agenda FUNDESA": "Agenda FUNDESA",
+  SPACE_MAPPING = {
+    'Agenda Auditório ADMINISTRAÇÃO': 'Auditório Administração',
+    'Agenda Auditório ESPAÇO GOV': 'Auditório Espaço Gov',
+    'Agenda Arena ESPAÇO GOV': 'Arena Espaço Gov',
+    'Agenda Bancada ESPAÇO GOV': 'Bancada Espaço Gov',
+    'Agenda Estande FIERGS': 'Estande FIERGS',
+    'Sala de reunião 1 ESPAÇO GOV ': 'Sala Reunião 1',
+    'Sala de reunião 2 ESPAÇO GOV': 'Sala Reunião 2',
+    'Sala de reunião 3 ESPAÇO GOV': 'Sala Reunião 3',
+    'ESTANDE SEAPI E SEMA': 'Estande SEAPI/SEMA',
+    'Agenda FUNDESA': 'Agenda FUNDESA',
   }
 
   if not os.path.exists(excel_path):
@@ -763,13 +763,13 @@ with tab_edit:
       excel_path = "Grade Expointer 2026.xlsx"
 
       try:
-        # Mapeamento reverso para manter os nomes originais das abas
-        inv_map = {v.lower(): k for k, v in space_mapping.items()}
+        # Mapeamento reverso para recuperar o nome exato da aba original
+        inv_map = {v.lower(): k for k, v in SPACE_MAPPING.items()}
 
         with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
           sheets_written = 0
 
-          # Percorre cada espaço para garantir a escrita de todas as abas
+          # Percorre cada espaço cadastrado
           for space_name in todos_espacos:
             group = edited_df[edited_df["Espaço"] == space_name]
 
@@ -778,7 +778,7 @@ with tab_edit:
                 str(space_name).lower(), f"Agenda {space_name}"
             )
 
-            # Limpa caracteres proibidos no Excel (\ / ? * : [ ]) e limita a 31 caracteres
+            # Limpa caracteres proibidos pelo Excel (\ / ? * : [ ]) e limita a 31 caracteres
             clean_sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
 
             if not group.empty:
@@ -786,7 +786,6 @@ with tab_edit:
                   writer, sheet_name=clean_sheet_title, index=False
               )
             else:
-              # Garante que a aba existe mesmo sem eventos para não quebrar o openpyxl
               dummy = pd.DataFrame(
                   columns=[
                       "Horário",
@@ -799,10 +798,9 @@ with tab_edit:
 
             sheets_written += 1
 
-          # Trava de segurança: se por algum motivo nenhuma aba foi gravada, cria uma padrão
           if sheets_written == 0:
             pd.DataFrame({"Info": ["Agenda Vazia"]}).to_excel(
-                writer, sheet_name="Agenda General", index=False
+                writer, sheet_name="Agenda Geral", index=False
             )
 
         st.success("✅ Alterações salvas com sucesso!")
