@@ -84,6 +84,7 @@ def sanitize_space_name(raw_name):
   name = str(raw_name).strip()
   if name in space_mapping:
     return space_mapping[name]
+  # Sanitização dinâmica para pegar nomes variados de abas
   clean = re.sub(r"^agenda\s+(auditório\s+)?", "", name, flags=re.IGNORECASE)
   return clean.strip().title()
 
@@ -249,6 +250,7 @@ def load_excel_from_github():
     all_events = []
 
     for sheet_name in excel_file.sheet_names:
+      # Ignora abas de escala ou suporte
       if "escala" in sheet_name.lower() or "equipe" in sheet_name.lower():
         continue
 
@@ -257,6 +259,8 @@ def load_excel_from_github():
         continue
 
       df_sheet = df_sheet.fillna("").astype(str)
+
+      # DETERMINA O ESPAÇO ESPECÍFICO DESTA ABA
       current_espaco = sanitize_space_name(sheet_name)
       current_data = "Sábado 29/08"
 
@@ -303,10 +307,10 @@ def load_excel_from_github():
           else:
             continue
 
-        tema_clean = tema.strip().lower()
+        tema_clean = tema.strip()
         is_vago = (
-            not tema
-            or tema_clean
+            not tema_clean
+            or tema_clean.lower()
             in [
                 "livre",
                 "vago",
@@ -320,14 +324,14 @@ def load_excel_from_github():
                 "-",
                 "--",
             ]
-            or tema.startswith("🔓")
+            or tema_clean.startswith("🔓")
         )
 
         all_events.append({
             "Espaço": current_espaco,
             "Data": current_data,
             "Horário": horario_limpo,
-            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema.strip(),
+            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema_clean,
             "Secretaria": sec.strip() if not is_vago else "",
             "Responsável": resp.strip() if not is_vago else "",
         })
@@ -342,7 +346,9 @@ def load_excel_from_github():
 
 def commit_changes_to_github(updated_df, change_log_notes=""):
   if not GITHUB_TOKEN:
-    st.error("❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud.")
+    st.error(
+        "❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud."
+    )
     return False
 
   headers = {
@@ -533,14 +539,12 @@ bg_url_css = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 custom_css = f"""
 <style>
-    /* Fundo geral da aplicação */
     .stApp {{
         background: linear-gradient(rgba(15, 23, 42, 0.40), rgba(15, 23, 42, 0.40)), url("{bg_url_css}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
-    /* BANNER PRINCIPAL COM GRADIENTE SUAVE E OPACIDADE CONTROLADA (CORES DO RIO GRANDE DO SUL) */
     .rs-banner-card {{
         background: linear-gradient(135deg, rgba(11, 102, 35, 0.88) 0%, rgba(21, 128, 61, 0.85) 35%, rgba(185, 28, 28, 0.85) 68%, rgba(234, 179, 8, 0.88) 100%) !important;
         border-radius: 16px;
@@ -578,13 +582,12 @@ custom_css = f"""
         background-color: rgba(255, 255, 255, 0.96) !important;
         border: 1px solid #cbd5e1 !important;
         border-left: 6px solid #15803d !important;
-        padding: 10px;
-        margin-bottom: 10px;
+        padding: 12px;
+        margin-bottom: 12px;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }}
 
-    /* GARANTE QUE O HORÁRIO NO CALENDÁRIO SEJA VERDE ESCURO */
     .cal-event-box span {{
         color: #15803d !important;
         font-weight: 800 !important;
@@ -603,7 +606,6 @@ custom_css = f"""
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }}
 
-    /* GARANTE COR VERDE VISÍVEL NO HORÁRIO DA ABA DE VAGOS */
     .card-time-vago {{
         color: #15803d !important;
         font-weight: 900 !important;
@@ -631,7 +633,6 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # Carregamento dos dados
 df_data = load_excel_from_github()
 
-# Banner com as Cores do Rio Grande do Sul
 banner_html = """
 <div class="rs-banner-card">
     <div class="rs-banner-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
@@ -648,13 +649,11 @@ todos_dias = [
     d for d in ORDEM_DIAS if d in dias_encontrados
 ] + [d for d in dias_encontrados if d not in ORDEM_DIAS]
 todos_espacos = sorted([e for e in df_data["Espaço"].unique() if e])
-todas_sec = sorted(
-    [
-        s
-        for s in df_data["Secretaria"].unique()
-        if s and str(s).strip() != "🔓 HORÁRIO VAGO"
-    ]
-)
+todas_sec = sorted([
+    s
+    for s in df_data["Secretaria"].unique()
+    if s and str(s).strip() != "🔓 HORÁRIO VAGO"
+])
 
 st.markdown("### 🔍 Pesquisar e Filtrar Programação")
 with st.container():
@@ -743,7 +742,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição & Versionamento",
 ])
 
-# ABA 1: CALENDÁRIO COM TODOS OS DIAS DO EVENTO
+# ABA 1: CALENDÁRIO
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -807,7 +806,7 @@ with tab_calendar:
                 unsafe_allow_html=True,
             )
 
-# ABA 2: HORÁRIOS LIVRES / VAGOS COM HORÁRIO EM VERDE VISÍVEL
+# ABA 2: HORÁRIOS LIVRES / VAGOS
 with tab_vagos:
   st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
   if df_vagos_totais.empty:
