@@ -1,5 +1,6 @@
 import io
 import re
+import urllib.parse
 import pandas as pd
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
@@ -16,8 +17,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Imagem de fundo no GitHub (Raw)
-URL_IMAGEM_FUNDO = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/bg_expointer.jpg"
+# NOME DO ARQUIVO DE IMAGEM NO REPOSITÓRIO E ENCODING CORRETO DO ~ (%7E)
+FILE_NAME = "Screenshot_20260825-095320~2.jpg"
+FILE_NAME_ENCODED = urllib.parse.quote(FILE_NAME)
+URL_IMAGEM_FUNDO = f"https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/{FILE_NAME_ENCODED}"
 
 ORDEM_DIAS = [
     "Sábado 29/08",
@@ -61,7 +64,7 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# Leitura tratando cabeçalhos e colunas sem depender do nome da linha 1
+# Leitura com desestruturação de colunas limpas
 @st.cache_data(ttl=10)
 def load_data_from_google_sheets():
   try:
@@ -73,16 +76,16 @@ def load_data_from_google_sheets():
 
     df = df.dropna(how="all").fillna("")
 
-    # Mapeamento inteligente de colunas
+    # Identificação por padrões
     cols = list(df.columns)
-
-    # Identifica onde está cada dado pela ordem ou por busca flexível
-    col_espaco = cols[0] if len(cols) > 0 else "Espaço"
-    col_data = cols[1] if len(cols) > 1 else "Data"
-    col_horario = cols[2] if len(cols) > 2 else "Horário"
-    col_tema = cols[3] if len(cols) > 3 else "Tema"
-    col_sec = cols[4] if len(cols) > 4 else "Secretaria"
-    col_resp = cols[5] if len(cols) > 5 else "Responsável"
+    col_espaco, col_data, col_horario, col_tema, col_sec, col_resp = (
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+    )
 
     for c in cols:
       c_clean = str(c).strip().lower()
@@ -104,6 +107,20 @@ def load_data_from_google_sheets():
       elif "responsável" in c_clean or "responsavel" in c_clean:
         col_resp = c
 
+    # Fallback posicional
+    if not col_espaco and len(cols) > 0:
+      col_espaco = cols[0]
+    if not col_data and len(cols) > 1:
+      col_data = cols[1]
+    if not col_horario and len(cols) > 2:
+      col_horario = cols[2]
+    if not col_tema and len(cols) > 3:
+      col_tema = cols[3]
+    if not col_sec and len(cols) > 4:
+      col_sec = cols[4]
+    if not col_resp and len(cols) > 5:
+      col_resp = cols[5]
+
     df_clean = []
     for idx, row in df.iterrows():
       espaco = str(row.get(col_espaco, "")).strip()
@@ -113,7 +130,6 @@ def load_data_from_google_sheets():
       sec = str(row.get(col_sec, "")).strip()
       resp = str(row.get(col_resp, "")).strip()
 
-      # Pula a linha se for a repetição do cabeçalho
       if (
           horario_raw.lower() in ["horário", "horario", "hora"]
           or data.lower() == "data"
@@ -275,23 +291,24 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# Estilização CSS que Força a Imagem de Fundo sobre o Dark Mode
+# ESTILIZAÇÃO CSS FORÇADA COM SOBREPOSIÇÃO DE DARK MODE E APLICAÇÃO DE CARDS
 custom_css = f"""
 <style>
-    /* Força a Imagem no Fundo da Tela */
-    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{
+    /* Imagem de Fundo em toda a Aplicação */
+    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
         background: url("{URL_IMAGEM_FUNDO}") no-repeat center center fixed !important;
         background-size: cover !important;
-        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
     /* Card Principal */
     .header-banner {{
-        background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(21, 128, 61, 0.95) 100%) !important;
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(21, 128, 61, 0.95) 100%), url("{URL_IMAGEM_FUNDO}") no-repeat center center !important;
+        background-size: cover !important;
         border-radius: 16px;
-        padding: 30px 20px;
+        padding: 32px 20px;
         text-align: center;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         margin-bottom: 24px;
         border-bottom: 5px solid #eab308;
     }}
@@ -301,10 +318,10 @@ custom_css = f"""
         font-weight: 900 !important;
         color: #ffffff !important;
         margin: 0 !important;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        text-shadow: 0 2px 5px rgba(0,0,0,0.8);
     }}
 
-    /* Estilo dos Cabeçalhos das Colunas da Grade */
+    /* Cabeçalho Verde das Colunas de Dias */
     .cal-header {{
         background-color: #064e3b !important;
         color: #ffffff !important;
@@ -313,19 +330,20 @@ custom_css = f"""
         font-weight: 800;
         border-radius: 8px;
         margin-bottom: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        font-size: 0.95rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+        font-size: 1rem;
+        border: 1px solid #15803d;
     }}
 
     /* Caixas de Eventos */
     .cal-event-box {{
         background-color: rgba(255, 255, 255, 0.96) !important;
         border: 1px solid #cbd5e1 !important;
-        border-left: 5px solid #15803d !important;
+        border-left: 6px solid #15803d !important;
         padding: 12px;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }}
 
     .event-card-vago {{
@@ -335,7 +353,7 @@ custom_css = f"""
         margin-bottom: 12px;
         border-left: 6px solid #d97706 !important;
         border: 1px dashed #f59e0b;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }}
 
     div[data-baseweb="select"] > div, input {{
@@ -347,7 +365,7 @@ custom_css = f"""
     label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {{
         color: #ffffff !important;
         font-weight: 800 !important;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
     }}
 </style>
 """
@@ -366,32 +384,33 @@ st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Verifique as configurações do Secrets no"
+      "⚠️ Nenhum dado carregado. Verifique a configuração do Secrets no"
       " Streamlit Cloud."
   )
   st.stop()
 
-# Filtros e Mapeamentos
+# Mapeamento de Dias Encontrados
 dias_encontrados = [
     d
     for d in df_data["Data"].unique()
-    if d and str(d).strip().lower() != "data"
+    if d and str(d).strip().lower() not in ["data", "nan", "none", ""]
 ]
 todos_dias = [
     d for d in ORDEM_DIAS if d in dias_encontrados
 ] + [d for d in dias_encontrados if d not in ORDEM_DIAS]
+
 todos_espacos = sorted(
     [
         e
         for e in df_data["Espaço"].unique()
-        if e and str(e).strip().lower() != "espaço"
+        if e and str(e).strip().lower() not in ["espaço", "nan", "none", ""]
     ]
 )
 todas_sec = sorted(
     [
         s
         for s in df_data["Secretaria"].unique()
-        if s and str(s).strip() != "🔓 HORÁRIO VAGO"
+        if s and str(s).strip() not in ["🔓 HORÁRIO VAGO", "nan", "none", ""]
     ]
 )
 
@@ -482,7 +501,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição Direta do App",
 ])
 
-# ABA 1: CALENDÁRIO (CORRIGIDO CABEÇALHOS DAS DATAS)
+# ABA 1: CALENDÁRIO COM CABEÇALHO CORRETO DE DIAS
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -507,7 +526,7 @@ with tab_calendar:
       grid_cols = st.columns(num_dias)
       for idx, d in enumerate(dias_para_exibir):
         with grid_cols[idx]:
-          # Renderiza o dia correspondente da coluna no topo do card verde
+          # Renderização explícita da Data da Coluna
           st.markdown(
               f'<div class="cal-header">📅 {d}</div>', unsafe_allow_html=True
           )
