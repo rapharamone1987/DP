@@ -18,25 +18,23 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Download e conversão da imagem de fundo para Base64 (Garante a exibição do fundo)
-RAW_IMG_URL = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/Screenshot_20260825-095320~2.jpg"
+# Download e Conversão da Imagem de Fundo para Base64
+URL_RAW_IMG = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/Screenshot_20260825-095320~2.jpg"
 
 
 @st.cache_data(ttl=3600)
-def get_base64_image(url):
+def load_background_base64(url):
   try:
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req) as response:
-      return base64.b64encode(response.read()).decode()
+    with urllib.request.urlopen(req) as resp:
+      return base64.b64encode(resp.read()).decode("utf-8")
   except Exception:
     return ""
 
 
-img_b64 = get_base64_image(RAW_IMG_URL)
+img_b64 = load_background_base64(URL_RAW_IMG)
 bg_style = (
-    f"data:image/jpeg;base64,{img_b64}"
-    if img_b64
-    else "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/Screenshot_20260825-095320~2.jpg"
+    f"data:image/jpeg;base64,{img_b64}" if img_b64 else URL_RAW_IMG
 )
 
 ORDEM_DIAS = [
@@ -81,9 +79,9 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# LEITURA E PARSER MULTI-ABAS BASEADO NO TEMPLATE
+# CARREGAMENTO E CONSOLIDACÃO AUTOMÁTICA DE TODAS AS GUIAS
 @st.cache_data(ttl=15)
-def load_and_consolidate_all_sheets():
+def consolidate_all_sheets():
   try:
     conn = st.connection("gsheets", type=GSheetsConnection)
     all_sheets = conn.read(worksheet=None, header=None)
@@ -91,7 +89,7 @@ def load_and_consolidate_all_sheets():
     sheets_dict = (
         all_sheets if isinstance(all_sheets, dict) else {"Geral": all_sheets}
     )
-    consolidated_rows = []
+    all_events = []
 
     for sheet_name, df_raw in sheets_dict.items():
       if df_raw is None or df_raw.empty:
@@ -100,30 +98,47 @@ def load_and_consolidate_all_sheets():
       df_raw = df_raw.fillna("").astype(str)
 
       current_data = "A Definir"
-      if any(d.lower() in sheet_name.lower() for d in ORDEM_DIAS):
-        current_data = sheet_name
+      for d in ORDEM_DIAS:
+        if d.lower() in sheet_name.lower():
+          current_data = d
+          break
 
-      current_espaco = "Espaço Gov RS"
+      current_espaco = sheet_name
 
       for idx, row in df_raw.iterrows():
         row_vals = [
-            str(v).strip() for v in row.values if str(v).strip() != "nan"
+            str(v).strip() for v in row.values if str(v).strip() != ""
         ]
         if not row_vals:
           continue
 
         line_str = " ".join(row_vals)
 
-        # 1. Identifica alteração de Data dentro da aba
+        # Detecta se a linha traz o nome de um dia/data
         for d in ORDEM_DIAS:
           if d.lower() in line_str.lower():
             current_data = d
             break
 
-        first_cell = str(row.values[0]).strip() if len(row.values) > 0 else ""
+        # Detecta se a linha define um novo Espaço/Local
+        for loc in [
+            "Auditório Administração",
+            "Auditório Espaço Gov",
+            "Arena Espaço Gov",
+            "Bancada Espaço Gov",
+            "FIERGS",
+        ]:
+          if loc.lower() in line_str.lower():
+            current_espaco = loc
+            break
 
-        # Ignora cabeçalhos visuais
-        if first_cell.lower() in [
+        col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
+        col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
+        col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
+        col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
+
+        # Ignora linhas de subcabeçalho
+        if col0.lower() in [
             "horário",
             "horario",
             "hora",
@@ -135,24 +150,18 @@ def load_and_consolidate_all_sheets():
         ]:
           continue
 
-        horario_limpo = clean_time_string(first_cell)
-
-        # Mapeamento relativo
-        val_1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
-        val_2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
-        val_3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
+        horario_limpo = clean_time_string(col0)
 
         if horario_limpo:
-          tema = val_1
-          sec = val_2
-          resp = val_3
+          tema = col1
+          sec = col2
+          resp = col3
         else:
-          # Se o horário estiver na segunda coluna
-          alt_horario = clean_time_string(val_1)
+          alt_horario = clean_time_string(col1)
           if alt_horario:
             horario_limpo = alt_horario
-            tema = val_2
-            sec = val_3
+            tema = col2
+            sec = col3
             resp = str(row.values[4]).strip() if len(row.values) > 4 else ""
           else:
             continue
@@ -167,7 +176,7 @@ def load_and_consolidate_all_sheets():
             or tema.startswith("🔓")
         )
 
-        consolidated_rows.append({
+        all_events.append({
             "Espaço": current_espaco,
             "Data": current_data,
             "Horário": horario_limpo,
@@ -176,7 +185,7 @@ def load_and_consolidate_all_sheets():
             "Responsável": resp if not is_vago else "",
         })
 
-    return pd.DataFrame(consolidated_rows)
+    return pd.DataFrame(all_events)
 
   except Exception as e:
     st.error(f"⚠️ Erro ao consolidar as abas da planilha: {e}")
@@ -311,10 +320,10 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO CSS COM FUNDO EM BASE64
+# INJEÇÃO FORÇADA DO FUNDO EM BASE64 SOBREPOSTO AO TEMA DARK
 custom_css = f"""
 <style>
-    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{
+    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
         background: url("{bg_style}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
@@ -387,8 +396,8 @@ custom_css = f"""
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Carrega e unifica as guias
-df_data = load_and_consolidate_all_sheets()
+# Carrega e consolida
+df_data = consolidate_all_sheets()
 
 # Banner Principal
 banner_html = """
@@ -400,7 +409,7 @@ st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Verifique as configurações do Secrets do"
+      "⚠️ Nenhum dado carregado. Verifique as credenciais no Secrets do"
       " Streamlit Cloud."
   )
   st.stop()
