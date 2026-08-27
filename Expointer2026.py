@@ -1,14 +1,13 @@
 import base64
 import io
 import re
-from google.oauth2.service_account import Credentials
-import gspread
 import pandas as pd
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
 import streamlit as st
+from streamlit_gsheets import GSheetsConnection
 
 # 1. Configuração da Página
 st.set_page_config(
@@ -17,9 +16,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
-
-# NOME DA SUA PLANILHA NO GOOGLE DRIVE / SHEETS
-GOOGLE_SHEET_NAME = "Grade Expointer 2026"
 
 ORDEM_DIAS = [
     "Sábado 29/08",
@@ -33,31 +29,6 @@ ORDEM_DIAS = [
     "Domingo 06/09",
     "Outros",
 ]
-
-SPACE_MAPPING = {
-    "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
-    "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
-    "Agenda Arena ESPAÇO GOV": "Arena Espaço Gov",
-    "Agenda Bancada ESPAÇO GOV": "Bancada Espaço Gov",
-    "Agenda Estande FIERGS": "Estande FIERGS",
-    "Sala de reunião 1 ESPAÇO GOV ": "Sala Reunião 1",
-    "Sala de reunião 2 ESPAÇO GOV": "Sala Reunião 2",
-    "Sala de reunião 3 ESPAÇO GOV": "Sala Reunião 3",
-    "ESTANDE SEAPI E SEMA": "Estande SEAPI/SEMA",
-    "Agenda FUNDESA": "Agenda FUNDESA",
-}
-
-
-@st.cache_resource
-def get_gspread_client():
-  scope = [
-      "https://www.googleapis.com/auth/spreadsheets",
-      "https://www.googleapis.com/auth/drive",
-  ]
-  credentials = Credentials.from_service_account_info(
-      st.secrets["gcp_service_account"], scopes=scope
-  )
-  return gspread.authorize(credentials)
 
 
 def clean_time_string(time_str):
@@ -88,157 +59,14 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
+# Leitura com st.connection nativo do Streamlit
+@st.cache_data(ttl=60)
 def load_data_from_sheets():
   try:
-    gc = get_gspread_client()
-    sh = gc.open(GOOGLE_SHEET_NAME)
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    df = conn.read(ttl=60)
 
-    raw_events = []
-
-    # Tenta ler a aba principal compilada primeiro
-    ws_first = sh.sheet1
-    all_values_first = ws_first.get_all_values()
-
-    # Se a primeira aba já contiver os dados consolidados no formato de tabela simples
-    if len(all_values_first) > 1 and "Espaço" in all_values_first[0]:
-      df_direct = pd.DataFrame(
-          all_values_first[1:], columns=all_values_first[0]
-      )
-      return df_direct
-
-    # Caso contrário, varre todas as abas de espaços
-    for worksheet in sh.worksheets():
-      sheet_title = worksheet.title.strip()
-
-      if sheet_title not in SPACE_MAPPING and sheet_title not in list(
-          SPACE_MAPPING.values()
-      ):
-        continue
-
-      space_name = SPACE_MAPPING.get(sheet_title, sheet_title)
-      rows = worksheet.get_all_values()
-
-      current_date = "Outros"
-
-      for row in rows:
-        if not row:
-          continue
-
-        row_str = " ".join([str(val) for val in row if val])
-
-        for day_code in [
-            "29/08",
-            "30/08",
-            "31/08",
-            "01/09",
-            "02/09",
-            "03/09",
-            "04/09",
-            "05/09",
-            "06/09",
-        ]:
-          if day_code in row_str and any(
-              w in row_str
-              for w in [
-                  "Sábado",
-                  "Domingo",
-                  "Segunda",
-                  "Terça",
-                  "Quarta",
-                  "Quinta",
-                  "Sexta",
-                  "2026",
-              ]
-          ):
-            if "29/08" in day_code:
-              current_date = "Sábado 29/08"
-            elif "30/08" in day_code:
-              current_date = "Domingo 30/08"
-            elif "31/08" in day_code:
-              current_date = "Segunda 31/08"
-            elif "01/09" in day_code:
-              current_date = "Terça 01/09"
-            elif "02/09" in day_code:
-              current_date = "Quarta 02/09"
-            elif "03/09" in day_code:
-              current_date = "Quinta 03/09"
-            elif "04/09" in day_code:
-              current_date = "Sexta 04/09"
-            elif "05/09" in day_code:
-              current_date = "Sábado 05/09"
-            elif "06/09" in day_code:
-              current_date = "Domingo 06/09"
-            break
-
-        horario_raw = str(row[0]).strip() if len(row) > 0 and row[0] else ""
-        tema = str(row[1]).strip() if len(row) > 1 and row[1] else ""
-        sec = str(row[2]).strip() if len(row) > 2 and row[2] else ""
-        resp = str(row[3]).strip() if len(row) > 3 and row[3] else ""
-
-        if any(
-            d.lower() in horario_raw.lower()
-            for d in [
-                "sábado",
-                "domingo",
-                "segunda",
-                "terça",
-                "quarta",
-                "quinta",
-                "sexta",
-                "29/08",
-                "30/08",
-                "31/08",
-                "01/09",
-                "02/09",
-                "03/09",
-                "04/09",
-                "05/09",
-                "06/09",
-            ]
-        ):
-          continue
-
-        horario_limpo = clean_time_string(horario_raw)
-
-        if (
-            horario_limpo
-            and horario_raw.lower() != "horário"
-            and not ("características" in horario_raw.lower())
-        ):
-          is_vago = (
-              not tema
-              or tema.lower()
-              in [
-                  "livre",
-                  "vago",
-                  "disponível",
-                  "horário vago",
-                  "nan",
-                  "none",
-                  "",
-              ]
-              or tema.startswith("🔓")
-          )
-
-          raw_events.append({
-              "Espaço": space_name,
-              "Data": current_date,
-              "Horário": horario_limpo,
-              "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-              "Secretaria": (
-                  ""
-                  if is_vago
-                  else (sec if sec.lower() not in ["nan", "none"] else "")
-              ),
-              "Responsável": (
-                  ""
-                  if is_vago
-                  else (resp if resp.lower() not in ["nan", "none"] else "")
-              ),
-          })
-
-    df_events = pd.DataFrame(raw_events)
-    if df_events.empty:
+    if df is None or df.empty:
       return pd.DataFrame(
           columns=[
               "Espaço",
@@ -250,67 +78,81 @@ def load_data_from_sheets():
           ]
       )
 
-    consolidated = []
-    for (space, date), group in df_events.groupby(
-        ["Espaço", "Data"], sort=False
-    ):
-      group = group.reset_index(drop=True)
-      i = 0
-      while i < len(group):
-        row = group.iloc[i]
-        title, time_start, org, resp = (
-            row["Tema"],
-            row["Horário"],
-            row["Secretaria"],
-            row["Responsável"],
+    df = df.dropna(how="all").fillna("")
+
+    df_clean = []
+    for idx, row in df.iterrows():
+      horario_raw = str(row.get("Horário", "")).strip()
+      tema = str(row.get("Tema", "")).strip()
+
+      if any(
+          d.lower() in horario_raw.lower()
+          for d in [
+              "sábado",
+              "domingo",
+              "segunda",
+              "terça",
+              "quarta",
+              "quinta",
+              "sexta",
+              "29/08",
+              "30/08",
+              "31/08",
+              "01/09",
+              "02/09",
+              "03/09",
+              "04/09",
+              "05/09",
+              "06/09",
+          ]
+      ):
+        continue
+
+      horario_limpo = clean_time_string(horario_raw)
+
+      if horario_limpo and horario_raw.lower() != "horário":
+        is_vago = (
+            not tema
+            or tema.lower()
+            in [
+                "livre",
+                "vago",
+                "disponível",
+                "horário vago",
+                "nan",
+                "none",
+                "",
+            ]
+            or tema.startswith("🔓")
         )
-        j = i + 1
-        time_end = time_start
-        while (
-            j < len(group)
-            and group.iloc[j]["Tema"] == title
-            and title != "🔓 HORÁRIO VAGO"
-        ):
-          time_end = group.iloc[j]["Horário"]
-          j += 1
 
-        time_disp = time_start
-        if time_end != time_start and "-" not in time_start:
-          time_disp = f"{time_start} - {time_end}"
-
-        consolidated.append({
-            "Espaço": space,
-            "Data": date,
-            "Horário": time_disp,
-            "Tema": title,
-            "Secretaria": org,
-            "Responsável": resp,
+        df_clean.append({
+            "Espaço": str(row.get("Espaço", "")).strip(),
+            "Data": str(row.get("Data", "")).strip(),
+            "Horário": horario_limpo,
+            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
+            "Secretaria": str(row.get("Secretaria", "")).strip()
+            if not is_vago
+            else "",
+            "Responsável": str(row.get("Responsável", "")).strip()
+            if not is_vago
+            else "",
         })
-        i = j
 
-    df_result = pd.DataFrame(consolidated)
-    df_result["Data_Cat"] = pd.Categorical(
-        df_result["Data"], categories=ORDEM_DIAS, ordered=True
-    )
-    return df_result.sort_values("Data_Cat").drop(columns=["Data_Cat"])
+    return pd.DataFrame(df_clean)
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao carregar dados do Google Sheets: {e}")
+    st.error(f"⚠️ Erro ao conectar ao Google Sheets: {e}")
     return pd.DataFrame()
 
 
 def save_data_to_sheets(df_to_save):
   try:
-    gc = get_gspread_client()
-    sh = gc.open(GOOGLE_SHEET_NAME)
-    worksheet = sh.sheet1
-    worksheet.clear()
-
-    data = [df_to_save.columns.values.tolist()] + df_to_save.values.tolist()
-    worksheet.update(data)
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    conn.update(data=df_to_save)
     return True
   except Exception as e:
-    st.error(f"⚠️ Erro ao salvar alterações no Google Sheets: {e}")
+    st.error(f"⚠️ Erro ao salvar no Google Sheets: {e}")
     return False
 
 
@@ -449,7 +291,7 @@ custom_css = """
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Carregamento de Dados
+# Carregamento dos dados
 df_data = load_data_from_sheets()
 
 # Banner
@@ -463,7 +305,8 @@ st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Verifique a conexão com o Google Sheets."
+      "⚠️ Nenhum dado carregado. Verifique as configurações de secrets do"
+      " Google Sheets."
   )
   st.stop()
 
@@ -677,7 +520,7 @@ with tab_edit:
     if st.button("💾 Salvar Diretamente no Google Sheets"):
       if save_data_to_sheets(edited_df):
         st.success("✅ Google Sheets atualizado com sucesso!")
-        st.cache_resource.clear()
+        st.cache_data.clear()
         st.rerun()
 
   elif senha:
