@@ -62,25 +62,27 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# Leitura Ultra-Rápida e Sem Erros via CSV Publicado
+# Leitura Rápida e Sem Erros via CSV Publicado
 @st.cache_data(ttl=30)
 def load_data_from_google_sheets():
   try:
     df = pd.read_csv(CSV_URL)
     df = df.dropna(how="all").fillna("")
 
-    # Mapeamento e limpeza
     df_clean = []
     for idx, row in df.iterrows():
-      # Garante leitura das colunas independentemente do nome
       cols = [str(c) for c in row.values]
 
-      horario_raw = str(row.get("Horário", cols[2] if len(cols) > 2 else "")).strip()
+      horario_raw = str(
+          row.get("Horário", cols[2] if len(cols) > 2 else "")
+      ).strip()
       tema = str(row.get("Tema", cols[3] if len(cols) > 3 else "")).strip()
       espaco = str(row.get("Espaço", cols[0] if len(cols) > 0 else "")).strip()
       data = str(row.get("Data", cols[1] if len(cols) > 1 else "")).strip()
       sec = str(row.get("Secretaria", cols[4] if len(cols) > 4 else "")).strip()
-      resp = str(row.get("Responsável", cols[5] if len(cols) > 5 else "")).strip()
+      resp = str(
+          row.get("Responsável", cols[5] if len(cols) > 5 else "")
+      ).strip()
 
       if any(
           d.lower() in horario_raw.lower()
@@ -406,47 +408,56 @@ with tab_calendar:
     st.info("Nenhum evento agendado para exibir nesta visão.")
   else:
     dias_para_exibir = [d for d in ORDEM_DIAS if d in df_grid["Data"].unique()]
-    grid_cols = st.columns(len(dias_para_exibir))
+    num_dias = len(dias_para_exibir)
 
-    for idx, d in enumerate(dias_para_exibir):
-      with grid_cols[idx]:
-        st.markdown(f'<div class="cal-header">{d}</div>', unsafe_allow_html=True)
-        evs_dia = df_grid[df_grid["Data"] == d]
-        for _, ev in evs_dia.iterrows():
-          sec_val = (
-              str(ev["Secretaria"]).strip() if pd.notna(ev["Secretaria"]) else ""
-          )
-          resp_val = (
-              str(ev["Responsável"]).strip()
-              if pd.notna(ev["Responsável"])
-              else ""
-          )
+    if num_dias == 0:
+      st.info("Nenhum dia correspondente para os filtros selecionados.")
+    else:
+      grid_cols = st.columns(num_dias)
 
-          sec_display = (
-              f'<div style="color:#334155; font-size:0.75rem;'
-              f' font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
-              if sec_val and sec_val.lower() not in ["nan", "none", ""]
-              else ""
-          )
-          resp_display = (
-              f'<div style="color:#475569; font-size:0.75rem;'
-              f' font-weight:500;">👤 {resp_val}</div>'
-              if resp_val and resp_val.lower() not in ["nan", "none", ""]
-              else ""
-          )
-
+      for idx, d in enumerate(dias_para_exibir):
+        with grid_cols[idx]:
           st.markdown(
-              f"""
-              <div class="cal-event-box">
-                  <span style="color:#15803d; font-weight:800; display:block; margin-bottom:4px;">⏰ {ev['Horário']}</span>
-                  <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">{ev['Tema']}</div>
-                  <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
-                  {sec_display}
-                  {resp_display}
-              </div>
-              """,
-              unsafe_allow_html=True,
+              f'<div class="cal-header">{d}</div>', unsafe_allow_html=True
           )
+          evs_dia = df_grid[df_grid["Data"] == d]
+          for _, ev in evs_dia.iterrows():
+            sec_val = (
+                str(ev["Secretaria"]).strip()
+                if pd.notna(ev["Secretaria"])
+                else ""
+            )
+            resp_val = (
+                str(ev["Responsável"]).strip()
+                if pd.notna(ev["Responsável"])
+                else ""
+            )
+
+            sec_display = (
+                f'<div style="color:#334155; font-size:0.75rem;'
+                f' font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
+                if sec_val and sec_val.lower() not in ["nan", "none", ""]
+                else ""
+            )
+            resp_display = (
+                f'<div style="color:#475569; font-size:0.75rem;'
+                f' font-weight:500;">👤 {resp_val}</div>'
+                if resp_val and resp_val.lower() not in ["nan", "none", ""]
+                else ""
+            )
+
+            st.markdown(
+                f"""
+                <div class="cal-event-box">
+                    <span style="color:#15803d; font-weight:800; display:block; margin-bottom:4px;">⏰ {ev['Horário']}</span>
+                    <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">{ev['Tema']}</div>
+                    <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
+                    {sec_display}
+                    {resp_display}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 # ABA 2: HORÁRIOS VAGOS
 with tab_vagos:
