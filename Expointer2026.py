@@ -116,15 +116,13 @@ def extract_time_val(time_str):
 
 
 def merge_consecutive_events(df):
-  """Consolida horários subsequentes para eventos idênticos (mesmo Espaço, Data, Tema, Secretaria e Responsável)."""
+  """Consolida horários subsequentes para eventos idênticos."""
   if df.empty:
     return df
 
   merged_rows = []
 
-  # Agrupa por Espaço e Data mantendo ordem
   for (espaco, data), group in df.groupby(["Espaço", "Data"], sort=False):
-    # Garante ordenação cronológica antes de agrupar
     group = group.copy()
     group["Time_Key"] = group["Horário"].apply(extract_time_val)
     group = group.sort_values(by="Time_Key")
@@ -154,7 +152,6 @@ def merge_consecutive_events(df):
         if same_theme and same_sec and same_resp and not_vago:
           current_event["Hora_Fim"] = str(row["Horário"]).strip()
         else:
-          # Formata o intervalo final
           if (
               current_event["Hora_Inicio"]
               and current_event["Hora_Fim"]
@@ -187,7 +184,9 @@ def merge_consecutive_events(df):
       merged_rows.append(current_event)
 
   res_df = pd.DataFrame(merged_rows)
-  cols_to_drop = [c for c in ["Time_Key", "Hora_Inicio", "Hora_Fim"] if c in res_df.columns]
+  cols_to_drop = [
+      c for c in ["Time_Key", "Hora_Inicio", "Hora_Fim"] if c in res_df.columns
+  ]
   return res_df.drop(columns=cols_to_drop)
 
 
@@ -379,34 +378,43 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO CSS
+# ESTILIZAÇÃO CSS (Bandeira RS com amarelo corrigido e tom opaco/fosco elegante)
 bg_url_css = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 custom_css = f"""
 <style>
     .stApp {{
-        background: linear-gradient(rgba(15, 23, 42, 0.40), rgba(15, 23, 42, 0.40)), url("{bg_url_css}") no-repeat center center fixed !important;
+        background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url("{bg_url_css}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
     .rs-banner-card {{
-        background: linear-gradient(135deg, rgba(11, 102, 35, 0.88) 0%, rgba(21, 128, 61, 0.85) 35%, rgba(185, 28, 28, 0.85) 68%, rgba(234, 179, 8, 0.88) 100%) !important;
+        background: linear-gradient(135deg, rgba(21, 101, 52, 0.72) 0%, rgba(22, 128, 61, 0.70) 32%, rgba(185, 28, 28, 0.70) 65%, rgba(234, 179, 8, 0.72) 100%) !important;
         border-radius: 16px;
-        padding: 38px 20px;
+        padding: 28px 20px;
         text-align: center;
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
-        margin-bottom: 26px;
-        border-bottom: 6px solid #facc15;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+        margin-bottom: 24px;
+        border-bottom: 5px solid #facc15;
         position: relative;
     }}
 
-    .rs-banner-title {{
+    .rs-banner-title-1 {{
         font-size: 2.2rem !important;
         font-weight: 900 !important;
         color: #ffffff !important;
+        margin: 0 0 6px 0 !important;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+        letter-spacing: 1px;
+    }}
+
+    .rs-banner-title-2 {{
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: #fef08a !important;
         margin: 0 !important;
-        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.95);
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.85);
         letter-spacing: 0.5px;
     }}
 
@@ -475,9 +483,11 @@ custom_css = f"""
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
+# Banner em duas linhas centralizado
 banner_html = """
 <div class="rs-banner-card">
-    <div class="rs-banner-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
+    <div class="rs-banner-title-1">EXPOINTER 2026</div>
+    <div class="rs-banner-title-2">Programação Institucional — Espaços Gov RS</div>
 </div>
 """
 st.markdown(banner_html, unsafe_allow_html=True)
@@ -593,10 +603,11 @@ with tab_calendar:
   if df_grid.empty:
     st.info("Nenhum evento agendado para exibir nesta visão.")
   else:
-    # 1. Aplica a consolidação de eventos consecutivos para cada Espaço e Dia
     df_grid_merged = merge_consecutive_events(df_grid)
 
-    dias_unicos = [d for d in ORDEM_DIAS if d in df_grid_merged["Data"].unique()]
+    dias_unicos = [
+        d for d in ORDEM_DIAS if d in df_grid_merged["Data"].unique()
+    ]
 
     if len(dias_unicos) == 0:
       st.info("Nenhum dia correspondente para os filtros selecionados.")
@@ -608,8 +619,8 @@ with tab_calendar:
               f'<div class="cal-header">📅 {d}</div>', unsafe_allow_html=True
           )
           evs_dia = df_grid_merged[df_grid_merged["Data"] == d].copy()
-          
-          # 2. Garante ordenação cronológica estrita crescente no dia
+
+          # Ordenação estrita crescente por horário
           evs_dia["Order_Key"] = evs_dia["Horário"].apply(extract_time_val)
           evs_dia = evs_dia.sort_values(by="Order_Key")
 
@@ -658,13 +669,16 @@ with tab_vagos:
     st.success("🎉 Todos os espaços estão ocupados para o filtro selecionado!")
   else:
     st.metric("Total de Horários Disponíveis", len(df_vagos_totais))
-    
-    # Ordena também os horários vagos cronologicamente
+
     df_vagos_sorted = df_vagos_totais.copy()
-    df_vagos_sorted["Order_Key"] = df_vagos_sorted["Horário"].apply(extract_time_val)
+    df_vagos_sorted["Order_Key"] = df_vagos_sorted["Horário"].apply(
+        extract_time_val
+    )
     df_vagos_sorted = df_vagos_sorted.sort_values(by="Order_Key")
 
-    for data in [d for d in ORDEM_DIAS if d in df_vagos_sorted["Data"].unique()]:
+    for data in [
+        d for d in ORDEM_DIAS if d in df_vagos_sorted["Data"].unique()
+    ]:
       grupo = df_vagos_sorted[df_vagos_sorted["Data"] == data]
       st.markdown(f"#### 📅 {data}")
       cols_vago = st.columns(3)
@@ -678,23 +692,42 @@ with tab_vagos:
                 """
         cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
-# ABA 3: EDIÇÃO COM VERSIONAMENTO
+# ABA 3: EDIÇÃO COM FILTROS E VERSIONAMENTO
 with tab_edit:
   st.markdown("### 🔒 Edição & Versionamento Automático")
   senha = st.text_input("Digite a senha de administrador:", type="password")
 
   if senha == ADMIN_PASSWORD:
     st.success(
-        "🔓 Acesso liberado! Edite os dados na tabela e registre a alteração."
+        "🔓 Acesso liberado! Utilize os filtros abaixo para localizar e editar"
+        " rapidamente qualquer dia ou espaço."
     )
+
+    # Filtros para a tabela de edição
+    col_f1, col_f2 = st.columns(2)
+    with col_f1:
+      edit_filter_dia = st.selectbox(
+          "📅 Filtrar tabela por Dia:", ["Todos"] + todos_dias, index=0
+      )
+    with col_f2:
+      edit_filter_espaco = st.selectbox(
+          "📍 Filtrar tabela por Espaço:", ["Todos"] + todos_espacos, index=0
+      )
+
+    # Prepara sub-conjunto filtrado para edição rápida
+    df_to_edit = df_data.copy()
+    if edit_filter_dia != "Todos":
+      df_to_edit = df_to_edit[df_to_edit["Data"] == edit_filter_dia]
+    if edit_filter_espaco != "Todos":
+      df_to_edit = df_to_edit[df_to_edit["Espaço"] == edit_filter_espaco]
 
     notes = st.text_input(
         "Motivo / Descrição da Alteração (Auditoria):",
         placeholder="Ex: Inclusão do painel SEDUC no dia 31/08",
     )
 
-    edited_df = st.data_editor(
-        df_data,
+    edited_subset = st.data_editor(
+        df_to_edit,
         use_container_width=True,
         num_rows="dynamic",
         column_config={
@@ -715,8 +748,31 @@ with tab_edit:
     )
 
     if st.button("💾 Salvar & Registrar Versão no GitHub"):
-      with st.spinner("Enviando alterações e registrando histórico..."):
-        if commit_changes_to_github(edited_df, notes):
+      with st.spinner("Mesclando alterações e salvando no GitHub..."):
+        # Mescla as alterações feitas no subconjunto de volta ao dataframe principal
+        df_final_save = df_data.copy()
+
+        # Remove as linhas antigas que pertencem aos filtros selecionados e insere as editadas
+        if edit_filter_dia != "Todos" and edit_filter_espaco != "Todos":
+          cond = (df_final_save["Data"] == edit_filter_dia) & (
+              df_final_save["Espaço"] == edit_filter_espaco
+          )
+        elif edit_filter_dia != "Todos":
+          cond = df_final_save["Data"] == edit_filter_dia
+        elif edit_filter_espaco != "Todos":
+          cond = df_final_save["Espaço"] == edit_filter_espaco
+        else:
+          cond = None
+
+        if cond is not None:
+          df_final_save = df_final_save[~cond]
+          df_final_save = pd.concat(
+              [df_final_save, edited_subset], ignore_index=True
+          )
+        else:
+          df_final_save = edited_subset
+
+        if commit_changes_to_github(df_final_save, notes):
           st.success(
               "✅ Arquivo CSV atualizado e novo registro salvo no GitHub!"
           )
@@ -725,3 +781,4 @@ with tab_edit:
 
   elif senha:
     st.error("❌ Senha incorreta.")
+    
