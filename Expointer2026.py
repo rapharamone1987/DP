@@ -10,7 +10,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 
-# 1. Configuração da Página
+# 1. Configuração Inicial da Página
 st.set_page_config(
     page_title="EXPOINTER 2026 — Agenda Institucional",
     page_icon="🌾",
@@ -18,7 +18,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Download e Conversão da Imagem de Fundo para Base64
+# Imagem de Fundo (GitHub Raw)
 URL_RAW_IMG = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/Screenshot_20260825-095320~2.jpg"
 
 
@@ -50,6 +50,14 @@ ORDEM_DIAS = [
     "Outros",
 ]
 
+# Dicionário de Mapeamento dos Espaços para as Abas do Sheets
+space_mapping = {
+    "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
+    "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
+    "Agenda ARENA ESPAÇO GOV": "Arena Espaço Gov",
+    "Agenda BANCADA ESPAÇO GOV": "Bancada Espaço Gov",
+}
+
 
 def clean_time_string(time_str):
   if not time_str or pd.isna(time_str):
@@ -79,7 +87,7 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# CARREGAMENTO E CONSOLIDACÃO AUTOMÁTICA DE TODAS AS GUIAS
+# CARREGAMENTO MULTI-ABAS COM SUPORTE A SPACE_MAPPING
 @st.cache_data(ttl=15)
 def consolidate_all_sheets():
   try:
@@ -97,13 +105,14 @@ def consolidate_all_sheets():
 
       df_raw = df_raw.fillna("").astype(str)
 
+      # Mapeia o Espaço correspondente ao nome da Aba
+      current_espaco = space_mapping.get(sheet_name, sheet_name)
+
       current_data = "A Definir"
       for d in ORDEM_DIAS:
         if d.lower() in sheet_name.lower():
           current_data = d
           break
-
-      current_espaco = sheet_name
 
       for idx, row in df_raw.iterrows():
         row_vals = [
@@ -120,24 +129,12 @@ def consolidate_all_sheets():
             current_data = d
             break
 
-        # Detecta se a linha define um novo Espaço/Local
-        for loc in [
-            "Auditório Administração",
-            "Auditório Espaço Gov",
-            "Arena Espaço Gov",
-            "Bancada Espaço Gov",
-            "FIERGS",
-        ]:
-          if loc.lower() in line_str.lower():
-            current_espaco = loc
-            break
-
         col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
         col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
         col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
         col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
 
-        # Ignora linhas de subcabeçalho
+        # Ignora linhas de cabeçalho
         if col0.lower() in [
             "horário",
             "horario",
@@ -190,16 +187,6 @@ def consolidate_all_sheets():
   except Exception as e:
     st.error(f"⚠️ Erro ao consolidar as abas da planilha: {e}")
     return pd.DataFrame()
-
-
-def save_data_to_google_sheets(updated_df):
-  try:
-    conn = st.connection("gsheets", type=GSheetsConnection)
-    conn.update(data=updated_df)
-    return True
-  except Exception as e:
-    st.error(f"⚠️ Erro ao salvar alterações no Google Sheets: {e}")
-    return False
 
 
 def generate_pdf_report(df_export, doc_title_info):
@@ -320,7 +307,7 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# INJEÇÃO FORÇADA DO FUNDO EM BASE64 SOBREPOSTO AO TEMA DARK
+# INJEÇÃO CSS DO FUNDO
 custom_css = f"""
 <style>
     html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
@@ -599,7 +586,7 @@ with tab_vagos:
                 """
         cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
-# ABA 3: EDIÇÃO DIRETA
+# ABA 3: EDIÇÃO DIRETA E SALVAMENTO ADAPTADO PARA O GOOGLE SHEETS
 with tab_edit:
   st.markdown("### 🔒 Edição Interativa da Grade de Eventos")
   senha = st.text_input("Digite a senha de administrador:", type="password")
@@ -631,11 +618,37 @@ with tab_edit:
         key="editor_sheets",
     )
 
-    if st.button("💾 Salvar Alterações no Google Sheets"):
-      if save_data_to_google_sheets(edited_df):
-        st.success("✅ Google Sheets atualizado com sucesso!")
+    if st.button("💾 Salvar Alterações na Planilha"):
+      try:
+        conn = st.connection("gsheets", type=GSheetsConnection)
+
+        # Agrupa os dados editados por "Espaço" mantendo a lógica de abas
+        for space_name, group in edited_df.groupby("Espaço"):
+          # Busca o nome original da aba via space_mapping ou gera um válido
+          orig_sheet = next(
+              (
+                  k
+                  for k, v in space_mapping.items()
+                  if str(v).lower() == str(space_name).lower()
+              ),
+              f"Agenda {space_name}",
+          )
+          sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
+
+          clean_group = group.copy()
+
+          # Atualiza a aba correspondente no Google Sheets
+          conn.update(worksheet=sheet_title, data=clean_group)
+
+        st.success(
+            "✅ Alterações salvas mantendo todas as abas e espaços no Google"
+            " Sheets!"
+        )
         st.cache_data.clear()
         st.rerun()
+
+      except Exception as e:
+        st.error(f"⚠️ Erro ao salvar as abas no Google Sheets: {e}")
 
   elif senha:
     st.error("❌ Senha incorreta.")
