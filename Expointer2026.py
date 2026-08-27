@@ -21,6 +21,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# Configurações do Repositório GitHub
 GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 FILE_EXCEL_PATH = "Grade Expointer 2026.xlsx"
@@ -94,437 +95,458 @@ TERMOS_IGNORAR = [
     "agenda bancada espaço gov",
 ]
 
+
 def map_sheet_to_space(sheet_name):
-    s = sheet_name.strip().lower()
-    if "admin" in s:
-        return "Auditório Administração"
-    elif "bancada" in s:
-        return "Bancada Espaço Gov"
-    elif "arena" in s:
-        return "Arena Espaço Gov"
-    elif "audit" in s or "gov" in s:
-        return "Auditório Espaço Gov"
-    
-    clean = re.sub(r"^(agenda\s+)?(auditório\s+|arena\s+|bancada\s+)?", "", sheet_name, flags=re.IGNORECASE).strip()
-    return clean.title() if clean else sheet_name
+  s = sheet_name.strip().lower()
+  if "admin" in s:
+    return "Auditório Administração"
+  elif "bancada" in s:
+    return "Bancada Espaço Gov"
+  elif "arena" in s:
+    return "Arena Espaço Gov"
+  elif "audit" in s or "gov" in s:
+    return "Auditório Espaço Gov"
+
+  clean = re.sub(
+      r"^(agenda\s+)?(auditório\s+|arena\s+|bancada\s+)?",
+      "",
+      sheet_name,
+      flags=re.IGNORECASE,
+  ).strip()
+  return clean.title() if clean else sheet_name
+
 
 def detect_day_from_line(line_str):
-    s = line_str.lower()
-    for key, mapped_day in MAPA_RECONHECIMENTO_DIAS.items():
-        if key in s:
-            if "sabado" in key or "sábado" in key:
-                if "05" in s or "5" in s:
-                    return "Sábado 05/09"
-                return "Sábado 29/08"
-            if "domingo" in key:
-                if "06" in s or "6" in s:
-                    return "Domingo 06/09"
-                return "Domingo 30/08"
-            return mapped_day
-    return None
+  s = line_str.lower()
+  for key, mapped_day in MAPA_RECONHECIMENTO_DIAS.items():
+    if key in s:
+      if "sabado" in key or "sábado" in key:
+        if "05" in s or "5" in s:
+          return "Sábado 05/09"
+        return "Sábado 29/08"
+      if "domingo" in key:
+        if "06" in s or "6" in s:
+          return "Domingo 06/09"
+        return "Domingo 30/08"
+      return mapped_day
+  return None
+
 
 @st.cache_data(ttl=3600)
 def load_background_base64(url):
-    try:
-        headers = {"User-Agent": "Mozilla/5.0"}
-        if GITHUB_TOKEN:
-            headers["Authorization"] = f"token {GITHUB_TOKEN}"
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req) as resp:
-            return base64.b64encode(resp.read()).decode("utf-8")
-    except Exception:
-        return ""
+  try:
+    headers = {"User-Agent": "Mozilla/5.0"}
+    if GITHUB_TOKEN:
+      headers["Authorization"] = f"token {GITHUB_TOKEN}"
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req) as resp:
+      return base64.b64encode(resp.read()).decode("utf-8")
+  except Exception:
+    return ""
+
 
 img_b64 = load_background_base64(URL_RAW_IMG)
 
+
 def clean_time_string(time_str):
-    if not time_str or pd.isna(time_str):
-        return ""
-    s = str(time_str).strip()
-    matches = re.findall(r" (?:[01]?\d|2[0-3])[:h][0-5]\d ", s)
-    if matches:
-        formatted = [
-            m.replace("h", ":")
-            if "h" in m
-            else (f"0{m}" if len(m) == 4 and m[1] == ":" else m)
-            for m in matches
-        ]
-        if len(formatted) >= 2:
-            return f"{formatted[0]} - {formatted[1]}"
-        return formatted[0]
-    return s
+  if not time_str or pd.isna(time_str):
+    return ""
+  s = str(time_str).strip()
+  matches = re.findall(r"\b(?:[01]?\d|2[0-3])[:h][0-5]\d\b", s)
+  if matches:
+    formatted = [
+        m.replace("h", ":")
+        if "h" in m
+        else (f"0{m}" if len(m) == 4 and m[1] == ":" else m)
+        for m in matches
+    ]
+    if len(formatted) >= 2:
+      return f"{formatted[0]} - {formatted[1]}"
+    return formatted[0]
+  return s
+
 
 def extract_start_time(horario_str):
-    if not horario_str:
-        return "99:99"
-    match = re.search(r" (?:[01]?\d|2[0-3]):[0-5]\d ", str(horario_str))
-    if match:
-        time_val = match.group(0)
-        return time_val if len(time_val) == 5 else f"0{time_val}"
+  if not horario_str:
     return "99:99"
+  match = re.search(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", str(horario_str))
+  if match:
+    time_val = match.group(0)
+    return time_val if len(time_val) == 5 else f"0{time_val}"
+  return "99:99"
+
 
 def extract_end_time(horario_str):
-    if not horario_str:
-        return ""
-    matches = re.findall(r" (?:[01]?\d|2[0-3]):[0-5]\d ", str(horario_str))
-    if len(matches) >= 2:
-        return matches[1]
-    elif len(matches) == 1:
-        h, m = map(int, matches[0].split(":"))
-        return f"{(h + 1) % 24:02d}:{m:02d}"
+  if not horario_str:
     return ""
+  matches = re.findall(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", str(horario_str))
+  if len(matches) >= 2:
+    return matches[1]
+  elif len(matches) == 1:
+    h, m = map(int, matches[0].split(":"))
+    return f"{(h + 1) % 24:02d}:{m:02d}"
+  return ""
+
 
 def merge_consecutive_events(df):
-    if df.empty:
-        return df
+  if df.empty:
+    return df
 
-    merged_rows = []
-    for (espaco, data), group in df.groupby(["Espaço", "Data"], sort=False):
-        group = group.copy()
-        group["Hora_Start"] = group["Horário"].apply(extract_start_time)
-        group = group.sort_values(by="Hora_Start")
+  merged_rows = []
+  for (espaco, data), group in df.groupby(["Espaço", "Data"], sort=False):
+    group = group.copy()
+    group["Hora_Start"] = group["Horário"].apply(extract_start_time)
+    group = group.sort_values(by="Hora_Start")
 
-        current_event = None
+    current_event = None
 
-        for _, row in group.iterrows():
-            if current_event is None:
-                current_event = dict(row)
-                current_event["Hora_Inicio"] = extract_start_time(row["Horário"])
-                current_event["Hora_Fim"] = extract_end_time(row["Horário"])
-            else:
-                same_theme = current_event["Tema"] == row["Tema"]
-                same_sec = current_event["Secretaria"] == row["Secretaria"]
-                same_resp = current_event["Responsável"] == row["Responsável"]
+    for _, row in group.iterrows():
+      if current_event is None:
+        current_event = dict(row)
+        current_event["Hora_Inicio"] = extract_start_time(row["Horário"])
+        current_event["Hora_Fim"] = extract_end_time(row["Horário"])
+      else:
+        same_theme = current_event["Tema"] == row["Tema"]
+        same_sec = current_event["Secretaria"] == row["Secretaria"]
+        same_resp = current_event["Responsável"] == row["Responsável"]
 
-                if (
-                    same_theme
-                    and same_sec
-                    and same_resp
-                    and row["Tema"] != "🔓 HORÁRIO VAGO"
-                ):
-                    new_end = extract_end_time(row["Horário"])
-                    if new_end:
-                        current_event["Hora_Fim"] = new_end
-                else:
-                    if current_event["Hora_Inicio"] and current_event["Hora_Fim"]:
-                        current_event["Horário"] = (
-                            f"{current_event['Hora_Inicio']} -"
-                            f" {current_event['Hora_Fim']}"
-                        )
-                    merged_rows.append(current_event)
+        if (
+            same_theme
+            and same_sec
+            and same_resp
+            and row["Tema"] != "🔓 HORÁRIO VAGO"
+        ):
+          new_end = extract_end_time(row["Horário"])
+          if new_end:
+            current_event["Hora_Fim"] = new_end
+        else:
+          if current_event["Hora_Inicio"] and current_event["Hora_Fim"]:
+            current_event["Horário"] = (
+                f"{current_event['Hora_Inicio']} -"
+                f" {current_event['Hora_Fim']}"
+            )
+          merged_rows.append(current_event)
 
-                    current_event = dict(row)
-                    current_event["Hora_Inicio"] = extract_start_time(row["Horário"])
-                    current_event["Hora_Fim"] = extract_end_time(row["Horário"])
+          current_event = dict(row)
+          current_event["Hora_Inicio"] = extract_start_time(row["Horário"])
+          current_event["Hora_Fim"] = extract_end_time(row["Horário"])
 
-        if current_event:
-            if current_event["Hora_Inicio"] and current_event["Hora_Fim"]:
-                current_event["Horário"] = (
-                    f"{current_event['Hora_Inicio']} - {current_event['Hora_Fim']}"
-                )
-            merged_rows.append(current_event)
+    if current_event:
+      if current_event["Hora_Inicio"] and current_event["Hora_Fim"]:
+        current_event["Horário"] = (
+            f"{current_event['Hora_Inicio']} - {current_event['Hora_Fim']}"
+        )
+      merged_rows.append(current_event)
 
-    res_df = pd.DataFrame(merged_rows)
-    cols_to_drop = [
-        c for c in ["Hora_Start", "Hora_Inicio", "Hora_Fim"] if c in res_df.columns
-    ]
-    return res_df.drop(columns=cols_to_drop)
+  res_df = pd.DataFrame(merged_rows)
+  cols_to_drop = [
+      c for c in ["Hora_Start", "Hora_Inicio", "Hora_Fim"] if c in res_df.columns
+  ]
+  return res_df.drop(columns=cols_to_drop)
+
 
 @st.cache_data(ttl=15)
 def load_excel_from_github():
-    try:
-        encoded_path = urllib.parse.quote(FILE_EXCEL_PATH)
-        api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
+  try:
+    encoded_path = urllib.parse.quote(FILE_EXCEL_PATH)
+    api_url = (
+        f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
+    )
 
-        headers = {"Accept": "application/vnd.github.v3+json"}
-        if GITHUB_TOKEN:
-            headers["Authorization"] = f"token {GITHUB_TOKEN}"
+    headers = {"Accept": "application/vnd.github.v3+json"}
+    if GITHUB_TOKEN:
+      headers["Authorization"] = f"token {GITHUB_TOKEN}"
 
-        res = requests.get(api_url, headers=headers)
+    res = requests.get(api_url, headers=headers)
+    if res.status_code != 200:
+      return pd.DataFrame()
 
-        if res.status_code == 200:
-            content_b64 = res.json().get("content", "")
-            content_bytes = base64.b64decode(content_b64)
-            excel_file = pd.ExcelFile(io.BytesIO(content_bytes), engine="openpyxl")
+    content_b64 = res.json().get("content", "")
+    sha = res.json().get("sha", "")
+    content_bytes = base64.b64decode(content_b64)
+    excel_file = pd.ExcelFile(io.BytesIO(content_bytes), engine="openpyxl")
+
+    # SE JÁ FOI CONSOLIDADO: Lê direto a tabela única limpa
+    if "Programacao_Consolidada" in excel_file.sheet_names:
+      df_clean = excel_file.parse("Programacao_Consolidada").fillna("")
+      return merge_consecutive_events(df_clean)
+
+    # PRIMEIRA VEZ: Processa as abas originais e limpa o problema do "Arena"
+    todos_eventos = []
+    for sheet_name in excel_file.sheet_names:
+      if "escala" in sheet_name.lower() or "equipe" in sheet_name.lower():
+        continue
+
+      espaco_fixo = map_sheet_to_space(sheet_name)
+      df_sheet = excel_file.parse(sheet_name, header=None).fillna("").astype(str)
+      dia_atual = "Sábado 29/08"
+
+      for _, row in df_sheet.iterrows():
+        vals = [str(v).strip() for v in row.values if str(v).strip() != ""]
+        if not vals:
+          continue
+
+        line_str = " ".join(vals)
+        if any(term in line_str.lower() for term in TERMOS_IGNORAR):
+          continue
+
+        detected_day = detect_day_from_line(line_str)
+        if detected_day:
+          dia_atual = detected_day
+          continue
+
+        col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
+        col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
+        col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
+        col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
+
+        horario_limpo = clean_time_string(col0)
+        if horario_limpo:
+          tema, sec, resp = col1, col2, col3
         else:
-            raw_url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{encoded_path}"
-            raw_req = urllib.request.Request(
-                raw_url,
-                headers={
-                    "Authorization": f"token {GITHUB_TOKEN}"
-                    if GITHUB_TOKEN
-                    else ""
-                },
-            )
-            with urllib.request.urlopen(raw_req) as resp:
-                excel_file = pd.ExcelFile(io.BytesIO(resp.read()), engine="openpyxl")
+          alt_horario = clean_time_string(col1)
+          if alt_horario:
+            horario_limpo = alt_horario
+            tema, sec = col2, col3
+            resp = str(row.values[4]).strip() if len(row.values) > 4 else ""
+          else:
+            continue
 
-        all_events = []
+        tema_clean = tema.strip()
+        is_vago = (
+            not tema_clean
+            or tema_clean.lower()
+            in [
+                "livre",
+                "vago",
+                "disponível",
+                "disponivel",
+                "horário vago",
+                "nan",
+                "none",
+                "",
+                "-",
+            ]
+            or tema_clean.startswith("🔓")
+        )
 
-        for sheet_name in excel_file.sheet_names:
-            if "escala" in sheet_name.lower() or "equipe" in sheet_name.lower():
-                continue
+        todos_eventos.append({
+            "Espaço": espaco_fixo,
+            "Data": dia_atual,
+            "Horário": horario_limpo,
+            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema_clean,
+            "Secretaria": sec.strip() if not is_vago else "",
+            "Responsável": resp.strip() if not is_vago else "",
+        })
 
-            # Mapeamento do espaço FIXO pelo nome da aba
-            sheet_espaco = map_sheet_to_space(sheet_name)
+    df_consolidado = merge_consecutive_events(pd.DataFrame(todos_eventos))
 
-            df_sheet = excel_file.parse(sheet_name, header=None)
-            if df_sheet.empty:
-                continue
+    # GRAVAÇÃO AUTOMÁTICA DA PRIMEIRA VEZ NO GITHUB
+    if GITHUB_TOKEN and not df_consolidado.empty:
+      buffer = io.BytesIO()
+      with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+        df_consolidado.to_excel(
+            writer, sheet_name="Programacao_Consolidada", index=False
+        )
 
-            df_sheet = df_sheet.fillna("").astype(str)
-            current_data = "Sábado 29/08"
+      buffer.seek(0)
+      new_b64 = base64.b64encode(buffer.read()).decode("utf-8")
+      payload = {
+          "message": "Automação: Consolidação inicial em aba única",
+          "content": new_b64,
+          "sha": sha,
+          "branch": "main",
+      }
+      requests.put(api_url, headers=headers, json=payload)
 
-            for idx, row in df_sheet.iterrows():
-                row_vals = [str(v).strip() for v in row.values if str(v).strip() != ""]
-                if not row_vals:
-                    continue
+    return df_consolidado
 
-                line_str = " ".join(row_vals)
-                line_lower = line_str.lower()
+  except Exception as e:
+    st.error(f"⚠️ Erro ao carregar/converter planilha: {e}")
+    return pd.DataFrame()
 
-                # Ignora linhas institucionais e cabeçalhos repetidos
-                if any(term in line_lower for term in TERMOS_IGNORAR):
-                    continue
-
-                detected_day = detect_day_from_line(line_str)
-                if detected_day:
-                    current_data = detected_day
-                    continue
-
-                col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
-                col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
-                col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
-                col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
-
-                horario_limpo = clean_time_string(col0)
-                if horario_limpo:
-                    tema = col1
-                    sec = col2
-                    resp = col3
-                else:
-                    alt_horario = clean_time_string(col1)
-                    if alt_horario:
-                        horario_limpo = alt_horario
-                        tema = col2
-                        sec = col3
-                        resp = str(row.values[4]).strip() if len(row.values) > 4 else ""
-                    else:
-                        continue
-
-                tema_clean = tema.strip()
-                is_vago = (
-                    not tema_clean
-                    or tema_clean.lower()
-                    in [
-                        "livre",
-                        "vago",
-                        "disponível",
-                        "disponivel",
-                        "horário vago",
-                        "horario vago",
-                        "nan",
-                        "none",
-                        "",
-                        "-",
-                        "--",
-                    ]
-                    or tema_clean.startswith("🔓")
-                )
-
-                all_events.append({
-                    "Espaço": sheet_espaco,
-                    "Data": current_data,
-                    "Horário": horario_limpo,
-                    "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema_clean,
-                    "Secretaria": sec.strip() if not is_vago else "",
-                    "Responsável": resp.strip() if not is_vago else "",
-                })
-
-        df_raw = pd.DataFrame(all_events)
-        return merge_consecutive_events(df_raw)
-
-    except Exception as e:
-        st.error(f"⚠️ Erro ao carregar planilha do GitHub: {e}")
-        return pd.DataFrame()
 
 def commit_changes_to_github(updated_df, change_log_notes=""):
-    if not GITHUB_TOKEN:
-        st.error("❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud.")
-        return False
+  if not GITHUB_TOKEN:
+    st.error(
+        "❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud."
+    )
+    return False
 
-    headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json",
+  headers = {
+      "Authorization": f"token {GITHUB_TOKEN}",
+      "Accept": "application/vnd.github.v3+json",
+  }
+
+  timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+  try:
+    excel_buffer = io.BytesIO()
+    with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+      updated_df.to_excel(
+          writer, sheet_name="Programacao_Consolidada", index=False
+      )
+
+    excel_buffer.seek(0)
+    excel_b64 = base64.b64encode(excel_buffer.read()).decode("utf-8")
+
+    encoded_filename = urllib.parse.quote(FILE_EXCEL_PATH)
+    get_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_filename}"
+    res = requests.get(get_file_url, headers=headers)
+    sha = res.json().get("sha", "") if res.status_code == 200 else ""
+
+    update_data = {
+        "message": f"Atualização da grade de eventos ({timestamp})",
+        "content": excel_b64,
+        "branch": "main",
     }
+    if sha:
+      update_data["sha"] = sha
 
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    requests.put(get_file_url, headers=headers, data=json.dumps(update_data))
 
-    try:
-        excel_buffer = io.BytesIO()
-        with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
-            for space_name, group in updated_df.groupby("Espaço"):
-                sheet_title = re.sub(r"[\\/*?:\[\]]", "_", f"Agenda {space_name}")[:31]
-                group.to_excel(writer, sheet_name=sheet_title, index=False)
+    log_content = {
+        "data_alteracao": timestamp,
+        "observacoes": change_log_notes,
+        "total_eventos": len(updated_df),
+        "eventos": updated_df.to_dict(orient="records"),
+    }
+    log_b64 = base64.b64encode(
+        json.dumps(log_content, ensure_ascii=False, indent=2).encode("utf-8")
+    ).decode("utf-8")
 
-        excel_buffer.seek(0)
-        excel_b64 = base64.b64encode(excel_buffer.read()).decode("utf-8")
+    log_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/historico_alteracoes/alteracao_{timestamp}.json"
+    log_data = {
+        "message": f"Registro de histórico de alteração ({timestamp})",
+        "content": log_b64,
+        "branch": "main",
+    }
+    requests.put(log_file_url, headers=headers, data=json.dumps(log_data))
 
-        encoded_filename = urllib.parse.quote(FILE_EXCEL_PATH)
-        get_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_filename}"
-        res = requests.get(get_file_url, headers=headers)
-        sha = res.json().get("sha", "") if res.status_code == 200 else ""
+    return True
 
-        update_data = {
-            "message": f"Atualização da grade de eventos ({timestamp})",
-            "content": excel_b64,
-            "branch": "main",
-        }
-        if sha:
-            update_data["sha"] = sha
+  except Exception as e:
+    st.error(f"⚠️ Erro no commit para o GitHub: {e}")
+    return False
 
-        requests.put(get_file_url, headers=headers, data=json.dumps(update_data))
-
-        log_content = {
-            "data_alteracao": timestamp,
-            "observacoes": change_log_notes,
-            "total_eventos": len(updated_df),
-            "eventos": updated_df.to_dict(orient="records"),
-        }
-        log_b64 = base64.b64encode(
-            json.dumps(log_content, ensure_ascii=False, indent=2).encode("utf-8")
-        ).decode("utf-8")
-
-        log_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/historico_alteracoes/alteracao_{timestamp}.json"
-        log_data = {
-            "message": f"Registro de histórico de alteração ({timestamp})",
-            "content": log_b64,
-            "branch": "main",
-        }
-        requests.put(log_file_url, headers=headers, data=json.dumps(log_data))
-
-        return True
-
-    except Exception as e:
-        st.error(f"⚠️ Erro no commit para o GitHub: {e}")
-        return False
 
 def generate_pdf_report(df_export, doc_title_info):
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=landscape(A4),
-        rightMargin=30,
-        leftMargin=30,
-        topMargin=30,
-        bottomMargin=30,
-    )
-    elements = []
-    styles = getSampleStyleSheet()
+  buffer = io.BytesIO()
+  doc = SimpleDocTemplate(
+      buffer,
+      pagesize=landscape(A4),
+      rightMargin=30,
+      leftMargin=30,
+      topMargin=30,
+      bottomMargin=30,
+  )
+  elements = []
+  styles = getSampleStyleSheet()
 
-    title_style = ParagraphStyle(
-        "DocTitle",
-        parent=styles["Heading1"],
-        fontSize=18,
-        leading=22,
-        textColor=colors.HexColor("#064e3b"),
-        fontName="Helvetica-Bold",
-        spaceAfter=4,
-    )
-    subtitle_style = ParagraphStyle(
-        "DocSubtitle",
-        parent=styles["Normal"],
-        fontSize=11,
-        textColor=colors.HexColor("#15803d"),
-        fontName="Helvetica-Bold",
-        spaceAfter=15,
-    )
-    cell_header_style = ParagraphStyle(
-        "CellHeader",
-        parent=styles["Normal"],
-        fontSize=10,
-        textColor=colors.white,
-        fontName="Helvetica-Bold",
-        alignment=1,
-    )
-    cell_time_style = ParagraphStyle(
-        "CellTime",
-        parent=styles["Normal"],
-        fontSize=8,
-        textColor=colors.HexColor("#15803d"),
-        fontName="Helvetica-Bold",
-    )
-    cell_title_style = ParagraphStyle(
-        "CellTitle",
-        parent=styles["Normal"],
-        fontSize=9,
-        textColor=colors.HexColor("#0f172a"),
-        fontName="Helvetica-Bold",
-        leading=11,
-    )
-    cell_meta_style = ParagraphStyle(
-        "CellMeta",
-        parent=styles["Normal"],
-        fontSize=8,
-        textColor=colors.HexColor("#475569"),
-        fontName="Helvetica",
-    )
+  title_style = ParagraphStyle(
+      "DocTitle",
+      parent=styles["Heading1"],
+      fontSize=18,
+      leading=22,
+      textColor=colors.HexColor("#064e3b"),
+      fontName="Helvetica-Bold",
+      spaceAfter=4,
+  )
+  subtitle_style = ParagraphStyle(
+      "DocSubtitle",
+      parent=styles["Normal"],
+      fontSize=11,
+      textColor=colors.HexColor("#15803d"),
+      fontName="Helvetica-Bold",
+      spaceAfter=15,
+  )
+  cell_header_style = ParagraphStyle(
+      "CellHeader",
+      parent=styles["Normal"],
+      fontSize=10,
+      textColor=colors.white,
+      fontName="Helvetica-Bold",
+      alignment=1,
+  )
+  cell_time_style = ParagraphStyle(
+      "CellTime",
+      parent=styles["Normal"],
+      fontSize=8,
+      textColor=colors.HexColor("#15803d"),
+      fontName="Helvetica-Bold",
+  )
+  cell_title_style = ParagraphStyle(
+      "CellTitle",
+      parent=styles["Normal"],
+      fontSize=9,
+      textColor=colors.HexColor("#0f172a"),
+      fontName="Helvetica-Bold",
+      leading=11,
+  )
+  cell_meta_style = ParagraphStyle(
+      "CellMeta",
+      parent=styles["Normal"],
+      fontSize=8,
+      textColor=colors.HexColor("#475569"),
+      fontName="Helvetica",
+  )
 
-    elements.append(
-        Paragraph(
-            "EXPOINTER 2026 — Programação Institucional - Espaços Gov RS",
-            title_style,
-        )
-    )
-    elements.append(
-        Paragraph(f"Filtro do Relatório: <b>{doc_title_info}</b>", subtitle_style)
-    )
+  elements.append(
+      Paragraph(
+          "EXPOINTER 2026 — Programação Institucional - Espaços Gov RS",
+          title_style,
+      )
+  )
+  elements.append(
+      Paragraph(f"Filtro do Relatório: <b>{doc_title_info}</b>", subtitle_style)
+  )
 
-    table_data = [[
-        Paragraph("Data", cell_header_style),
-        Paragraph("Horário", cell_header_style),
-        Paragraph("Espaço / Auditório", cell_header_style),
-        Paragraph("Atividade / Tema", cell_header_style),
-        Paragraph("Organização / Responsável", cell_header_style),
-    ]]
+  table_data = [[
+      Paragraph("Data", cell_header_style),
+      Paragraph("Horário", cell_header_style),
+      Paragraph("Espaço / Auditório", cell_header_style),
+      Paragraph("Atividade / Tema", cell_header_style),
+      Paragraph("Organização / Responsável", cell_header_style),
+  ]]
 
-    for _, row in df_export.iterrows():
-        resp_str = f" ({row['Responsável']})" if row["Responsável"] else ""
-        org_resp = (
-            f"{row['Secretaria']}{resp_str}"
-            if row["Secretaria"]
-            else row["Responsável"]
-        )
-        table_data.append([
-            Paragraph(f"<b>{row['Data']}</b>", cell_meta_style),
-            Paragraph(row["Horário"], cell_time_style),
-            Paragraph(row["Espaço"], cell_meta_style),
-            Paragraph(row["Tema"], cell_title_style),
-            Paragraph(org_resp if org_resp else "-", cell_meta_style),
-        ])
-
-    t = Table(table_data, colWidths=[90, 80, 130, 320, 160], repeatRows=1)
-    t.setStyle(
-        TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#064e3b")),
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-            ("ALIGN", (0, 0), (-1, -1), "LEFT"),
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-            ("TOPPADDING", (0, 0), (-1, -1), 6),
-            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
-            (
-                "ROWBACKGROUNDS",
-                (0, 1),
-                (-1, -1),
-                [colors.white, colors.HexColor("#f8fafc")],
-            ),
-        ])
+  for _, row in df_export.iterrows():
+    resp_str = f" ({row['Responsável']})" if row["Responsável"] else ""
+    org_resp = (
+        f"{row['Secretaria']}{resp_str}"
+        if row["Secretaria"]
+        else row["Responsável"]
     )
-    elements.append(t)
-    doc.build(elements)
-    buffer.seek(0)
-    return buffer
+    table_data.append([
+        Paragraph(f"<b>{row['Data']}</b>", cell_meta_style),
+        Paragraph(row["Horário"], cell_time_style),
+        Paragraph(row["Espaço"], cell_meta_style),
+        Paragraph(row["Tema"], cell_title_style),
+        Paragraph(org_resp if org_resp else "-", cell_meta_style),
+    ])
+
+  t = Table(table_data, colWidths=[90, 80, 130, 320, 160], repeatRows=1)
+  t.setStyle(
+      TableStyle([
+          ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#064e3b")),
+          ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+          ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+          ("VALIGN", (0, 0), (-1, -1), "TOP"),
+          ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+          ("TOPPADDING", (0, 0), (-1, -1), 6),
+          ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+          (
+              "ROWBACKGROUNDS",
+              (0, 1),
+              (-1, -1),
+              [colors.white, colors.HexColor("#f8fafc")],
+          ),
+      ])
+  )
+  elements.append(t)
+  doc.build(elements)
+  buffer.seek(0)
+  return buffer
+
 
 # ESTILIZAÇÃO CSS
 bg_url_css = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
@@ -633,7 +655,7 @@ banner_html = """
 st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
-    st.stop()
+  st.stop()
 
 # Filtros Globais
 dias_encontrados = [d for d in df_data["Data"].unique() if d]
@@ -649,50 +671,50 @@ todas_sec = sorted([
 
 st.markdown("### 🔍 Pesquisar e Filtrar Programação")
 with st.container():
-    col_busca, col_dias = st.columns([2, 2])
-    with col_busca:
-        busca = st.text_input(
-            "🔎 Palavra-chave:", "", placeholder="Digite um tema ou termo..."
-        )
-    with col_dias:
-        dias_sel = st.multiselect(
-            "📅 Filtrar por Dia(s):",
-            todos_dias,
-            default=[],
-            placeholder="Selecione os dias...",
-        )
+  col_busca, col_dias = st.columns([2, 2])
+  with col_busca:
+    busca = st.text_input(
+        "🔎 Palavra-chave:", "", placeholder="Digite um tema ou termo..."
+    )
+  with col_dias:
+    dias_sel = st.multiselect(
+        "📅 Filtrar por Dia(s):",
+        todos_dias,
+        default=[],
+        placeholder="Selecione os dias...",
+    )
 
-    col_espaco, col_sec = st.columns(2)
-    with col_espaco:
-        espacos_sel = st.multiselect(
-            "📍 Filtrar por Espaço / Auditório:",
-            todos_espacos,
-            default=[],
-            placeholder="Selecione os locais...",
-        )
-    with col_sec:
-        sec_sel = st.multiselect(
-            "🏢 Filtrar por Secretaria / Entidade:",
-            todas_sec,
-            default=[],
-            placeholder="Selecione as entidades...",
-        )
+  col_espaco, col_sec = st.columns(2)
+  with col_espaco:
+    espacos_sel = st.multiselect(
+        "📍 Filtrar por Espaço / Auditório:",
+        todos_espacos,
+        default=[],
+        placeholder="Selecione os locais...",
+    )
+  with col_sec:
+    sec_sel = st.multiselect(
+        "🏢 Filtrar por Secretaria / Entidade:",
+        todas_sec,
+        default=[],
+        placeholder="Selecione as entidades...",
+    )
 
 df_filtered = df_data.copy()
 
 if busca:
-    t = busca.lower()
-    df_filtered = df_filtered[
-        df_filtered["Tema"].astype(str).str.lower().str.contains(t)
-        | df_filtered["Espaço"].astype(str).str.lower().str.contains(t)
-        | df_filtered["Responsável"].astype(str).str.lower().str.contains(t)
-    ]
+  t = busca.lower()
+  df_filtered = df_filtered[
+      df_filtered["Tema"].astype(str).str.lower().str.contains(t)
+      | df_filtered["Espaço"].astype(str).str.lower().str.contains(t)
+      | df_filtered["Responsável"].astype(str).str.lower().str.contains(t)
+  ]
 if dias_sel:
-    df_filtered = df_filtered[df_filtered["Data"].isin(dias_sel)]
+  df_filtered = df_filtered[df_filtered["Data"].isin(dias_sel)]
 if espacos_sel:
-    df_filtered = df_filtered[df_filtered["Espaço"].isin(espacos_sel)]
+  df_filtered = df_filtered[df_filtered["Espaço"].isin(espacos_sel)]
 if sec_sel:
-    df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
+  df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
 
 # Ordenação Cronológica
 df_filtered["Hora_Sort"] = df_filtered["Horário"].apply(extract_start_time)
@@ -709,21 +731,21 @@ df_vagos_totais = df_filtered[df_filtered["Tema"] == "🔓 HORÁRIO VAGO"]
 # Sidebar
 st.sidebar.header("📄 Exportação & Gestão")
 if st.sidebar.button("⚙️ Gerar Relatório PDF"):
-    if not df_agendados.empty:
-        info_str = "Seleção Personalizada"
-        if espacos_sel:
-            info_str = f"Espaços: {', '.join(espacos_sel)}"
-        elif dias_sel:
-            info_str = f"Dias: {', '.join(dias_sel)}"
-        pdf_bytes = generate_pdf_report(df_agendados, info_str)
-        st.sidebar.download_button(
-            label="📥 Baixar PDF da Programação",
-            data=pdf_bytes,
-            file_name="agenda_expointer.pdf",
-            mime="application/pdf",
-        )
-    else:
-        st.sidebar.error("Nenhum evento agendado selecionado.")
+  if not df_agendados.empty:
+    info_str = "Seleção Personalizada"
+    if espacos_sel:
+      info_str = f"Espaços: {', '.join(espacos_sel)}"
+    elif dias_sel:
+      info_str = f"Dias: {', '.join(dias_sel)}"
+    pdf_bytes = generate_pdf_report(df_agendados, info_str)
+    st.sidebar.download_button(
+        label="📥 Baixar PDF da Programação",
+        data=pdf_bytes,
+        file_name="agenda_expointer.pdf",
+        mime="application/pdf",
+    )
+  else:
+    st.sidebar.error("Nenhum evento agendado selecionado.")
 
 st.sidebar.divider()
 
@@ -736,133 +758,133 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
 
 # ABA 1: CALENDÁRIO
 with tab_calendar:
-    dia_grid_sel = st.selectbox(
-        "📆 Destacar dia na grade:",
-        ["Exibir Todos Selecionados"] + todos_dias,
-        index=0,
-    )
-    df_grid = df_agendados.copy()
-    if dia_grid_sel != "Exibir Todos Selecionados":
-        df_grid = df_grid[df_grid["Data"] == dia_grid_sel]
+  dia_grid_sel = st.selectbox(
+      "📆 Destacar dia na grade:",
+      ["Exibir Todos Selecionados"] + todos_dias,
+      index=0,
+  )
+  df_grid = df_agendados.copy()
+  if dia_grid_sel != "Exibir Todos Selecionados":
+    df_grid = df_grid[df_grid["Data"] == dia_grid_sel]
 
-    if df_grid.empty:
-        st.info("Nenhum evento agendado para exibir nesta visão.")
+  if df_grid.empty:
+    st.info("Nenhum evento agendado para exibir nesta visão.")
+  else:
+    dias_unicos = [d for d in ORDEM_DIAS if d in df_grid["Data"].unique()]
+
+    if len(dias_unicos) == 0:
+      st.info("Nenhum dia correspondente para os filtros selecionados.")
     else:
-        dias_unicos = [d for d in ORDEM_DIAS if d in df_grid["Data"].unique()]
+      grid_cols = st.columns(len(dias_unicos))
+      for idx, d in enumerate(dias_unicos):
+        with grid_cols[idx]:
+          st.markdown(
+              f'<div class="cal-header">📅 {d}</div>', unsafe_allow_html=True
+          )
+          evs_dia = df_grid[df_grid["Data"] == d]
+          for _, ev in evs_dia.iterrows():
+            sec_val = (
+                str(ev["Secretaria"]).strip()
+                if pd.notna(ev["Secretaria"])
+                else ""
+            )
+            resp_val = (
+                str(ev["Responsável"]).strip()
+                if pd.notna(ev["Responsável"])
+                else ""
+            )
 
-        if len(dias_unicos) == 0:
-            st.info("Nenhum dia correspondente para os filtros selecionados.")
-        else:
-            grid_cols = st.columns(len(dias_unicos))
-            for idx, d in enumerate(dias_unicos):
-                with grid_cols[idx]:
-                    st.markdown(
-                        f'<div class="cal-header">📅 {d}</div>', unsafe_allow_html=True
-                    )
-                    evs_dia = df_grid[df_grid["Data"] == d]
-                    for _, ev in evs_dia.iterrows():
-                        sec_val = (
-                            str(ev["Secretaria"]).strip()
-                            if pd.notna(ev["Secretaria"])
-                            else ""
-                        )
-                        resp_val = (
-                            str(ev["Responsável"]).strip()
-                            if pd.notna(ev["Responsável"])
-                            else ""
-                        )
+            sec_display = (
+                f'<div style="color:#334155; font-size:0.75rem;'
+                f' font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
+                if sec_val and sec_val.lower() not in ["nan", "none", ""]
+                else ""
+            )
+            resp_display = (
+                f'<div style="color:#475569; font-size:0.75rem;'
+                f' font-weight:500;">👤 {resp_val}</div>'
+                if resp_val and resp_val.lower() not in ["nan", "none", ""]
+                else ""
+            )
 
-                        sec_display = (
-                            f'<div style="color:#334155; font-size:0.75rem;'
-                            f' font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
-                            if sec_val and sec_val.lower() not in ["nan", "none", ""]
-                            else ""
-                        )
-                        resp_display = (
-                            f'<div style="color:#475569; font-size:0.75rem;'
-                            f' font-weight:500;">👤 {resp_val}</div>'
-                            if resp_val and resp_val.lower() not in ["nan", "none", ""]
-                            else ""
-                        )
-
-                        st.markdown(
-                            f"""
-                            <div class="cal-event-box">
-                                <span>⏰ {ev['Horário']}</span>
-                                <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">{ev['Tema']}</div>
-                                <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
-                                {sec_display}
-                                {resp_display}
-                            </div>
-                            """,
-                            unsafe_allow_html=True,
-                        )
+            st.markdown(
+                f"""
+                <div class="cal-event-box">
+                    <span>⏰ {ev['Horário']}</span>
+                    <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">{ev['Tema']}</div>
+                    <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
+                    {sec_display}
+                    {resp_display}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 # ABA 2: HORÁRIOS LIVRES / VAGOS
 with tab_vagos:
-    st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
-    if df_vagos_totais.empty:
-        st.success("🎉 Todos os espaços estão ocupados para o filtro selecionado!")
-    else:
-        st.metric("Total de Horários Disponíveis", len(df_vagos_totais))
-        for data, grupo in df_vagos_totais.groupby("Data", sort=False):
-            st.markdown(f"#### 📅 {data}")
-            cols_vago = st.columns(3)
-            for idx, (_, row) in enumerate(grupo.iterrows()):
-                vago_html = f"""
+  st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
+  if df_vagos_totais.empty:
+    st.success("🎉 Todos os espaços estão ocupados para o filtro selecionado!")
+  else:
+    st.metric("Total de Horários Disponíveis", len(df_vagos_totais))
+    for data, grupo in df_vagos_totais.groupby("Data", sort=False):
+      st.markdown(f"#### 📅 {data}")
+      cols_vago = st.columns(3)
+      for idx, (_, row) in enumerate(grupo.iterrows()):
+        vago_html = f"""
                 <div class="event-card-vago">
                     <span class="card-time-vago">⏰ {row['Horário']}</span>
                     <div style="font-weight:800; font-size:0.95rem; color:#b45309; margin-top:4px;">🔓 HORÁRIO DISPONÍVEL</div>
                     <div style="color:#0369a1; font-weight:800; font-size:0.88rem; margin-top:2px;">📍 {row['Espaço']}</div>
                 </div>
                 """
-                cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
+        cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
 # ABA 3: EDIÇÃO COM VERSIONAMENTO
 with tab_edit:
-    st.markdown("### 🔒 Edição & Versionamento Automático")
-    senha = st.text_input("Digite a senha de administrador:", type="password")
+  st.markdown("### 🔒 Edição & Versionamento Automático")
+  senha = st.text_input("Digite a senha de administrador:", type="password")
 
-    if senha == "expointer2026":
-        st.success(
-            "🔓 Acesso liberado! Edite os dados na tabela e registre a alteração."
-        )
+  if senha == "expointer2026":
+    st.success(
+        "🔓 Acesso liberado! Edite os dados na tabela e registre a alteração."
+    )
 
-        notes = st.text_input(
-            "Motivo / Descrição da Alteração (Auditoria):",
-            placeholder="Ex: Ajuste no horário do painel SEDUC",
-        )
+    notes = st.text_input(
+        "Motivo / Descrição da Alteração (Auditoria):",
+        placeholder="Ex: Ajuste no horário do painel SEDUC",
+    )
 
-        edited_df = st.data_editor(
-            df_data,
-            use_container_width=True,
-            num_rows="dynamic",
-            column_config={
-                "Espaço": st.column_config.SelectboxColumn(
-                    "Espaço / Local", options=todos_espacos, required=True
-                ),
-                "Data": st.column_config.SelectboxColumn(
-                    "Dia", options=ORDEM_DIAS, required=True
-                ),
-                "Horário": st.column_config.TextColumn("Horário", required=True),
-                "Tema": st.column_config.TextColumn(
-                    "Atividade / Tema", required=True
-                ),
-                "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
-                "Responsável": st.column_config.TextColumn("Responsável"),
-            },
-            key="editor_github",
-        )
+    edited_df = st.data_editor(
+        df_data,
+        use_container_width=True,
+        num_rows="dynamic",
+        column_config={
+            "Espaço": st.column_config.SelectboxColumn(
+                "Espaço / Local", options=todos_espacos, required=True
+            ),
+            "Data": st.column_config.SelectboxColumn(
+                "Dia", options=ORDEM_DIAS, required=True
+            ),
+            "Horário": st.column_config.TextColumn("Horário", required=True),
+            "Tema": st.column_config.TextColumn(
+                "Atividade / Tema", required=True
+            ),
+            "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
+            "Responsável": st.column_config.TextColumn("Responsável"),
+        },
+        key="editor_github",
+    )
 
-        if st.button("💾 Salvar & Registrar Versão no GitHub"):
-            with st.spinner("Enviando alterações e registrando histórico..."):
-                if commit_changes_to_github(edited_df, notes):
-                    st.success(
-                        "✅ Planilha atualizada e novo arquivo de histórico registrado"
-                        " no GitHub!"
-                    )
-                    st.cache_data.clear()
-                    st.rerun()
+    if st.button("💾 Salvar & Registrar Versão no GitHub"):
+      with st.spinner("Enviando alterações e registrando histórico..."):
+        if commit_changes_to_github(edited_df, notes):
+          st.success(
+              "✅ Planilha atualizada e novo arquivo de histórico registrado"
+              " no GitHub!"
+          )
+          st.cache_data.clear()
+          st.rerun()
 
-    elif senha:
-        st.error("❌ Senha incorreta.")
+  elif senha:
+    st.error("❌ Senha incorreta.")
