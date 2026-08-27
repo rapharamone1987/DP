@@ -21,9 +21,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# Configurações do Repositório GitHub
 GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
-FILE_EXCEL_PATH = "Grade Expointer 2026.xlsx"
+FILE_CSV_PATH = "Grade Expointer 2026.csv"
 
 URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
 
@@ -38,72 +39,6 @@ ORDEM_DIAS = [
     "Sábado 05/09",
     "Domingo 06/09",
 ]
-
-MAPA_RECONHECIMENTO_DIAS = {
-    "29/08": "Sábado 29/08",
-    "sabado 29": "Sábado 29/08",
-    "sábado 29": "Sábado 29/08",
-    "30/08": "Domingo 30/08",
-    "domingo 30": "Domingo 30/08",
-    "31/08": "Segunda 31/08",
-    "segunda 31": "Segunda 31/08",
-    "segunda": "Segunda 31/08",
-    "01/09": "Terça 01/09",
-    "terca 01": "Terça 01/09",
-    "terça 01": "Terça 01/09",
-    "terca": "Terça 01/09",
-    "terça": "Terça 01/09",
-    "02/09": "Quarta 02/09",
-    "quarta 02": "Quarta 02/09",
-    "quarta": "Quarta 02/09",
-    "03/09": "Quinta 03/09",
-    "quinta 03": "Quinta 03/09",
-    "quinta": "Quinta 03/09",
-    "04/09": "Sexta 04/09",
-    "sexta 04": "Sexta 04/09",
-    "sexta": "Sexta 04/09",
-    "05/09": "Sábado 05/09",
-    "sabado 05": "Sábado 05/09",
-    "sábado 05": "Sábado 05/09",
-    "06/09": "Domingo 06/09",
-    "domingo 06": "Domingo 06/09",
-}
-
-
-def map_sheet_to_space(sheet_name):
-  s = sheet_name.strip().lower()
-  if "admin" in s:
-    return "Auditório Administração"
-  elif "bancada" in s:
-    return "Bancada Espaço Gov"
-  elif "arena" in s:
-    return "Arena Espaço Gov"
-  elif "audit" in s or "gov" in s:
-    return "Auditório Espaço Gov"
-
-  clean = re.sub(
-      r"^(agenda\s+)?(auditório\s+|arena\s+|bancada\s+)?",
-      "",
-      sheet_name,
-      flags=re.IGNORECASE,
-  ).strip()
-  return clean.title() if clean else sheet_name
-
-
-def detect_day_from_line(line_str):
-  s = line_str.lower()
-  for key, mapped_day in MAPA_RECONHECIMENTO_DIAS.items():
-    if key in s:
-      if "sabado" in key or "sábado" in key:
-        if "05" in s or "5" in s:
-          return "Sábado 05/09"
-        return "Sábado 29/08"
-      if "domingo" in key:
-        if "06" in s or "6" in s:
-          return "Domingo 06/09"
-        return "Domingo 30/08"
-      return mapped_day
-  return None
 
 
 @st.cache_data(ttl=3600)
@@ -220,9 +155,9 @@ def merge_consecutive_events(df):
 
 
 @st.cache_data(ttl=15)
-def load_excel_from_github():
+def load_csv_from_github():
   try:
-    encoded_path = urllib.parse.quote(FILE_EXCEL_PATH)
+    encoded_path = urllib.parse.quote(FILE_CSV_PATH)
     api_url = (
         f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
     )
@@ -233,131 +168,97 @@ def load_excel_from_github():
 
     res = requests.get(api_url, headers=headers)
     if res.status_code != 200:
-      st.error(f"⚠️ Erro HTTP ao buscar arquivo no GitHub: {res.status_code}")
+      st.error(
+          f"⚠️ Erro HTTP {res.status_code} ao buscar arquivo CSV no GitHub."
+      )
       return pd.DataFrame()
 
     content_b64 = res.json().get("content", "")
     content_bytes = base64.b64decode(content_b64)
-    excel_file = pd.ExcelFile(io.BytesIO(content_bytes), engine="openpyxl")
 
-    # Se já existir uma aba limpa e válida chamada Programacao_Consolidada
-    if "Programacao_Consolidada" in excel_file.sheet_names:
-      df_clean = excel_file.parse("Programacao_Consolidada")
+    # Tenta ler CSV com autodetecção de delimitador (vírgula ou ponto e vírgula)
+    try:
+      df_csv = pd.read_csv(
+          io.BytesIO(content_bytes), sep=None, engine="python", dtype=str
+      ).fillna("")
+    except Exception:
+      df_csv = pd.read_csv(
+          io.BytesIO(content_bytes), sep=";", dtype=str
+      ).fillna("")
 
-      # Garante nomes corretos das colunas
-      df_clean.columns = [str(c).strip() for c in df_clean.columns]
-      cols_esperadas = [
-          "Espaço",
-          "Data",
-          "Horário",
-          "Tema",
-          "Secretaria",
-          "Responsável",
-      ]
+    # Normalização de nomes de colunas
+    df_csv.columns = [str(c).strip().title() for c in df_csv.columns]
 
-      if all(col in df_clean.columns for col in cols_esperadas):
-        # Remove eventuais linhas onde a própria palavra "Espaço" ou "Horário" foi gravada como dado
-        df_clean = df_clean[df_clean["Espaço"] != "Espaço"]
-        df_clean = df_clean[df_clean["Horário"] != "Horário"]
-        return merge_consecutive_events(df_clean.fillna(""))
+    # Mapeia variações de cabeçalho
+    renames = {}
+    for col in df_csv.columns:
+      c_lower = col.lower()
+      if "espaco" in c_lower or "espaço" in c_lower or "local" in c_lower:
+        renames[col] = "Espaço"
+      elif "data" in c_lower or "dia" in c_lower:
+        renames[col] = "Data"
+      elif "horario" in c_lower or "horário" in c_lower or "hora" in c_lower:
+        renames[col] = "Horário"
+      elif "tema" in c_lower or "atividade" in c_lower or "evento" in c_lower:
+        renames[col] = "Tema"
+      elif "secretaria" in c_lower or "entidade" in c_lower:
+        renames[col] = "Secretaria"
+      elif "responsavel" in c_lower or "responsável" in c_lower:
+        renames[col] = "Responsável"
 
-    # Lê todas as abas normais do Excel
-    todos_eventos = []
-    for sheet_name in excel_file.sheet_names:
+    df_csv = df_csv.rename(columns=renames)
+
+    # Garante a presença de todas as colunas necessárias
+    cols_necessarias = [
+        "Espaço",
+        "Data",
+        "Horário",
+        "Tema",
+        "Secretaria",
+        "Responsável",
+    ]
+    for col in cols_necessarias:
+      if col not in df_csv.columns:
+        df_csv[col] = ""
+
+    df_csv = df_csv[cols_necessarias]
+
+    # Limpeza de linhas inválidas ou vaziamente preenchidas
+    df_csv = df_csv[
+        (df_csv["Espaço"].str.strip() != "")
+        | (df_csv["Horário"].str.strip() != "")
+    ]
+
+    # Trata horários e identifica horários vagos
+    df_csv["Horário"] = df_csv["Horário"].apply(clean_time_string)
+
+    def ajustar_vago(row):
+      t = str(row["Tema"]).strip()
       if (
-          "escala" in sheet_name.lower()
-          or "equipe" in sheet_name.lower()
-          or sheet_name == "Programacao_Consolidada"
+          not t
+          or t.lower()
+          in [
+              "livre",
+              "vago",
+              "disponível",
+              "disponivel",
+              "horário vago",
+              "nan",
+              "none",
+              "",
+              "-",
+          ]
+          or t.startswith("🔓")
       ):
-        continue
+        return "🔓 HORÁRIO VAGO"
+      return t
 
-      espaco_fixo = map_sheet_to_space(sheet_name)
-      df_sheet = excel_file.parse(sheet_name, header=None).fillna("").astype(str)
-      dia_atual = "Sábado 29/08"
+    df_csv["Tema"] = df_csv.apply(ajustar_vago, axis=1)
 
-      for _, row in df_sheet.iterrows():
-        vals = [str(v).strip() for v in row.values if str(v).strip() != ""]
-        if not vals:
-          continue
-
-        line_str = " ".join(vals)
-        line_lower = line_str.lower().strip()
-
-        # Descartar cabeçalhos soltos nas células
-        if any(
-            t in line_lower
-            for t in [
-                "características do espaço",
-                "paz no campo",
-                "pavilhão internacional",
-                "estande de governo",
-            ]
-        ):
-          continue
-
-        detected_day = detect_day_from_line(line_str)
-        if detected_day:
-          dia_atual = detected_day
-          continue
-
-        col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
-        col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
-        col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
-        col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
-
-        # Ignorar linhas com títulos de coluna
-        if col0.lower() in [
-            "horario",
-            "horário",
-            "hora",
-            "espaço",
-            "espaço / local",
-        ]:
-          continue
-
-        horario_limpo = clean_time_string(col0)
-        if horario_limpo:
-          tema, sec, resp = col1, col2, col3
-        else:
-          alt_horario = clean_time_string(col1)
-          if alt_horario:
-            horario_limpo = alt_horario
-            tema, sec = col2, col3
-            resp = str(row.values[4]).strip() if len(row.values) > 4 else ""
-          else:
-            continue
-
-        tema_clean = tema.strip()
-        is_vago = (
-            not tema_clean
-            or tema_clean.lower()
-            in [
-                "livre",
-                "vago",
-                "disponível",
-                "disponivel",
-                "horário vago",
-                "nan",
-                "none",
-                "",
-                "-",
-            ]
-            or tema_clean.startswith("🔓")
-        )
-
-        todos_eventos.append({
-            "Espaço": espaco_fixo,
-            "Data": dia_atual,
-            "Horário": horario_limpo,
-            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema_clean,
-            "Secretaria": sec.strip() if not is_vago else "",
-            "Responsável": resp.strip() if not is_vago else "",
-        })
-
-    return merge_consecutive_events(pd.DataFrame(todos_eventos))
+    return merge_consecutive_events(df_csv)
 
   except Exception as e:
-    st.error(f"⚠️ Falha ao ler arquivo Excel: {e}")
+    st.error(f"⚠️ Erro ao processar o CSV do GitHub: {e}")
     return pd.DataFrame()
 
 
@@ -376,23 +277,20 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
   timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
   try:
-    excel_buffer = io.BytesIO()
-    with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
-      updated_df.to_excel(
-          writer, sheet_name="Programacao_Consolidada", index=False
-      )
+    csv_buffer = io.StringIO()
+    updated_df.to_csv(csv_buffer, index=False)
+    csv_b64 = base64.b64encode(csv_buffer.getvalue().encode("utf-8")).decode(
+        "utf-8"
+    )
 
-    excel_buffer.seek(0)
-    excel_b64 = base64.b64encode(excel_buffer.read()).decode("utf-8")
-
-    encoded_filename = urllib.parse.quote(FILE_EXCEL_PATH)
+    encoded_filename = urllib.parse.quote(FILE_CSV_PATH)
     get_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_filename}"
     res = requests.get(get_file_url, headers=headers)
     sha = res.json().get("sha", "") if res.status_code == 200 else ""
 
     update_data = {
-        "message": f"Atualização da grade de eventos ({timestamp})",
-        "content": excel_b64,
+        "message": f"Atualização da grade CSV ({timestamp})",
+        "content": csv_b64,
         "branch": "main",
     }
     if sha:
@@ -646,12 +544,13 @@ banner_html = """
 """
 st.markdown(banner_html, unsafe_allow_html=True)
 
-# Carregamento dos dados
-df_data = load_excel_from_github()
+# Carregamento dos dados via CSV
+df_data = load_csv_from_github()
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado foi carregado da planilha. Verifique o arquivo no GitHub."
+      "⚠️ Nenhum dado foi carregado. Verifique o arquivo 'Grade Expointer 2026.csv'"
+      " no GitHub."
   )
   st.stop()
 
@@ -878,8 +777,7 @@ with tab_edit:
       with st.spinner("Enviando alterações e registrando histórico..."):
         if commit_changes_to_github(edited_df, notes):
           st.success(
-              "✅ Planilha atualizada e novo arquivo de histórico registrado"
-              " no GitHub!"
+              "✅ Arquivo CSV atualizado e novo registro salvo no GitHub!"
           )
           st.cache_data.clear()
           st.rerun()
