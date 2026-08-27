@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# NOME DO ARQUIVO DE IMAGEM NO REPOSITÓRIO E ENCODING CORRETO DO ~ (%7E)
+# IMAGEM DE FUNDO DO GITHUB (URL CODIFICADA COM %7E)
 FILE_NAME = "Screenshot_20260825-095320~2.jpg"
 FILE_NAME_ENCODED = urllib.parse.quote(FILE_NAME)
 URL_IMAGEM_FUNDO = f"https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/{FILE_NAME_ENCODED}"
@@ -64,7 +64,7 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# Leitura com desestruturação de colunas limpas
+# LEITURA UNIVERSAL E REORGANIZAÇÃO COMPLETA DAS COLUNAS
 @st.cache_data(ttl=10)
 def load_data_from_google_sheets():
   try:
@@ -74,10 +74,9 @@ def load_data_from_google_sheets():
     if df is None or df.empty:
       return pd.DataFrame()
 
-    df = df.dropna(how="all").fillna("")
+    df = df.fillna("")
 
-    # Identificação por padrões
-    cols = list(df.columns)
+    # Mapeamento dinâmico buscando nomes de colunas por conteúdo ou posição
     col_espaco, col_data, col_horario, col_tema, col_sec, col_resp = (
         None,
         None,
@@ -87,27 +86,28 @@ def load_data_from_google_sheets():
         None,
     )
 
-    for c in cols:
-      c_clean = str(c).strip().lower()
-      if "espaço" in c_clean or "espaco" in c_clean or "local" in c_clean:
+    for c in df.columns:
+      c_str = str(c).strip().lower()
+      if any(k in c_str for k in ["espaço", "espaco", "local", "auditório"]):
         col_espaco = c
-      elif "data" in c_clean or "dia" in c_clean:
+      elif any(k in c_str for k in ["data", "dia"]):
         col_data = c
-      elif "horário" in c_clean or "horario" in c_clean or "hora" in c_clean:
+      elif any(k in c_str for k in ["horário", "horario", "hora"]):
         col_horario = c
-      elif (
-          "tema" in c_clean
-          or "atividade" in c_clean
-          or "evento" in c_clean
-          or "programação" in c_clean
+      elif any(
+          k in c_str
+          for k in ["tema", "atividade", "evento", "programação", "titulo"]
       ):
         col_tema = c
-      elif "secretaria" in c_clean or "entidade" in c_clean or "org" in c_clean:
+      elif any(
+          k in c_str
+          for k in ["secretaria", "entidade", "org", "órgão", "orgao"]
+      ):
         col_sec = c
-      elif "responsável" in c_clean or "responsavel" in c_clean:
+      elif any(k in c_str for k in ["responsável", "responsavel", "contato"]):
         col_resp = c
 
-    # Fallback posicional
+    cols = list(df.columns)
     if not col_espaco and len(cols) > 0:
       col_espaco = cols[0]
     if not col_data and len(cols) > 1:
@@ -130,9 +130,11 @@ def load_data_from_google_sheets():
       sec = str(row.get(col_sec, "")).strip()
       resp = str(row.get(col_resp, "")).strip()
 
+      # Pula repetições de cabeçalhos
       if (
           horario_raw.lower() in ["horário", "horario", "hora"]
-          or data.lower() == "data"
+          or data.lower() in ["data", "dia"]
+          or tema.lower() in ["tema", "atividade"]
       ):
         continue
 
@@ -140,6 +142,7 @@ def load_data_from_google_sheets():
       if not horario_limpo:
         horario_limpo = horario_raw
 
+      # Se o tema for vazio/vago
       is_vago = (
           not tema
           or tema.lower()
@@ -147,16 +150,21 @@ def load_data_from_google_sheets():
           or tema.startswith("🔓")
       )
 
+      # Se a linha não tiver dados válidos mínimos de horário/tema/espaço, pula
+      if not horario_limpo and not tema and not espaco:
+        continue
+
       df_clean.append({
-          "Espaço": espaco,
-          "Data": data,
-          "Horário": horario_limpo,
+          "Espaço": espaco if espaco else "Espaço Geral",
+          "Data": data if data else "A Definir",
+          "Horário": horario_limpo if horario_limpo else "--:--",
           "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
           "Secretaria": sec if not is_vago else "",
           "Responsável": resp if not is_vago else "",
       })
 
-    return pd.DataFrame(df_clean)
+    res_df = pd.DataFrame(df_clean)
+    return res_df
 
   except Exception as e:
     st.error(f"⚠️ Erro ao carregar dados do Google Sheets: {e}")
@@ -291,17 +299,15 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO CSS FORÇADA COM SOBREPOSIÇÃO DE DARK MODE E APLICAÇÃO DE CARDS
+# ESTILIZAÇÃO CSS FORÇADA COM IMAGEM DE FUNDO E CABEÇALHOS VERDES
 custom_css = f"""
 <style>
-    /* Imagem de Fundo em toda a Aplicação */
     html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
         background: url("{URL_IMAGEM_FUNDO}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
-    /* Card Principal */
     .header-banner {{
         background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(21, 128, 61, 0.95) 100%), url("{URL_IMAGEM_FUNDO}") no-repeat center center !important;
         background-size: cover !important;
@@ -321,7 +327,6 @@ custom_css = f"""
         text-shadow: 0 2px 5px rgba(0,0,0,0.8);
     }}
 
-    /* Cabeçalho Verde das Colunas de Dias */
     .cal-header {{
         background-color: #064e3b !important;
         color: #ffffff !important;
@@ -335,7 +340,6 @@ custom_css = f"""
         border: 1px solid #15803d;
     }}
 
-    /* Caixas de Eventos */
     .cal-event-box {{
         background-color: rgba(255, 255, 255, 0.96) !important;
         border: 1px solid #cbd5e1 !important;
@@ -389,7 +393,7 @@ if df_data.empty:
   )
   st.stop()
 
-# Mapeamento de Dias Encontrados
+# Filtros e Mapeamentos
 dias_encontrados = [
     d
     for d in df_data["Data"].unique()
@@ -501,7 +505,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição Direta do App",
 ])
 
-# ABA 1: CALENDÁRIO COM CABEÇALHO CORRETO DE DIAS
+# ABA 1: CALENDÁRIO COM CABEÇALHOS CORRETOS
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -515,18 +519,16 @@ with tab_calendar:
   if df_grid.empty:
     st.info("Nenhum evento agendado para exibir nesta visão.")
   else:
-    dias_para_exibir = [
-        d for d in todos_dias if d in df_grid["Data"].unique()
-    ]
-    num_dias = len(dias_para_exibir)
+    # Agrupa por Data ou Exibe por Colunas de Dias
+    dias_unicos = [d for d in todos_dias if d in df_grid["Data"].unique()]
 
-    if num_dias == 0:
+    if len(dias_unicos) == 0:
       st.info("Nenhum dia correspondente para os filtros selecionados.")
     else:
-      grid_cols = st.columns(num_dias)
-      for idx, d in enumerate(dias_para_exibir):
+      grid_cols = st.columns(len(dias_unicos))
+      for idx, d in enumerate(dias_unicos):
         with grid_cols[idx]:
-          # Renderização explícita da Data da Coluna
+          # CABEÇALHO DO DIA EM CADA COLUNA
           st.markdown(
               f'<div class="cal-header">📅 {d}</div>', unsafe_allow_html=True
           )
