@@ -2,9 +2,9 @@ import base64
 import datetime
 import io
 import json
-import re
 import urllib.parse
 import pandas as pd
+
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -24,13 +24,8 @@ GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 ADMIN_PASSWORD = st.secrets.get("ADMIN_PASSWORD", "expointer2026")
 
-if ADMIN_PASSWORD == "expointer2026":
-  st.warning(
-      "Usando senha admin padrão embutida. Considere configurar ADMIN_PASSWORD"
-      " em st.secrets."
-  )
-
-FILE_CSV_PATH = "Grade Expointer 2026.csv"
+# Nome exato do novo arquivo CSV padronizado
+FILE_CSV_PATH = "Grade Expointer.csv"
 
 URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
 
@@ -45,18 +40,6 @@ ORDEM_DIAS = [
     "Sábado 05/09",
     "Domingo 06/09",
 ]
-
-MAPA_DIAS = {
-    "29/08": "Sábado 29/08",
-    "30/08": "Domingo 30/08",
-    "31/08": "Segunda 31/08",
-    "01/09": "Terça 01/09",
-    "02/09": "Quarta 02/09",
-    "03/09": "Quinta 03/09",
-    "04/09": "Sexta 04/09",
-    "05/09": "Sábado 05/09",
-    "06/09": "Domingo 06/09",
-}
 
 
 @st.cache_data(ttl=3600)
@@ -76,134 +59,7 @@ def load_background_base64(url):
 img_b64 = load_background_base64(URL_RAW_IMG)
 
 
-def clean_time_string(time_str):
-  if not time_str or pd.isna(time_str):
-    return ""
-  s = str(time_str).strip()
-  matches = re.findall(r"\b(?:[01]?\d|2[0-3])[:h][0-5]\d\b", s)
-  if matches:
-    formatted = [
-        m.replace("h", ":")
-        if "h" in m
-        else (f"0{m}" if len(m) == 4 and m[1] == ":" else m)
-        for m in matches
-    ]
-    if len(formatted) >= 2:
-      return f"{formatted[0]} - {formatted[1]}"
-    return formatted[0]
-  return s
-
-
-def extract_start_time(horario_str):
-  if not horario_str:
-    return "99:99"
-  match = re.search(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", str(horario_str))
-  if match:
-    time_val = match.group(0)
-    return time_val if len(time_val) == 5 else f"0{time_val}"
-  return "99:99"
-
-
-def extract_end_time(horario_str):
-  if not horario_str:
-    return ""
-  matches = re.findall(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", str(horario_str))
-  if len(matches) >= 2:
-    return matches[1]
-  elif len(matches) == 1:
-    try:
-      h, m = map(int, matches[0].split(":"))
-      return f"{(h + 1) % 24:02d}:{m:02d}"
-    except Exception:
-      return ""
-  return ""
-
-
-def detect_space_from_string(text):
-  if not text:
-    return None
-  t = str(text).lower()
-  if "admin" in t:
-    return "Auditório Administração"
-  elif "bancada" in t:
-    return "Bancada Espaço Gov"
-  elif "arena" in t:
-    return "Arena Espaço Gov"
-  elif "audit" in t or "espaço gov" in t or "espaco gov" in t:
-    return "Auditório Espaço Gov"
-  return None
-
-
-def detect_day_from_string(text):
-  if not text:
-    return None
-  t = str(text).lower()
-  for key, full_day in MAPA_DIAS.items():
-    if key in t:
-      return full_day
-  for d in ORDEM_DIAS:
-    if d.lower() in t:
-      return d
-  return None
-
-
-def merge_consecutive_events(df):
-  if df.empty:
-    return df
-
-  merged_rows = []
-  for (espaco, data), group in df.groupby(["Espaço", "Data"], sort=False):
-    group = group.copy()
-    group["Hora_Start"] = group["Horário"].apply(extract_start_time)
-    group = group.sort_values(by="Hora_Start")
-
-    current_event = None
-
-    for _, row in group.iterrows():
-      if current_event is None:
-        current_event = dict(row)
-        current_event["Hora_Inicio"] = extract_start_time(row["Horário"])
-        current_event["Hora_Fim"] = extract_end_time(row["Horário"])
-      else:
-        same_theme = current_event.get("Tema") == row.get("Tema")
-        same_sec = current_event.get("Secretaria") == row.get("Secretaria")
-        same_resp = current_event.get("Responsável") == row.get("Responsável")
-
-        if (
-            same_theme
-            and same_sec
-            and same_resp
-            and row.get("Tema") != "🔓 HORÁRIO VAGO"
-        ):
-          new_end = extract_end_time(row["Horário"])
-          if new_end:
-            current_event["Hora_Fim"] = new_end
-        else:
-          if current_event.get("Hora_Inicio") and current_event.get("Hora_Fim"):
-            current_event["Horário"] = (
-                f"{current_event['Hora_Inicio']} -"
-                f" {current_event['Hora_Fim']}"
-            )
-          merged_rows.append(current_event)
-
-          current_event = dict(row)
-          current_event["Hora_Inicio"] = extract_start_time(row["Horário"])
-          current_event["Hora_Fim"] = extract_end_time(row["Horário"])
-
-    if current_event:
-      if current_event.get("Hora_Inicio") and current_event.get("Hora_Fim"):
-        current_event["Horário"] = (
-            f"{current_event['Hora_Inicio']} - {current_event['Hora_Fim']}"
-        )
-      merged_rows.append(current_event)
-
-  res_df = pd.DataFrame(merged_rows)
-  cols_to_drop = [
-      c for c in ["Hora_Start", "Hora_Inicio", "Hora_Fim"] if c in res_df.columns
-  ]
-  return res_df.drop(columns=cols_to_drop)
-
-
+# 2. Leitura Direta e Rápida do CSV Padronizado
 @st.cache_data(ttl=15)
 def load_csv_from_github():
   try:
@@ -218,7 +74,10 @@ def load_csv_from_github():
 
     res = requests.get(api_url, headers=headers, timeout=15)
     if not res.ok:
-      st.error(f"⚠️ Erro HTTP {res.status_code} ao buscar arquivo no GitHub.")
+      st.error(
+          f"⚠️ Erro HTTP {res.status_code} ao buscar '{FILE_CSV_PATH}' no"
+          " GitHub."
+      )
       return pd.DataFrame()
 
     content_b64 = res.json().get("content", "")
@@ -227,120 +86,31 @@ def load_csv_from_github():
 
     content_bytes = base64.b64decode(content_b64)
 
-    text = ""
-    for enc in ["utf-8-sig", "utf-8", "latin1", "cp1252"]:
-      try:
-        text = content_bytes.decode(enc)
-        if "Ã" in text or "¡" in text:
-          text = (
-              text.encode("latin1", errors="ignore")
-              .decode("utf-8", errors="ignore")
-          )
-        break
-      except Exception:
-        continue
+    # Leitura direta do CSV com separador ';' e codificação UTF-8
+    df = pd.read_csv(
+        io.BytesIO(content_bytes), sep=";", encoding="utf-8-sig", dtype=str
+    )
+    df = df.fillna("")
 
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    # Normalização de horários vagos
+    df["Tema"] = df["Tema"].apply(
+        lambda x: "🔓 HORÁRIO VAGO"
+        if not str(x).strip()
+        or str(x).strip().lower() in ["vago", "livre", "nan", "none", "", "-"]
+        else str(x).strip()
+    )
 
-    current_space = "Auditório Espaço Gov"
-    current_day = "Sábado 29/08"
-    eventos = []
-
-    for line in lines:
-      clean_line = line.replace('"', "").strip()
-
-      space_check = detect_space_from_string(clean_line)
-      if space_check and not clean_time_string(clean_line):
-        current_space = space_check
-
-      day_check = detect_day_from_string(clean_line)
-      if day_check and not clean_time_string(clean_line):
-        current_day = day_check
-        continue
-
-      parts = (
-          [p.strip() for p in clean_line.split(";")]
-          if ";" in clean_line
-          else [p.strip() for p in clean_line.split(",")]
-      )
-
-      idx_h = -1
-      horario_limpo = ""
-      for idx, p in enumerate(parts):
-        h = clean_time_string(p)
-        if h and p.lower() not in [
-            "horario",
-            "horário",
-            "hora",
-            "horã¡jrio",
-            "horã¡rio",
-        ]:
-          horario_limpo = h
-          idx_h = idx
-          break
-
-      if idx_h == -1:
-        continue
-
-      tema = parts[idx_h + 1] if len(parts) > idx_h + 1 else ""
-      sec = parts[idx_h + 2] if len(parts) > idx_h + 2 else ""
-      resp = parts[idx_h + 3] if len(parts) > idx_h + 3 else ""
-
-      if tema.lower() in [
-          "tema",
-          "atividade",
-          "evento",
-          "descrição",
-          "descricao",
-      ]:
-        continue
-
-      is_vago = (
-          not tema
-          or tema.lower()
-          in [
-              "livre",
-              "vago",
-              "disponível",
-              "disponivel",
-              "horário vago",
-              "nan",
-              "none",
-              "",
-              "-",
-          ]
-          or tema.startswith("🔓")
-      )
-
-      eventos.append({
-          "Espaço": current_space,
-          "Data": current_day,
-          "Horário": horario_limpo,
-          "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-          "Secretaria": sec if not is_vago else "",
-          "Responsável": resp if not is_vago else "",
-      })
-
-    df_final = pd.DataFrame(eventos)
-    if df_final.empty:
-      st.error(
-          "⚠️ O CSV foi lido, mas nenhum evento com horário válido foi"
-          " encontrado."
-      )
-      return pd.DataFrame()
-
-    return merge_consecutive_events(df_final)
+    return df
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao processar o CSV: {e}")
+    st.error(f"⚠️ Erro ao carregar arquivo CSV: {e}")
     return pd.DataFrame()
 
 
+# 3. Commit de Alterações de Volta para o GitHub
 def commit_changes_to_github(updated_df, change_log_notes=""):
   if not GITHUB_TOKEN:
-    st.error(
-        "❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud."
-    )
+    st.error("❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud.")
     return False
 
   headers = {
@@ -351,13 +121,11 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
   timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
   try:
-    repo_api = f"https://api.github.com/repos/{GITHUB_REPO}"
-    repo_res = requests.get(repo_api, headers=headers, timeout=10)
-    default_branch = (
-        repo_res.json().get("default_branch", "main")
-        if repo_res.ok
-        else "main"
-    )
+    encoded_filename = urllib.parse.quote(FILE_CSV_PATH)
+    get_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_filename}"
+    res = requests.get(get_file_url, headers=headers, timeout=10)
+
+    sha = res.json().get("sha", "") if res.ok else ""
 
     csv_buffer = io.StringIO()
     updated_df.to_csv(csv_buffer, index=False, sep=";")
@@ -365,16 +133,10 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
         "utf-8"
     )
 
-    encoded_filename = urllib.parse.quote(FILE_CSV_PATH)
-    get_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_filename}"
-    res = requests.get(get_file_url, headers=headers, timeout=10)
-
-    sha = res.json().get("sha", "") if res.ok else ""
-
     update_data = {
-        "message": f"Atualização da grade CSV ({timestamp})",
+        "message": f"Atualização de grade via App ({timestamp})",
         "content": csv_b64,
-        "branch": default_branch,
+        "branch": "main",
     }
     if sha:
       update_data["sha"] = sha
@@ -383,44 +145,36 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
         get_file_url, headers=headers, json=update_data, timeout=15
     )
     if not res_put.ok:
-      st.error(
-          f"Falha ao atualizar '{FILE_CSV_PATH}' no GitHub:"
-          f" {res_put.status_code} - {res_put.text}"
-      )
+      st.error(f"Falha ao atualizar arquivo no GitHub: {res_put.text}")
       return False
 
-    max_events_for_log = 2000
-    eventos_for_log = updated_df.to_dict(orient="records")
-    truncated_msg = (
-        f" (truncated: original {len(updated_df)} eventos)"
-        if len(eventos_for_log) > max_events_for_log
-        else ""
-    )
-    if len(eventos_for_log) > max_events_for_log:
-      eventos_for_log = eventos_for_log[:1000]
-
+    # Registro de Histórico de Auditoria em JSON
     log_content = {
         "data_alteracao": timestamp,
-        "observacoes": change_log_notes + truncated_msg,
-        "total_eventos": len(updated_df),
-        "eventos": eventos_for_log,
+        "observacoes": change_log_notes,
+        "total_linhas": len(updated_df),
+        "eventos": updated_df.to_dict(orient="records"),
     }
     log_b64 = base64.b64encode(
         json.dumps(log_content, ensure_ascii=False, indent=2).encode("utf-8")
     ).decode("utf-8")
 
     log_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/historico_alteracoes/alteracao_{timestamp}.json"
-    log_data = {
-        "message": f"Registro de histórico de alteração ({timestamp})",
-        "content": log_b64,
-        "branch": default_branch,
-    }
-    requests.put(log_file_url, headers=headers, json=log_data, timeout=15)
+    requests.put(
+        log_file_url,
+        headers=headers,
+        json={
+            "message": f"Histórico de alteração ({timestamp})",
+            "content": log_b64,
+            "branch": "main",
+        },
+        timeout=15,
+    )
 
     return True
 
   except Exception as e:
-    st.error(f"⚠️ Erro no commit para o GitHub: {e}")
+    st.error(f"⚠️ Erro ao salvar alterações no GitHub: {e}")
     return False
 
 
@@ -649,8 +403,8 @@ df_data = load_csv_from_github()
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado foi carregado. Verifique o arquivo 'Grade Expointer 2026.csv'"
-      " no GitHub."
+      "⚠️ Nenhum dado foi carregado. Verifique o arquivo 'Grade Expointer.csv' no"
+      " GitHub."
   )
   st.stop()
 
@@ -711,14 +465,6 @@ if espacos_sel:
   df_filtered = df_filtered[df_filtered["Espaço"].isin(espacos_sel)]
 if sec_sel:
   df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
-
-df_filtered["Hora_Sort"] = df_filtered["Horário"].apply(extract_start_time)
-df_filtered["Data_Cat"] = pd.Categorical(
-    df_filtered["Data"], categories=ORDEM_DIAS, ordered=True
-)
-df_filtered = df_filtered.sort_values(
-    by=["Data_Cat", "Hora_Sort"]
-).drop(columns=["Data_Cat", "Hora_Sort"])
 
 df_agendados = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
 df_vagos_totais = df_filtered[df_filtered["Tema"] == "🔓 HORÁRIO VAGO"]
@@ -845,7 +591,7 @@ with tab_edit:
 
     notes = st.text_input(
         "Motivo / Descrição da Alteração (Auditoria):",
-        placeholder="Ex: Ajuste no horário do painel SEDUC",
+        placeholder="Ex: Inclusão do painel SEDUC no dia 31/08",
     )
 
     edited_df = st.data_editor(
