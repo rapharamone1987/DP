@@ -21,8 +21,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Configurações do Repositório GitHub
-GITHUB_REPO = st.secrets.get("GITHUB_REPO", "raphaelsilveiraduarte/dp")
+# Repositório GitHub
+GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 FILE_EXCEL_PATH = "Grade Expointer 2026.xlsx"
 
@@ -95,7 +95,75 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# CARREGAMENTO DO EXCEL VIA GITHUB API AUTENTICADA
+def extract_end_time(horario_str):
+  if not horario_str:
+    return ""
+  matches = re.findall(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", str(horario_str))
+  if len(matches) >= 2:
+    return matches[1]
+  elif len(matches) == 1:
+    # Se só tem hora inicial (ex: 09:00), estima término de 1h
+    h, m = map(int, matches[0].split(":"))
+    return f"{(h + 1) % 24:02d}:{m:02d}"
+  return ""
+
+
+# AGRUPAMENTO DE HORÁRIOS SUBSEQUENTES
+def merge_consecutive_events(df):
+  if df.empty:
+    return df
+
+  merged_rows = []
+  # Agrupa por Espaço, Data e Tema/Secretaria/Responsável
+  for (espaco, data), group in df.groupby(["Espaço", "Data"], sort=False):
+    group = group.copy()
+    group["Hora_Start"] = group["Horário"].apply(extract_start_time)
+    group = group.sort_values(by="Hora_Start")
+
+    current_event = None
+
+    for _, row in group.iterrows():
+      if current_event is None:
+        current_event = dict(row)
+        current_event["Hora_Inicio"] = extract_start_time(row["Horário"])
+        current_event["Hora_Fim"] = extract_end_time(row["Horário"])
+      else:
+        # Verifica se é o mesmo evento continuado
+        same_theme = current_event["Tema"] == row["Tema"]
+        same_sec = current_event["Secretaria"] == row["Secretaria"]
+        same_resp = current_event["Responsável"] == row["Responsável"]
+
+        if same_theme and same_sec and same_resp:
+          # Atualiza a hora final estendida
+          new_end = extract_end_time(row["Horário"])
+          if new_end:
+            current_event["Hora_Fim"] = new_end
+        else:
+          # Finaliza o evento anterior e formata o horário
+          if current_event["Hora_Inicio"] and current_event["Hora_Fim"]:
+            current_event["Horário"] = (
+                f"{current_event['Hora_Inicio']} -"
+                f" {current_event['Hora_Fim']}"
+            )
+          merged_rows.append(current_event)
+
+          current_event = dict(row)
+          current_event["Hora_Inicio"] = extract_start_time(row["Horário"])
+          current_event["Hora_Fim"] = extract_end_time(row["Horário"])
+
+    if current_event:
+      if current_event["Hora_Inicio"] and current_event["Hora_Fim"]:
+        current_event["Horário"] = (
+            f"{current_event['Hora_Inicio']} - {current_event['Hora_Fim']}"
+        )
+      merged_rows.append(current_event)
+
+  res_df = pd.DataFrame(merged_rows)
+  cols_to_drop = [c for c in ["Hora_Start", "Hora_Inicio", "Hora_Fim"] if c in res_df.columns]
+  return res_df.drop(columns=cols_to_drop)
+
+
+# CARREGAMENTO DO EXCEL IGNORANDO 'ESCALAS EQUIPE'
 @st.cache_data(ttl=15)
 def load_excel_from_github():
   try:
@@ -113,7 +181,6 @@ def load_excel_from_github():
       content_bytes = base64.b64decode(content_b64)
       excel_file = pd.ExcelFile(io.BytesIO(content_bytes), engine="openpyxl")
     else:
-      # Tenta via URL Raw autenticada se a API falhar
       raw_url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{encoded_path}"
       raw_req = urllib.request.Request(
           raw_url,
@@ -131,6 +198,10 @@ def load_excel_from_github():
     all_events = []
 
     for sheet_name in excel_file.sheet_names:
+      # IGNORA A ABA DE ESCALAS/EQUIPE
+      if "escala" in sheet_name.lower() or "equipe" in sheet_name.lower():
+        continue
+
       df_sheet = excel_file.parse(sheet_name, header=None)
       if df_sheet.empty:
         continue
@@ -203,14 +274,14 @@ def load_excel_from_github():
             "Responsável": resp if not is_vago else "",
         })
 
-    return pd.DataFrame(all_events)
+    df_raw = pd.DataFrame(all_events)
+    return merge_consecutive_events(df_raw)
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao acessar '{FILE_EXCEL_PATH}' no GitHub: {e}")
+    st.error(f"⚠️ Erro ao carregar planilha do GitHub: {e}")
     return pd.DataFrame()
 
 
-# COMMIT E VERSIONAMENTO VIA API DO GITHUB
 def commit_changes_to_github(updated_df, change_log_notes=""):
   if not GITHUB_TOKEN:
     st.error(
@@ -401,27 +472,26 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO CSS
-css_bg_clause = (
-    f'background: url("{bg_style}") no-repeat center center fixed !important;'
-    ' background-size: cover !important;'
-    if bg_style
-    else "background-color: #f8fafc !important;"
-)
+# ESTILIZAÇÃO COM OPACIDADE E IMAGEM DE FUNDO NO BANNER
+bg_url_css = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 custom_css = f"""
 <style>
-    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
-        {css_bg_clause}
+    /* Fundo geral com Overlay/Opacidade suave */
+    .stApp {{
+        background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), url("{bg_url_css}") no-repeat center center fixed !important;
+        background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
+    /* Card/Banner Inicial com Imagem de Fundo Integrada */
     .header-banner {{
-        background: linear-gradient(135deg, rgba(6, 78, 59, 0.93) 0%, rgba(21, 128, 61, 0.93) 100%) !important;
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.88) 0%, rgba(21, 128, 61, 0.88) 100%), url("{bg_url_css}") no-repeat center center !important;
+        background-size: cover !important;
         border-radius: 16px;
-        padding: 30px 20px;
+        padding: 35px 20px;
         text-align: center;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
         margin-bottom: 24px;
         border-bottom: 5px solid #eab308;
     }}
@@ -431,7 +501,7 @@ custom_css = f"""
         font-weight: 900 !important;
         color: #ffffff !important;
         margin: 0 !important;
-        text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        text-shadow: 0 3px 6px rgba(0,0,0,0.9);
     }}
 
     .cal-header {{
@@ -681,7 +751,7 @@ with tab_vagos:
                 """
         cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
-# ABA 3: EDIÇÃO COM VERSIONAMENTO NO GITHUB
+# ABA 3: EDIÇÃO COM VERSIONAMENTO
 with tab_edit:
   st.markdown("### 🔒 Edição & Versionamento Automático")
   senha = st.text_input("Digite a senha de administrador:", type="password")
