@@ -7,7 +7,6 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
 
 # 1. Configuração da Página
 st.set_page_config(
@@ -16,6 +15,10 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+# ID ÚNICO DA SUA PLANILHA NO GOOGLE SHEETS
+SHEET_ID = "1WfuAKCRfdGx2jPV_Y0bJYDfolRCJTqyE"
+CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
 ORDEM_DIAS = [
     "Sábado 29/08",
@@ -59,31 +62,25 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# Leitura com st.connection nativo do Streamlit
-@st.cache_data(ttl=60)
-def load_data_from_sheets():
+# Leitura Ultra-Rápida e Sem Erros via CSV Publicado
+@st.cache_data(ttl=30)
+def load_data_from_google_sheets():
   try:
-    conn = st.connection("gsheets", type=GSheetsConnection)
-    df = conn.read(ttl=60)
-
-    if df is None or df.empty:
-      return pd.DataFrame(
-          columns=[
-              "Espaço",
-              "Data",
-              "Horário",
-              "Tema",
-              "Secretaria",
-              "Responsável",
-          ]
-      )
-
+    df = pd.read_csv(CSV_URL)
     df = df.dropna(how="all").fillna("")
 
+    # Mapeamento e limpeza
     df_clean = []
     for idx, row in df.iterrows():
-      horario_raw = str(row.get("Horário", "")).strip()
-      tema = str(row.get("Tema", "")).strip()
+      # Garante leitura das colunas independentemente do nome
+      cols = [str(c) for c in row.values]
+
+      horario_raw = str(row.get("Horário", cols[2] if len(cols) > 2 else "")).strip()
+      tema = str(row.get("Tema", cols[3] if len(cols) > 3 else "")).strip()
+      espaco = str(row.get("Espaço", cols[0] if len(cols) > 0 else "")).strip()
+      data = str(row.get("Data", cols[1] if len(cols) > 1 else "")).strip()
+      sec = str(row.get("Secretaria", cols[4] if len(cols) > 4 else "")).strip()
+      resp = str(row.get("Responsável", cols[5] if len(cols) > 5 else "")).strip()
 
       if any(
           d.lower() in horario_raw.lower()
@@ -127,33 +124,19 @@ def load_data_from_sheets():
         )
 
         df_clean.append({
-            "Espaço": str(row.get("Espaço", "")).strip(),
-            "Data": str(row.get("Data", "")).strip(),
+            "Espaço": espaco,
+            "Data": data,
             "Horário": horario_limpo,
             "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-            "Secretaria": str(row.get("Secretaria", "")).strip()
-            if not is_vago
-            else "",
-            "Responsável": str(row.get("Responsável", "")).strip()
-            if not is_vago
-            else "",
+            "Secretaria": sec if not is_vago else "",
+            "Responsável": resp if not is_vago else "",
         })
 
     return pd.DataFrame(df_clean)
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao conectar ao Google Sheets: {e}")
+    st.error(f"⚠️ Erro ao carregar dados do Google Sheets: {e}")
     return pd.DataFrame()
-
-
-def save_data_to_sheets(df_to_save):
-  try:
-    conn = st.connection("gsheets", type=GSheetsConnection)
-    conn.update(data=df_to_save)
-    return True
-  except Exception as e:
-    st.error(f"⚠️ Erro ao salvar no Google Sheets: {e}")
-    return False
 
 
 def generate_pdf_report(df_export, doc_title_info):
@@ -292,21 +275,21 @@ custom_css = """
 st.markdown(custom_css, unsafe_allow_html=True)
 
 # Carregamento dos dados
-df_data = load_data_from_sheets()
+df_data = load_data_from_google_sheets()
 
 # Banner
 banner_html = """
 <div class="header-banner">
     <div class="header-logo-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
-    <div class="header-subtitle">Painel Interativo de Eventos & Gestão Conectado ao Google Sheets</div>
+    <div class="header-subtitle">Painel Interativo de Eventos & Gestão de Horários</div>
 </div>
 """
 st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Verifique as configurações de secrets do"
-      " Google Sheets."
+      "⚠️ Nenhum dado carregado. Verifique se a planilha está aberta para leitura"
+      " pública."
   )
   st.stop()
 
@@ -405,7 +388,7 @@ st.sidebar.divider()
 tab_calendar, tab_vagos, tab_edit = st.tabs([
     "📅 Visão Calendário",
     "🔓 Horários Livres / Vagos",
-    "🔒 Área de Edição (Google Sheets)",
+    "🔒 Edição & Visualização",
 ])
 
 # ABA 1: CALENDÁRIO
@@ -485,43 +468,19 @@ with tab_vagos:
                 """
         cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
-# ABA 3: EDIÇÃO GOOGLE SHEETS
+# ABA 3: EDIÇÃO E LINK DIRETO
 with tab_edit:
-  st.markdown("### 🔒 Edição Direta no Google Sheets")
-  senha = st.text_input("Digite a senha de administrador:", type="password")
+  st.markdown("### 🔒 Gestão & Edição da Planilha")
+  st.info(
+      "Como os dados estão sincronizados em tempo real, as edições devem ser"
+      " feitas diretamente no Google Sheets para evitar conflitos."
+  )
 
-  if senha == "expointer2026":
-    st.success(
-        "🔓 Acesso liberado! Edições salvas aqui serão gravadas diretamente no"
-        " Google Sheets."
-    )
+  st.link_button(
+      "🔗 Abrir Planilha Oficial no Google Sheets",
+      f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit",
+  )
 
-    edited_df = st.data_editor(
-        df_data,
-        use_container_width=True,
-        num_rows="dynamic",
-        column_config={
-            "Espaço": st.column_config.SelectboxColumn(
-                "Espaço / Local", options=todos_espacos, required=True
-            ),
-            "Data": st.column_config.SelectboxColumn(
-                "Dia", options=todos_dias, required=True
-            ),
-            "Horário": st.column_config.TextColumn("Horário", required=True),
-            "Tema": st.column_config.TextColumn(
-                "Atividade / Tema (ou 🔓 HORÁRIO VAGO)", required=True
-            ),
-            "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
-            "Responsável": st.column_config.TextColumn("Responsável"),
-        },
-        key="editor_sheets",
-    )
-
-    if st.button("💾 Salvar Diretamente no Google Sheets"):
-      if save_data_to_sheets(edited_df):
-        st.success("✅ Google Sheets atualizado com sucesso!")
-        st.cache_data.clear()
-        st.rerun()
-
-  elif senha:
-    st.error("❌ Senha incorreta.")
+  st.divider()
+  st.markdown("#### Tabela de Dados Atualizada em Tempo Real")
+  st.dataframe(df_data, use_container_width=True)
