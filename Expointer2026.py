@@ -1,4 +1,3 @@
-import base64
 import io
 import re
 import pandas as pd
@@ -7,6 +6,7 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
 import streamlit as st
+from streamlit_gsheets import GSheetsConnection
 
 # 1. Configuração da Página
 st.set_page_config(
@@ -16,12 +16,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# LINK DA IMAGEM DE FUNDO DO SEU REPOSITÓRIO NO GITHUB
+# Imagem de fundo do repositório
 URL_IMAGEM_FUNDO = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/bg_expointer.jpg"
-
-# NOVO ID DA PLANILHA DO GOOGLE SHEETS
-SHEET_ID = "1y8wAIYxyVYc0dzc6rI1om24vVc1FZKc3SNPPr7e-Pkg"
-CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv"
 
 ORDEM_DIAS = [
     "Sábado 29/08",
@@ -65,12 +61,14 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# Leitura Estável via Google Visualization API CSV
+# Leitura via GSheetsConnection (Privada/Autenticada)
 @st.cache_data(ttl=15)
 def load_data_from_google_sheets():
   try:
-    df = pd.read_csv(CSV_URL)
-    if df.empty:
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    df = conn.read(ttl=15)
+
+    if df is None or df.empty:
       return pd.DataFrame()
 
     df = df.dropna(how="all").fillna("")
@@ -150,6 +148,17 @@ def load_data_from_google_sheets():
   except Exception as e:
     st.error(f"⚠️ Erro ao carregar dados do Google Sheets: {e}")
     return pd.DataFrame()
+
+
+# Gravação Direta no Google Sheets via App
+def save_data_to_google_sheets(updated_df):
+  try:
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    conn.update(data=updated_df)
+    return True
+  except Exception as e:
+    st.error(f"⚠️ Erro ao salvar alterações no Google Sheets: {e}")
+    return False
 
 
 def generate_pdf_report(df_export, doc_title_info):
@@ -270,7 +279,7 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# Estilização CSS com Imagem do GitHub no Fundo
+# Estilização CSS com Imagem no Fundo
 custom_css = f"""
 <style>
     .stApp {{
@@ -347,7 +356,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # Carregamento dos dados
 df_data = load_data_from_google_sheets()
 
-# Banner Principal Sem o Subtítulo
+# Banner Principal
 banner_html = """
 <div class="header-banner">
     <div class="header-logo-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
@@ -357,8 +366,8 @@ st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Certifique-se de que a planilha está pública em"
-      " 'Compartilhar' -> 'Qualquer pessoa com o link'."
+      "⚠️ Nenhum dado carregado. Verifique as configurações de secrets do"
+      " Google Sheets no Streamlit Cloud."
   )
   st.stop()
 
@@ -460,7 +469,7 @@ st.sidebar.divider()
 tab_calendar, tab_vagos, tab_edit = st.tabs([
     "📅 Visão Calendário",
     "🔓 Horários Livres / Vagos",
-    "🔒 Edição & Visualização",
+    "🔒 Edição Direta do App",
 ])
 
 # ABA 1: CALENDÁRIO
@@ -550,19 +559,43 @@ with tab_vagos:
                 """
         cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
-# ABA 3: EDIÇÃO E LINK DIRETO
+# ABA 3: EDIÇÃO DIRETA DENTRO DO APP
 with tab_edit:
-  st.markdown("### 🔒 Gestão & Edição da Planilha")
-  st.info(
-      "Como os dados estão sincronizados em tempo real, as edições devem ser"
-      " feitas diretamente no Google Sheets."
-  )
+  st.markdown("### 🔒 Edição Interativa da Grade de Eventos")
+  senha = st.text_input("Digite a senha de administrador:", type="password")
 
-  st.link_button(
-      "🔗 Abrir Planilha Oficial no Google Sheets",
-      f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit",
-  )
+  if senha == "expointer2026":
+    st.success(
+        "🔓 Acesso liberado! Edite os dados na tabela abaixo e clique no botão"
+        " para salvar na planilha."
+    )
 
-  st.divider()
-  st.markdown("#### Tabela de Dados Carregada")
-  st.dataframe(df_data, use_container_width=True)
+    edited_df = st.data_editor(
+        df_data,
+        use_container_width=True,
+        num_rows="dynamic",
+        column_config={
+            "Espaço": st.column_config.SelectboxColumn(
+                "Espaço / Local", options=todos_espacos, required=True
+            ),
+            "Data": st.column_config.SelectboxColumn(
+                "Dia", options=ORDEM_DIAS, required=True
+            ),
+            "Horário": st.column_config.TextColumn("Horário", required=True),
+            "Tema": st.column_config.TextColumn(
+                "Atividade / Tema", required=True
+            ),
+            "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
+            "Responsável": st.column_config.TextColumn("Responsável"),
+        },
+        key="editor_sheets",
+    )
+
+    if st.button("💾 Salvar Alterações no Google Sheets"):
+      if save_data_to_google_sheets(edited_df):
+        st.success("✅ Google Sheets atualizado com sucesso!")
+        st.cache_data.clear()
+        st.rerun()
+
+  elif senha:
+    st.error("❌ Senha incorreta.")
