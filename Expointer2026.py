@@ -2,9 +2,9 @@ import base64
 import datetime
 import io
 import json
+import re
 import urllib.parse
 import pandas as pd
-
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -24,9 +24,7 @@ GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 ADMIN_PASSWORD = st.secrets.get("ADMIN_PASSWORD", "expointer2026")
 
-# Nome exato do novo arquivo CSV padronizado
 FILE_CSV_PATH = "Grade Expointer.csv"
-
 URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
 
 ORDEM_DIAS = [
@@ -59,7 +57,7 @@ def load_background_base64(url):
 img_b64 = load_background_base64(URL_RAW_IMG)
 
 
-# 2. Leitura Direta e Rápida do CSV Padronizado
+# 2. Leitura e Processamento do CSV
 @st.cache_data(ttl=15)
 def load_csv_from_github():
   try:
@@ -86,13 +84,11 @@ def load_csv_from_github():
 
     content_bytes = base64.b64decode(content_b64)
 
-    # Leitura direta do CSV com separador ';' e codificação UTF-8
     df = pd.read_csv(
         io.BytesIO(content_bytes), sep=";", encoding="utf-8-sig", dtype=str
     )
     df = df.fillna("")
 
-    # Normalização de horários vagos
     df["Tema"] = df["Tema"].apply(
         lambda x: "🔓 HORÁRIO VAGO"
         if not str(x).strip()
@@ -107,7 +103,95 @@ def load_csv_from_github():
     return pd.DataFrame()
 
 
-# 3. Commit de Alterações de Volta para o GitHub
+# Funções Auxiliares para Agrupamento e Ordenação
+def extract_time_val(time_str):
+  """Extrai o horário inicial como int (ex: '09:30' -> 930) para ordenação precisa."""
+  if not time_str:
+    return 9999
+  m = re.search(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", str(time_str))
+  if m:
+    h, mins = m.group(0).split(":")
+    return int(h) * 100 + int(mins)
+  return 9999
+
+
+def merge_consecutive_events(df):
+  """Consolida horários subsequentes para eventos idênticos (mesmo Espaço, Data, Tema, Secretaria e Responsável)."""
+  if df.empty:
+    return df
+
+  merged_rows = []
+
+  # Agrupa por Espaço e Data mantendo ordem
+  for (espaco, data), group in df.groupby(["Espaço", "Data"], sort=False):
+    # Garante ordenação cronológica antes de agrupar
+    group = group.copy()
+    group["Time_Key"] = group["Horário"].apply(extract_time_val)
+    group = group.sort_values(by="Time_Key")
+
+    current_event = None
+
+    for _, row in group.iterrows():
+      if current_event is None:
+        current_event = dict(row)
+        current_event["Hora_Inicio"] = str(row["Horário"]).strip()
+        current_event["Hora_Fim"] = str(row["Horário"]).strip()
+      else:
+        same_theme = (
+            str(current_event.get("Tema")).strip().lower()
+            == str(row.get("Tema")).strip().lower()
+        )
+        same_sec = (
+            str(current_event.get("Secretaria")).strip().lower()
+            == str(row.get("Secretaria")).strip().lower()
+        )
+        same_resp = (
+            str(current_event.get("Responsável")).strip().lower()
+            == str(row.get("Responsável")).strip().lower()
+        )
+        not_vago = row.get("Tema") != "🔓 HORÁRIO VAGO"
+
+        if same_theme and same_sec and same_resp and not_vago:
+          current_event["Hora_Fim"] = str(row["Horário"]).strip()
+        else:
+          # Formata o intervalo final
+          if (
+              current_event["Hora_Inicio"]
+              and current_event["Hora_Fim"]
+              and current_event["Hora_Inicio"] != current_event["Hora_Fim"]
+          ):
+            current_event["Horário"] = (
+                f"{current_event['Hora_Inicio']} - {current_event['Hora_Fim']}"
+            )
+          else:
+            current_event["Horário"] = current_event["Hora_Inicio"]
+
+          merged_rows.append(current_event)
+
+          current_event = dict(row)
+          current_event["Hora_Inicio"] = str(row["Horário"]).strip()
+          current_event["Hora_Fim"] = str(row["Horário"]).strip()
+
+    if current_event:
+      if (
+          current_event["Hora_Inicio"]
+          and current_event["Hora_Fim"]
+          and current_event["Hora_Inicio"] != current_event["Hora_Fim"]
+      ):
+        current_event["Horário"] = (
+            f"{current_event['Hora_Inicio']} - {current_event['Hora_Fim']}"
+        )
+      else:
+        current_event["Horário"] = current_event["Hora_Inicio"]
+
+      merged_rows.append(current_event)
+
+  res_df = pd.DataFrame(merged_rows)
+  cols_to_drop = [c for c in ["Time_Key", "Hora_Inicio", "Hora_Fim"] if c in res_df.columns]
+  return res_df.drop(columns=cols_to_drop)
+
+
+# 3. Commit de Alterações para o GitHub
 def commit_changes_to_github(updated_df, change_log_notes=""):
   if not GITHUB_TOKEN:
     st.error("❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud.")
@@ -148,7 +232,6 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
       st.error(f"Falha ao atualizar arquivo no GitHub: {res_put.text}")
       return False
 
-    # Registro de Histórico de Auditoria em JSON
     log_content = {
         "data_alteracao": timestamp,
         "observacoes": change_log_notes,
@@ -477,7 +560,8 @@ if st.sidebar.button("⚙️ Gerar Relatório PDF"):
       info_str = f"Espaços: {', '.join(espacos_sel)}"
     elif dias_sel:
       info_str = f"Dias: {', '.join(dias_sel)}"
-    pdf_bytes = generate_pdf_report(df_agendados, info_str)
+    df_pdf = merge_consecutive_events(df_agendados)
+    pdf_bytes = generate_pdf_report(df_pdf, info_str)
     st.sidebar.download_button(
         label="📥 Baixar PDF da Programação",
         data=pdf_bytes,
@@ -509,7 +593,10 @@ with tab_calendar:
   if df_grid.empty:
     st.info("Nenhum evento agendado para exibir nesta visão.")
   else:
-    dias_unicos = [d for d in ORDEM_DIAS if d in df_grid["Data"].unique()]
+    # 1. Aplica a consolidação de eventos consecutivos para cada Espaço e Dia
+    df_grid_merged = merge_consecutive_events(df_grid)
+
+    dias_unicos = [d for d in ORDEM_DIAS if d in df_grid_merged["Data"].unique()]
 
     if len(dias_unicos) == 0:
       st.info("Nenhum dia correspondente para os filtros selecionados.")
@@ -520,7 +607,12 @@ with tab_calendar:
           st.markdown(
               f'<div class="cal-header">📅 {d}</div>', unsafe_allow_html=True
           )
-          evs_dia = df_grid[df_grid["Data"] == d]
+          evs_dia = df_grid_merged[df_grid_merged["Data"] == d].copy()
+          
+          # 2. Garante ordenação cronológica estrita crescente no dia
+          evs_dia["Order_Key"] = evs_dia["Horário"].apply(extract_time_val)
+          evs_dia = evs_dia.sort_values(by="Order_Key")
+
           for _, ev in evs_dia.iterrows():
             sec_val = (
                 str(ev["Secretaria"]).strip()
@@ -566,7 +658,14 @@ with tab_vagos:
     st.success("🎉 Todos os espaços estão ocupados para o filtro selecionado!")
   else:
     st.metric("Total de Horários Disponíveis", len(df_vagos_totais))
-    for data, grupo in df_vagos_totais.groupby("Data", sort=False):
+    
+    # Ordena também os horários vagos cronologicamente
+    df_vagos_sorted = df_vagos_totais.copy()
+    df_vagos_sorted["Order_Key"] = df_vagos_sorted["Horário"].apply(extract_time_val)
+    df_vagos_sorted = df_vagos_sorted.sort_values(by="Order_Key")
+
+    for data in [d for d in ORDEM_DIAS if d in df_vagos_sorted["Data"].unique()]:
+      grupo = df_vagos_sorted[df_vagos_sorted["Data"] == data]
       st.markdown(f"#### 📅 {data}")
       cols_vago = st.columns(3)
       for idx, (_, row) in enumerate(grupo.iterrows()):
