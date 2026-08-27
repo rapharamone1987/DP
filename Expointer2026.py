@@ -16,12 +16,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# LINK RAW DA SUA IMAGEM NO GITHUB
+# LINK DA IMAGEM DE FUNDO DO SEU REPOSITÓRIO NO GITHUB
 URL_IMAGEM_FUNDO = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/bg_expointer.jpg"
 
-# ID DA PLANILHA NO GOOGLE SHEETS
-SHEET_ID = "1WfuAKCRfdGx2jPV_Y0bJYDfolRCJTqyE"
-CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
+# NOVO ID DA PLANILHA DO GOOGLE SHEETS
+SHEET_ID = "1y8wAIYxyVYc0dzc6rI1om24vVc1FZKc3SNPPr7e-Pkg"
+CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv"
 
 ORDEM_DIAS = [
     "Sábado 29/08",
@@ -65,7 +65,7 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# Leitura Flexível do CSV
+# Leitura Estável via Google Visualization API CSV
 @st.cache_data(ttl=15)
 def load_data_from_google_sheets():
   try:
