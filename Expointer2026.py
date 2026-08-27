@@ -177,7 +177,7 @@ def load_csv_from_github():
     content_b64 = res.json().get("content", "")
     content_bytes = base64.b64decode(content_b64)
 
-    # Decodificação flexível de enconding e delimitador
+    # Decodificação adaptativa
     df_raw = None
     for enc in ["utf-8-sig", "utf-8", "latin1", "cp1252"]:
       for sep in [";", ",", "\t"]:
@@ -203,24 +203,30 @@ def load_csv_from_github():
 
     df_raw = df_raw.fillna("").astype(str)
 
-    # Tenta descobrir se a primeira linha é cabeçalho
+    # Verifica se a primeira linha traz nomes de colunas
     primeira_linha = [str(x).lower().strip() for x in df_raw.iloc[0].values]
     tem_cabecalho = any(
         k in " ".join(primeira_linha)
-        for k in ["espaço", "espaco", "horario", "horário", "tema", "data"]
+        for k in [
+            "espaço",
+            "espaco",
+            "horario",
+            "horário",
+            "tema",
+            "data",
+            "secretaria",
+        ]
     )
 
     if tem_cabecalho:
-      # Promove a primeira linha a cabeçalho
-      headers_line = [str(x).strip() for x in df_raw.iloc[0].values]
-      df_data_rows = df_raw.iloc[1:].copy()
-      df_data_rows.columns = headers_line
+      df_data = df_raw.iloc[1:].copy()
+      df_data.columns = [str(x).strip() for x in df_raw.iloc[0].values]
     else:
-      df_data_rows = df_raw.copy()
+      df_data = df_raw.copy()
 
-    # Mapeamento de Colunas
+    # Mapeamento flexível das colunas pelo nome
     col_map = {}
-    for c in df_data_rows.columns:
+    for c in df_data.columns:
       c_str = str(c).lower().strip()
       if "espaco" in c_str or "espaço" in c_str or "local" in c_str:
         col_map[c] = "Espaço"
@@ -228,20 +234,34 @@ def load_csv_from_github():
         col_map[c] = "Data"
       elif "horario" in c_str or "horário" in c_str or "hora" in c_str:
         col_map[c] = "Horário"
-      elif "tema" in c_str or "atividade" in c_str or "evento" in c_str:
+      elif (
+          "tema" in c_str
+          or "atividade" in c_str
+          or "evento" in c_str
+          or "descrição" in c_str
+          or "descricao" in c_str
+      ):
         col_map[c] = "Tema"
-      elif "secretaria" in c_str or "entidade" in c_str:
+      elif (
+          "secretaria" in c_str
+          or "entidade" in c_str
+          or "órgão" in c_str
+          or "orgao" in c_str
+      ):
         col_map[c] = "Secretaria"
       elif "responsavel" in c_str or "responsável" in c_str:
         col_map[c] = "Responsável"
 
-    df_mapped = df_data_rows.rename(columns=col_map)
+    df_mapped = df_data.rename(columns=col_map)
 
-    # Se faltaram colunas nomeadas, extrai por posição posicional
-    eventos_extraidos = []
+    eventos = []
     for _, row in df_mapped.iterrows():
-      vals = [str(v).strip() for v in row.values if str(v).strip() != ""]
-      if not vals:
+      row_vals = [
+          str(v).strip()
+          for v in row.values
+          if str(v).strip() != "" and str(v).strip().lower() != "nan"
+      ]
+      if not row_vals:
         continue
 
       espaco = str(row.get("Espaço", "")).strip()
@@ -251,24 +271,46 @@ def load_csv_from_github():
       sec = str(row.get("Secretaria", "")).strip()
       resp = str(row.get("Responsável", "")).strip()
 
-      # Fallback: Se o CSV não tinha cabeçalho, descobre as colunas pelas células da linha
-      if not horario_raw or not clean_time_string(horario_raw):
-        for v in row.values:
-          v_str = str(v).strip()
-          if clean_time_string(v_str):
-            horario_raw = v_str
+      # Se faltar identificação explícita de colunas, realiza mapeamento posicional inteligente
+      if not tem_cabecalho or not horario_raw:
+        # Tenta achar qual coluna é o Horário
+        idx_h = -1
+        for idx, val in enumerate(row_vals):
+          if clean_time_string(val):
+            horario_raw = val
+            idx_h = idx
             break
+
+        if idx_h != -1:
+          # Estrutura posicional padrão: [Espaço, Data, Horário, Tema, Secretaria, Responsável]
+          if idx_h == 2 and len(row_vals) >= 4:
+            if not espaco:
+              espaco = row_vals[0]
+            if not data:
+              data = row_vals[1]
+            if not tema and len(row_vals) > 3:
+              tema = row_vals[3]
+            if not sec and len(row_vals) > 4:
+              sec = row_vals[4]
+            if not resp and len(row_vals) > 5:
+              resp = row_vals[5]
+          # Estrutura posicional alternativa: [Horário, Tema, Secretaria, Responsável]
+          elif idx_h == 0 and len(row_vals) >= 2:
+            if not tema:
+              tema = row_vals[1]
+            if not sec and len(row_vals) > 2:
+              sec = row_vals[2]
+            if not resp and len(row_vals) > 3:
+              resp = row_vals[3]
 
       horario_limpo = clean_time_string(horario_raw)
       if not horario_limpo:
         continue
 
-      if not espaco and len(vals) > 0:
-        espaco = vals[0] if vals[0] != horario_raw else "Auditório Espaço Gov"
-      if not data:
+      if not espaco or espaco.lower() in ["nan", "none", ""]:
+        espaco = "Auditório Espaço Gov"
+      if not data or data.lower() in ["nan", "none", ""]:
         data = "Sábado 29/08"
-      if not tema and len(vals) > 2:
-        tema = vals[2]
 
       is_vago = (
           not tema
@@ -287,20 +329,20 @@ def load_csv_from_github():
           or tema.startswith("🔓")
       )
 
-      eventos_extraidos.append({
-          "Espaço": espaco if espaco else "Auditório Espaço Gov",
-          "Data": data if data else "Sábado 29/08",
+      eventos.append({
+          "Espaço": espaco,
+          "Data": data,
           "Horário": horario_limpo,
           "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
           "Secretaria": sec if not is_vago else "",
           "Responsável": resp if not is_vago else "",
       })
 
-    df_final = pd.DataFrame(eventos_extraidos)
+    df_final = pd.DataFrame(eventos)
     if df_final.empty:
       st.error(
           "⚠️ O arquivo CSV foi lido, mas nenhuma linha com horário válido foi"
-          " encontrada."
+          " identificada."
       )
       return pd.DataFrame()
 
