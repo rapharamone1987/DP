@@ -38,10 +38,39 @@ ORDEM_DIAS = [
     "Sexta 04/09",
     "Sábado 05/09",
     "Domingo 06/09",
-    "Outros",
 ]
 
-# Mapeamento e Sanitização Estrita de Nomes de Espaço
+# Dicionário inteligente para capturar qualquer variação de dia na planilha
+MAPA_RECONHECIMENTO_DIAS = {
+    "29/08": "Sábado 29/08",
+    "sabado 29": "Sábado 29/08",
+    "sábado 29": "Sábado 29/08",
+    "30/08": "Domingo 30/08",
+    "domingo 30": "Domingo 30/08",
+    "31/08": "Segunda 31/08",
+    "segunda 31": "Segunda 31/08",
+    "segunda": "Segunda 31/08",
+    "01/09": "Terça 01/09",
+    "terca 01": "Terça 01/09",
+    "terça 01": "Terça 01/09",
+    "terca": "Terça 01/09",
+    "terça": "Terça 01/09",
+    "02/09": "Quarta 02/09",
+    "quarta 02": "Quarta 02/09",
+    "quarta": "Quarta 02/09",
+    "03/09": "Quinta 03/09",
+    "quinta 03": "Quinta 03/09",
+    "quinta": "Quinta 03/09",
+    "04/09": "Sexta 04/09",
+    "sexta 04": "Sexta 04/09",
+    "sexta": "Sexta 04/09",
+    "05/09": "Sábado 05/09",
+    "sabado 05": "Sábado 05/09",
+    "sábado 05": "Sábado 05/09",
+    "06/09": "Domingo 06/09",
+    "domingo 06": "Domingo 06/09",
+}
+
 space_mapping = {
     "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
     "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
@@ -56,9 +85,26 @@ def sanitize_space_name(raw_name):
   name = str(raw_name).strip()
   if name in space_mapping:
     return space_mapping[name]
-  # Remove prefixos 'Agenda ' ou 'Agenda Auditório '
   clean = re.sub(r"^agenda\s+(auditório\s+)?", "", name, flags=re.IGNORECASE)
   return clean.strip().title()
+
+
+def detect_day_from_line(line_str):
+  s = line_str.lower()
+  # Busca termos do mapa de reconhecimento
+  for key, mapped_day in MAPA_RECONHECIMENTO_DIAS.items():
+    if key in s:
+      # Diferencia Sábado 29 de Sábado 05
+      if "sabado" in key or "sábado" in key:
+        if "05" in s or "5" in s:
+          return "Sábado 05/09"
+        return "Sábado 29/08"
+      if "domingo" in key:
+        if "06" in s or "6" in s:
+          return "Domingo 06/09"
+        return "Domingo 30/08"
+      return mapped_day
+  return None
 
 
 @st.cache_data(ttl=3600)
@@ -75,7 +121,6 @@ def load_background_base64(url):
 
 
 img_b64 = load_background_base64(URL_RAW_IMG)
-bg_style = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 
 def clean_time_string(time_str):
@@ -140,7 +185,12 @@ def merge_consecutive_events(df):
         same_sec = current_event["Secretaria"] == row["Secretaria"]
         same_resp = current_event["Responsável"] == row["Responsável"]
 
-        if same_theme and same_sec and same_resp and row["Tema"] != "🔓 HORÁRIO VAGO":
+        if (
+            same_theme
+            and same_sec
+            and same_resp
+            and row["Tema"] != "🔓 HORÁRIO VAGO"
+        ):
           new_end = extract_end_time(row["Horário"])
           if new_end:
             current_event["Hora_Fim"] = new_end
@@ -164,11 +214,13 @@ def merge_consecutive_events(df):
       merged_rows.append(current_event)
 
   res_df = pd.DataFrame(merged_rows)
-  cols_to_drop = [c for c in ["Hora_Start", "Hora_Inicio", "Hora_Fim"] if c in res_df.columns]
+  cols_to_drop = [
+      c for c in ["Hora_Start", "Hora_Inicio", "Hora_Fim"] if c in res_df.columns
+  ]
   return res_df.drop(columns=cols_to_drop)
 
 
-# CARREGAMENTO DO EXCEL COM CORREÇÃO DE LEITURA DE VAGOS E ESPAÇOS SANITIZADOS
+# CARREGAMENTO INTELIGENTE DE TODOS OS DIAS DO EVENTO
 @st.cache_data(ttl=15)
 def load_excel_from_github():
   try:
@@ -196,9 +248,7 @@ def load_excel_from_github():
           },
       )
       with urllib.request.urlopen(raw_req) as resp:
-        excel_file = pd.ExcelFile(
-            io.BytesIO(resp.read()), engine="openpyxl"
-        )
+        excel_file = pd.ExcelFile(io.BytesIO(resp.read()), engine="openpyxl")
 
     all_events = []
 
@@ -212,20 +262,19 @@ def load_excel_from_github():
 
       df_sheet = df_sheet.fillna("").astype(str)
       current_espaco = sanitize_space_name(sheet_name)
-      current_data = "A Definir"
+      current_data = "Sábado 29/08"
 
       for idx, row in df_sheet.iterrows():
-        row_vals = [
-            str(v).strip() for v in row.values if str(v).strip() != ""
-        ]
+        row_vals = [str(v).strip() for v in row.values if str(v).strip() != ""]
         if not row_vals:
           continue
 
         line_str = " ".join(row_vals)
-        for d in ORDEM_DIAS:
-          if d.lower() in line_str.lower():
-            current_data = d
-            break
+
+        # Detecta mudança de dia na linha
+        detected_day = detect_day_from_line(line_str)
+        if detected_day:
+          current_data = detected_day
 
         col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
         col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
@@ -259,7 +308,6 @@ def load_excel_from_github():
           else:
             continue
 
-        # TRATAMENTO RIGOROSO DE HORÁRIOS LIVRES / VAGOS
         tema_clean = tema.strip().lower()
         is_vago = (
             not tema
@@ -299,9 +347,7 @@ def load_excel_from_github():
 
 def commit_changes_to_github(updated_df, change_log_notes=""):
   if not GITHUB_TOKEN:
-    st.error(
-        "❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud."
-    )
+    st.error("❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud.")
     return False
 
   headers = {
@@ -487,27 +533,44 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO CSS (OPACIDADE REVIZORADA DE 0.75 PARA 0.40 E ROLL-GRID)
+# ESTILIZAÇÃO CSS
 bg_url_css = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 custom_css = f"""
 <style>
-    /* Redução mínima da opacidade para clarear a imagem de fundo */
+    /* Fundo suave na página */
     .stApp {{
         background: linear-gradient(rgba(15, 23, 42, 0.40), rgba(15, 23, 42, 0.40)), url("{bg_url_css}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
-    .header-banner {{
-        background: linear-gradient(135deg, rgba(6, 78, 59, 0.88) 0%, rgba(21, 128, 61, 0.88) 100%), url("{bg_url_css}") no-repeat center center !important;
-        background-size: cover !important;
+    /* Card/Header Verde com Imagem de Fundo sobreposta */
+    .header-banner-container {{
+        position: relative;
+        background-color: #064e3b;
         border-radius: 16px;
-        padding: 35px 20px;
-        text-align: center;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
         margin-bottom: 24px;
         border-bottom: 5px solid #eab308;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    }}
+
+    .header-banner-bg {{
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: url("{bg_url_css}") no-repeat center center;
+        background-size: cover;
+        opacity: 0.25;
+        z-index: 1;
+    }}
+
+    .header-banner-content {{
+        position: relative;
+        z-index: 2;
+        padding: 35px 20px;
+        text-align: center;
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.85) 0%, rgba(21, 128, 61, 0.85) 100%);
     }}
     
     .header-logo-title {{
@@ -518,24 +581,16 @@ custom_css = f"""
         text-shadow: 0 3px 6px rgba(0,0,0,0.9);
     }}
 
-    /* Suporte a Rolagem Horizontal no Grid Multi-Dias */
-    .grid-container-scroll {{
-        display: flex;
-        overflow-x: auto;
-        gap: 12px;
-        padding-bottom: 12px;
-    }}
-
     .cal-header {{
         background-color: #064e3b !important;
         color: #ffffff !important;
         text-align: center;
-        padding: 12px 8px;
+        padding: 12px 6px;
         font-weight: 800;
         border-radius: 8px;
         margin-bottom: 12px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         border: 1px solid #15803d;
     }}
 
@@ -543,8 +598,8 @@ custom_css = f"""
         background-color: rgba(255, 255, 255, 0.96) !important;
         border: 1px solid #cbd5e1 !important;
         border-left: 6px solid #15803d !important;
-        padding: 12px;
-        margin-bottom: 12px;
+        padding: 10px;
+        margin-bottom: 10px;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }}
@@ -577,10 +632,13 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # Carregamento dos dados
 df_data = load_excel_from_github()
 
-# Banner Principal
+# Banner Principal com Imagem Garantida
 banner_html = """
-<div class="header-banner">
-    <div class="header-logo-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
+<div class="header-banner-container">
+    <div class="header-banner-bg"></div>
+    <div class="header-banner-content">
+        <div class="header-logo-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
+    </div>
 </div>
 """
 st.markdown(banner_html, unsafe_allow_html=True)
@@ -689,7 +747,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição & Versionamento",
 ])
 
-# ABA 1: CALENDÁRIO EXIBINDO TODOS OS DIAS SEM CORTAR
+# ABA 1: CALENDÁRIO COM TODOS OS DIAS DO EVENTO
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -703,12 +761,11 @@ with tab_calendar:
   if df_grid.empty:
     st.info("Nenhum evento agendado para exibir nesta visão.")
   else:
-    dias_unicos = [d for d in todos_dias if d in df_grid["Data"].unique()]
+    dias_unicos = [d for d in ORDEM_DIAS if d in df_grid["Data"].unique()]
 
     if len(dias_unicos) == 0:
       st.info("Nenhum dia correspondente para os filtros selecionados.")
     else:
-      # Cria colunas dinâmicas para todos os dias encontrados na planilha
       grid_cols = st.columns(len(dias_unicos))
       for idx, d in enumerate(dias_unicos):
         with grid_cols[idx]:
@@ -754,7 +811,7 @@ with tab_calendar:
                 unsafe_allow_html=True,
             )
 
-# ABA 2: HORÁRIOS LIVRES / VAGOS DETECTADOS COM SUCESSO
+# ABA 2: HORÁRIOS LIVRES / VAGOS
 with tab_vagos:
   st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
   if df_vagos_totais.empty:
