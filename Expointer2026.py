@@ -1,6 +1,7 @@
+import base64
 import io
 import re
-import urllib.parse
+import urllib.request
 import pandas as pd
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
@@ -17,9 +18,26 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Imagem de fundo do GitHub (Raw com %7E)
-FILE_NAME = "Screenshot_20260825-095320~2.jpg"
-URL_IMAGEM_FUNDO = f"https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/{urllib.parse.quote(FILE_NAME)}"
+# Download e conversão da imagem de fundo para Base64 (Garante a exibição do fundo)
+RAW_IMG_URL = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/Screenshot_20260825-095320~2.jpg"
+
+
+@st.cache_data(ttl=3600)
+def get_base64_image(url):
+  try:
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req) as response:
+      return base64.b64encode(response.read()).decode()
+  except Exception:
+    return ""
+
+
+img_b64 = get_base64_image(RAW_IMG_URL)
+bg_style = (
+    f"data:image/jpeg;base64,{img_b64}"
+    if img_b64
+    else "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/Screenshot_20260825-095320~2.jpg"
+)
 
 ORDEM_DIAS = [
     "Sábado 29/08",
@@ -63,21 +81,17 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# LEITURA DE MATRIZ CRUA EM TODAS AS ABAS (HEADER=NONE)
-@st.cache_data(ttl=10)
-def load_and_parse_raw_matrix():
+# LEITURA E PARSER MULTI-ABAS BASEADO NO TEMPLATE
+@st.cache_data(ttl=15)
+def load_and_consolidate_all_sheets():
   try:
     conn = st.connection("gsheets", type=GSheetsConnection)
-
-    # Lê todas as guias sem considerar a primeira linha como cabeçalho
-    all_worksheets = conn.read(worksheet=None, header=None)
-    combined_rows = []
+    all_sheets = conn.read(worksheet=None, header=None)
 
     sheets_dict = (
-        all_worksheets
-        if isinstance(all_worksheets, dict)
-        else {"Principal": all_worksheets}
+        all_sheets if isinstance(all_sheets, dict) else {"Geral": all_sheets}
     )
+    consolidated_rows = []
 
     for sheet_name, df_raw in sheets_dict.items():
       if df_raw is None or df_raw.empty:
@@ -85,54 +99,31 @@ def load_and_parse_raw_matrix():
 
       df_raw = df_raw.fillna("").astype(str)
 
-      current_day = (
-          sheet_name
-          if any(d.lower() in sheet_name.lower() for d in ORDEM_DIAS)
-          else "A Definir"
-      )
-      current_space = "Espaço Gov RS"
+      current_data = "A Definir"
+      if any(d.lower() in sheet_name.lower() for d in ORDEM_DIAS):
+        current_data = sheet_name
+
+      current_espaco = "Espaço Gov RS"
 
       for idx, row in df_raw.iterrows():
-        # Transforma a linha em lista limpa
-        vals = [str(v).strip() for v in row.values if str(v).strip()]
-        if not vals:
+        row_vals = [
+            str(v).strip() for v in row.values if str(v).strip() != "nan"
+        ]
+        if not row_vals:
           continue
 
-        col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
+        line_str = " ".join(row_vals)
 
-        # 1. Detecta cabeçalhos de Dia/Data em qualquer coluna da linha
-        day_match = None
-        for v in vals:
-          if any(
-              d.lower() in v.lower()
-              for d in [
-                  "sábado",
-                  "domingo",
-                  "segunda",
-                  "terça",
-                  "quarta",
-                  "quinta",
-                  "sexta",
-                  "29/08",
-                  "30/08",
-                  "31/08",
-                  "01/09",
-                  "02/09",
-                  "03/09",
-                  "04/09",
-                  "05/09",
-                  "06/09",
-              ]
-          ):
-            day_match = v
+        # 1. Identifica alteração de Data dentro da aba
+        for d in ORDEM_DIAS:
+          if d.lower() in line_str.lower():
+            current_data = d
             break
 
-        if day_match and not clean_time_string(col0):
-          current_day = day_match
-          continue
+        first_cell = str(row.values[0]).strip() if len(row.values) > 0 else ""
 
-        # 2. Ignora subcabeçalhos visuais
-        if col0.lower() in [
+        # Ignora cabeçalhos visuais
+        if first_cell.lower() in [
             "horário",
             "horario",
             "hora",
@@ -140,41 +131,33 @@ def load_and_parse_raw_matrix():
             "local",
             "tema",
             "atividade",
+            "secretaria",
         ]:
           continue
 
-        # 3. Mapeamento por posição relativa da matriz
-        horario_limpo = clean_time_string(col0)
+        horario_limpo = clean_time_string(first_cell)
 
-        col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
-        col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
-        col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
+        # Mapeamento relativo
+        val_1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
+        val_2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
+        val_3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
 
-        # Ajuste inteligente de colunas caso o horário esteja na Col 0
         if horario_limpo:
-          tema = col1
-          secretaria = col2
-          responsavel = col3
+          tema = val_1
+          sec = val_2
+          resp = val_3
         else:
-          # Se o horário não estiver na Col 0, tenta achar em outra coluna
-          horario_alt = clean_time_string(col1)
-          if horario_alt:
-            horario_limpo = horario_alt
-            tema = col2
-            secretaria = col3
-            responsavel = (
-                str(row.values[4]).strip() if len(row.values) > 4 else ""
-            )
+          # Se o horário estiver na segunda coluna
+          alt_horario = clean_time_string(val_1)
+          if alt_horario:
+            horario_limpo = alt_horario
+            tema = val_2
+            sec = val_3
+            resp = str(row.values[4]).strip() if len(row.values) > 4 else ""
           else:
-            tema = col0
-            secretaria = col1
-            responsavel = col2
+            continue
 
-        if (
-            not horario_limpo
-            and not tema
-            or tema.lower() in ["horário", "secretaria", "responsável"]
-        ):
+        if not tema or tema.lower() in ["tema", "atividade", "horário"]:
           continue
 
         is_vago = (
@@ -184,19 +167,19 @@ def load_and_parse_raw_matrix():
             or tema.startswith("🔓")
         )
 
-        combined_rows.append({
-            "Espaço": current_space,
-            "Data": current_day,
-            "Horário": horario_limpo if horario_limpo else "--:--",
+        consolidated_rows.append({
+            "Espaço": current_espaco,
+            "Data": current_data,
+            "Horário": horario_limpo,
             "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-            "Secretaria": secretaria if not is_vago else "",
-            "Responsável": responsavel if not is_vago else "",
+            "Secretaria": sec if not is_vago else "",
+            "Responsável": resp if not is_vago else "",
         })
 
-    return pd.DataFrame(combined_rows)
+    return pd.DataFrame(consolidated_rows)
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao processar matriz do Google Sheets: {e}")
+    st.error(f"⚠️ Erro ao consolidar as abas da planilha: {e}")
     return pd.DataFrame()
 
 
@@ -206,7 +189,7 @@ def save_data_to_google_sheets(updated_df):
     conn.update(data=updated_df)
     return True
   except Exception as e:
-    st.error(f"⚠️ Erro ao salvar no Google Sheets: {e}")
+    st.error(f"⚠️ Erro ao salvar alterações no Google Sheets: {e}")
     return False
 
 
@@ -328,20 +311,20 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO CSS FORÇADA COM IMAGEM DE FUNDO DO GITHUB
+# ESTILIZAÇÃO CSS COM FUNDO EM BASE64
 custom_css = f"""
 <style>
-    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
-        background: url("{URL_IMAGEM_FUNDO}") no-repeat center center fixed !important;
+    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{
+        background: url("{bg_style}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
     .header-banner {{
-        background: linear-gradient(135deg, rgba(6, 78, 59, 0.92) 0%, rgba(21, 128, 61, 0.92) 100%), url("{URL_IMAGEM_FUNDO}") no-repeat center center !important;
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.93) 0%, rgba(21, 128, 61, 0.93) 100%), url("{bg_style}") no-repeat center center !important;
         background-size: cover !important;
         border-radius: 16px;
-        padding: 32px 20px;
+        padding: 30px 20px;
         text-align: center;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
         margin-bottom: 24px;
@@ -404,8 +387,8 @@ custom_css = f"""
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Processa Matriz
-df_data = load_and_parse_raw_matrix()
+# Carrega e unifica as guias
+df_data = load_and_consolidate_all_sheets()
 
 # Banner Principal
 banner_html = """
@@ -417,7 +400,7 @@ st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Verifique as credenciais no Secrets do"
+      "⚠️ Nenhum dado carregado. Verifique as configurações do Secrets do"
       " Streamlit Cloud."
   )
   st.stop()
@@ -645,7 +628,5 @@ with tab_edit:
         st.cache_data.clear()
         st.rerun()
 
-  elif senha:
-    st.error("❌ Senha incorreta.")
   elif senha:
     st.error("❌ Senha incorreta.")
