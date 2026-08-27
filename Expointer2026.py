@@ -21,7 +21,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Configurações do Repositório GitHub
 GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 FILE_EXCEL_PATH = "Grade Expointer 2026.xlsx"
@@ -70,38 +69,44 @@ MAPA_RECONHECIMENTO_DIAS = {
     "domingo 06": "Domingo 06/09",
 }
 
-space_mapping = {
-    "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
-    "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
-    "Agenda ARENA ESPAÇO GOV": "Arena Espaço Gov",
-    "Agenda BANCADA ESPAÇO GOV": "Bancada Espaço Gov",
-}
+TERMOS_IGNORAR = [
+    "características do espaço",
+    "caracteristicas do espaço",
+    "lugares",
+    "telão",
+    "som",
+    "paz no campo",
+    "pavilhão",
+    "pavilhão internacional",
+    "estande de governo",
+    "horário",
+    "horario",
+    "secretaria",
+    "responsável",
+    "responsavel",
+    "tema",
+    "atividade",
+    "espaço",
+    "local",
+    "agenda auditório administração",
+    "agenda auditório espaço gov",
+    "agenda arena espaço gov",
+    "agenda bancada espaço gov",
+]
 
-def sanitize_space_name(raw_name):
-    if not raw_name:
-        return "Espaço Geral"
-    name = str(raw_name).strip()
-    
-    # Direct match in space_mapping
-    for k, v in space_mapping.items():
-        if k.lower() == name.lower():
-            return v
-            
-    # Clean up prefixes
-    clean = re.sub(r"^(agenda\s+)?(auditório\s+|arena\s+|bancada\s+)?", "", name, flags=re.IGNORECASE).strip()
-    
-    # Match key words
-    nl = name.lower()
-    if "administra" in nl:
+def map_sheet_to_space(sheet_name):
+    s = sheet_name.strip().lower()
+    if "admin" in s:
         return "Auditório Administração"
-    elif "auditório" in nl or "auditorio" in nl:
-        return "Auditório Espaço Gov"
-    elif "arena" in nl:
-        return "Arena Espaço Gov"
-    elif "bancada" in nl:
+    elif "bancada" in s:
         return "Bancada Espaço Gov"
-        
-    return clean.title() if clean else name
+    elif "arena" in s:
+        return "Arena Espaço Gov"
+    elif "audit" in s or "gov" in s:
+        return "Auditório Espaço Gov"
+    
+    clean = re.sub(r"^(agenda\s+)?(auditório\s+|arena\s+|bancada\s+)?", "", sheet_name, flags=re.IGNORECASE).strip()
+    return clean.title() if clean else sheet_name
 
 def detect_day_from_line(line_str):
     s = line_str.lower()
@@ -174,7 +179,6 @@ def merge_consecutive_events(df):
         return df
 
     merged_rows = []
-    # Key fix: Group explicitly including 'Espaço' and 'Data'
     for (espaco, data), group in df.groupby(["Espaço", "Data"], sort=False):
         group = group.copy()
         group["Hora_Start"] = group["Horário"].apply(extract_start_time)
@@ -261,12 +265,14 @@ def load_excel_from_github():
             if "escala" in sheet_name.lower() or "equipe" in sheet_name.lower():
                 continue
 
+            # Mapeamento do espaço FIXO pelo nome da aba
+            sheet_espaco = map_sheet_to_space(sheet_name)
+
             df_sheet = excel_file.parse(sheet_name, header=None)
             if df_sheet.empty:
                 continue
 
             df_sheet = df_sheet.fillna("").astype(str)
-            sheet_espaco = sanitize_space_name(sheet_name)
             current_data = "Sábado 29/08"
 
             for idx, row in df_sheet.iterrows():
@@ -275,33 +281,21 @@ def load_excel_from_github():
                     continue
 
                 line_str = " ".join(row_vals)
+                line_lower = line_str.lower()
+
+                # Ignora linhas institucionais e cabeçalhos repetidos
+                if any(term in line_lower for term in TERMOS_IGNORAR):
+                    continue
 
                 detected_day = detect_day_from_line(line_str)
                 if detected_day:
                     current_data = detected_day
-
-                # Check if the line itself defines a space header within the sheet
-                for raw_sp_key in space_mapping.keys():
-                    if raw_sp_key.lower() in line_str.lower():
-                        sheet_espaco = space_mapping[raw_sp_key]
-                        break
+                    continue
 
                 col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
                 col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
                 col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
                 col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
-
-                if col0.lower() in [
-                    "horário",
-                    "horario",
-                    "hora",
-                    "espaço",
-                    "local",
-                    "tema",
-                    "atividade",
-                    "secretaria",
-                ]:
-                    continue
 
                 horario_limpo = clean_time_string(col0)
                 if horario_limpo:
@@ -370,15 +364,7 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
         excel_buffer = io.BytesIO()
         with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
             for space_name, group in updated_df.groupby("Espaço"):
-                orig_sheet = next(
-                    (
-                        k
-                        for k, v in space_mapping.items()
-                        if str(v).lower() == str(space_name).lower()
-                    ),
-                    f"Agenda {space_name}",
-                )
-                sheet_title = re.sub(r"[\/*?:\[\]]", "_", orig_sheet)[:31]
+                sheet_title = re.sub(r"[\\/*?:\[\]]", "_", f"Agenda {space_name}")[:31]
                 group.to_excel(writer, sheet_name=sheet_title, index=False)
 
         excel_buffer.seek(0)
@@ -534,7 +520,7 @@ def generate_pdf_report(df_export, doc_title_info):
                 [colors.white, colors.HexColor("#f8fafc")],
             ),
         ])
-  )
+    )
     elements.append(t)
     doc.build(elements)
     buffer.seek(0)
