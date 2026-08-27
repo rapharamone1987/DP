@@ -70,29 +70,17 @@ MAPA_RECONHECIMENTO_DIAS = {
     "domingo 06": "Domingo 06/09",
 }
 
-TERMOS_IGNORAR = [
+TERMOS_IGNORAR_EXATOS = [
     "características do espaço",
     "caracteristicas do espaço",
     "lugares",
     "telão",
     "som",
     "paz no campo",
-    "pavilhão",
     "pavilhão internacional",
     "estande de governo",
     "horário",
     "horario",
-    "secretaria",
-    "responsável",
-    "responsavel",
-    "tema",
-    "atividade",
-    "espaço",
-    "local",
-    "agenda auditório administração",
-    "agenda auditório espaço gov",
-    "agenda arena espaço gov",
-    "agenda bancada espaço gov",
 ]
 
 
@@ -291,7 +279,10 @@ def load_excel_from_github():
           continue
 
         line_str = " ".join(vals)
-        if any(term in line_str.lower() for term in TERMOS_IGNORAR):
+        line_lower = line_str.lower().strip()
+
+        # Descarta apenas títulos institucionais exatos
+        if line_lower in TERMOS_IGNORAR_EXATOS:
           continue
 
         detected_day = detect_day_from_line(line_str)
@@ -303,6 +294,18 @@ def load_excel_from_github():
         col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
         col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
         col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
+
+        # Descarta a linha de cabeçalho da tabela interna
+        if col0.lower() in [
+            "horario",
+            "horário",
+            "hora",
+        ] and col1.lower() in [
+            "tema",
+            "atividade",
+            "evento",
+        ]:
+          continue
 
         horario_limpo = clean_time_string(col0)
         if horario_limpo:
@@ -872,6 +875,9 @@ with tab_edit:
           )
           st.cache_data.clear()
           st.rerun()
+
+  elif senha:
+    st.error("❌ Senha incorreta.")
 
   elif senha:
     st.error("❌ Senha incorreta.")
