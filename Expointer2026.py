@@ -24,7 +24,9 @@ st.set_page_config(
 GITHUB_REPO = st.secrets.get("GITHUB_REPO", "raphaelsilveiraduarte/dp")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 FILE_EXCEL_PATH = "Grade Expointer 2026.xlsx"
-URL_RAW_EXCEL = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{urllib.parse.quote(FILE_EXCEL_PATH)}"
+
+# URLs com encoding para evitar HTTP 404
+URL_RAW_EXCEL = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Grade%20Expointer%202026.xlsx"
 URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
 
 ORDEM_DIAS = [
@@ -92,7 +94,7 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# CARREGAMENTO DO EXCEL BASE DIRETO DO GITHUB
+# CARREGAMENTO SEGURO DO EXCEL DO GITHUB
 @st.cache_data(ttl=15)
 def load_excel_from_github():
   try:
@@ -181,11 +183,14 @@ def load_excel_from_github():
     return pd.DataFrame(all_events)
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao carregar arquivo do GitHub: {e}")
+    st.error(
+        "⚠️ Não foi possível baixar 'Grade Expointer 2026.xlsx' direto do GitHub"
+        f" ({e}). Verifique se o arquivo está na raiz do repositório."
+    )
     return pd.DataFrame()
 
 
-# SALVAMENTO E REGISTRO DE ALTERAÇÕES VIA GITHUB API
+# COMMIT E VERSIONAMENTO VIA API DO GITHUB
 def commit_changes_to_github(updated_df, change_log_notes=""):
   if not GITHUB_TOKEN:
     st.error(
@@ -201,7 +206,6 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
   timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
   try:
-    # 1. Gera o arquivo Excel consolidado em memória
     excel_buffer = io.BytesIO()
     with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
       for space_name, group in updated_df.groupby("Espaço"):
@@ -219,14 +223,11 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
     excel_buffer.seek(0)
     excel_b64 = base64.b64encode(excel_buffer.read()).decode("utf-8")
 
-    # 2. Busca o SHA do arquivo atual no GitHub para atualizar
-    get_file_url = (
-        f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_EXCEL_PATH}"
-    )
+    encoded_filename = urllib.parse.quote(FILE_EXCEL_PATH)
+    get_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_filename}"
     res = requests.get(get_file_url, headers=headers)
     sha = res.json().get("sha", "") if res.status_code == 200 else ""
 
-    # 3. Atualiza o Excel principal no GitHub
     update_data = {
         "message": f"Atualização da grade de eventos ({timestamp})",
         "content": excel_b64,
@@ -237,7 +238,6 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
 
     requests.put(get_file_url, headers=headers, data=json.dumps(update_data))
 
-    # 4. Registra um arquivo individual no Histórico de Alterações
     log_content = {
         "data_alteracao": timestamp,
         "observacoes": change_log_notes,
@@ -469,9 +469,6 @@ banner_html = """
 st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
-  st.warning(
-      "⚠️ Nenhum dado carregado. Verifique a existência do arquivo no GitHub."
-  )
   st.stop()
 
 # Filtros Globais
