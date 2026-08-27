@@ -77,6 +77,28 @@ space_mapping = {
     "Agenda BANCADA ESPAÇO GOV": "Bancada Espaço Gov",
 }
 
+# Palavras-chave de linhas institucionais que DEVEM SER IGNORADAS
+TERMOS_IGNORAR = [
+    "características do espaço",
+    "caracteristicas do espaço",
+    "lugares",
+    "telão",
+    "som",
+    "paz no campo",
+    "pavilhão",
+    "pavilhão internacional",
+    "estande de governo",
+    "horário",
+    "horario",
+    "secretaria",
+    "responsável",
+    "responsavel",
+    "tema",
+    "atividade",
+    "espaço",
+    "local",
+]
+
 
 def sanitize_space_name(raw_name):
   if not raw_name:
@@ -88,12 +110,10 @@ def sanitize_space_name(raw_name):
   return clean.strip().title()
 
 
-def sanitize_field_value(val):
+def is_invalid_text(val):
   if not val or pd.isna(val):
-    return ""
-  s = str(val).strip()
-  s_lower = s.lower()
-  # Filtra sujeiras conhecidas de parsing incorreto
+    return True
+  s_lower = str(val).strip().lower()
   if s_lower in [
       "nan",
       "none",
@@ -107,18 +127,14 @@ def sanitize_field_value(val):
       "disponivel",
       "horário vago",
       "horario vago",
-      "secretaria",
-      "responsável",
-      "responsavel",
-      "tema",
-      "atividade",
-      "horario",
-      "horário",
   ]:
-    return ""
+    return True
+  for term in TERMOS_IGNORAR:
+    if term in s_lower:
+      return True
   if re.match(r"^\b(?:[01]?\d|2[0-3])[:h][0-5]\d\b", s_lower):
-    return ""
-  return s
+    return True
+  return False
 
 
 def detect_day_from_line(line_str):
@@ -250,7 +266,7 @@ def merge_consecutive_events(df):
   return res_df.drop(columns=cols_to_drop)
 
 
-# CARREGAMENTO COM SANITIZAÇÃO RIGOROSA
+# CARREGAMENTO DE DADOS COM FILTRAGEM RIGOROSA DE LINHAS FANTASMAS
 @st.cache_data(ttl=15)
 def load_excel_from_github():
   try:
@@ -301,27 +317,21 @@ def load_excel_from_github():
 
         line_str = " ".join(row_vals)
 
+        # Atualiza a data atual se encontrar cabeçalho de dia
         detected_day = detect_day_from_line(line_str)
         if detected_day:
           current_data = detected_day
+          continue
+
+        # Se a linha contiver frases de descrição/cabeçalho da aba, ignora
+        line_lower = line_str.lower()
+        if any(term in line_lower for term in TERMOS_IGNORAR):
+          continue
 
         col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
         col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
         col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
         col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
-
-        # Descarta linhas de títulos de tabela
-        if col0.lower() in [
-            "horário",
-            "horario",
-            "hora",
-            "espaço",
-            "local",
-            "tema",
-            "atividade",
-            "secretaria",
-        ]:
-          continue
 
         horario_limpo = clean_time_string(col0)
         if horario_limpo:
@@ -338,9 +348,9 @@ def load_excel_from_github():
           else:
             continue
 
-        tema_clean = sanitize_field_value(tema_raw)
-        sec_clean = sanitize_field_value(sec_raw)
-        resp_clean = sanitize_field_value(resp_raw)
+        tema_clean = "" if is_invalid_text(tema_raw) else str(tema_raw).strip()
+        sec_clean = "" if is_invalid_text(sec_raw) else str(sec_raw).strip()
+        resp_clean = "" if is_invalid_text(resp_raw) else str(resp_raw).strip()
 
         is_vago = not tema_clean or tema_clean.startswith("🔓")
 
@@ -597,18 +607,36 @@ custom_css = f"""
         background-color: rgba(255, 255, 255, 0.96) !important;
         border: 1px solid #cbd5e1 !important;
         border-left: 6px solid #15803d !important;
-        padding: 10px;
-        margin-bottom: 10px;
+        padding: 12px;
+        margin-bottom: 12px;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }}
 
-    .cal-event-box span {{
+    .time-badge {{
         color: #15803d !important;
         font-weight: 800 !important;
-        display: block;
+        font-size: 0.85rem;
         margin-bottom: 4px;
-        text-shadow: none !important;
+    }}
+
+    .event-title-text {{
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+        font-size: 0.9rem;
+    }}
+
+    .space-tag-text {{
+        color: #0369a1;
+        font-weight: 700;
+        font-size: 0.8rem;
+    }}
+
+    .meta-info-text {{
+        color: #475569;
+        font-size: 0.75rem;
+        margin-top: 3px;
     }}
 
     .event-card-vago {{
@@ -627,7 +655,6 @@ custom_css = f"""
         font-size: 0.9rem !important;
         display: block !important;
         margin-bottom: 6px !important;
-        text-shadow: none !important;
     }}
 
     div[data-baseweb="select"] > div, input {{
@@ -757,7 +784,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição & Versionamento",
 ])
 
-# ABA 1: CALENDÁRIO SEM FALSOS RESPONSÁVEIS
+# ABA 1: CALENDÁRIO COM ESTRUTURA HTML SEGURA
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -784,34 +811,30 @@ with tab_calendar:
           )
           evs_dia = df_grid[df_grid["Data"] == d]
           for _, ev in evs_dia.iterrows():
-            sec_val = sanitize_field_value(ev["Secretaria"])
-            resp_val = sanitize_field_value(ev["Responsável"])
+            sec_val = str(ev["Secretaria"]).strip()
+            resp_val = str(ev["Responsável"]).strip()
 
-            sec_display = (
-                f'<div style="color:#334155; font-size:0.75rem;'
-                f' font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
+            sec_html = (
+                f'<div class="meta-info-text">🏢 {sec_val}</div>'
                 if sec_val
                 else ""
             )
-            resp_display = (
-                f'<div style="color:#475569; font-size:0.75rem;'
-                f' font-weight:500;">👤 {resp_val}</div>'
+            resp_html = (
+                f'<div class="meta-info-text">👤 {resp_val}</div>'
                 if resp_val
                 else ""
             )
 
-            st.markdown(
-                f"""
-                <div class="cal-event-box">
-                    <span>⏰ {ev['Horário']}</span>
-                    <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">{ev['Tema']}</div>
-                    <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
-                    {sec_display}
-                    {resp_display}
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            card_content = f"""
+            <div class="cal-event-box">
+                <div class="time-badge">⏰ {ev['Horário']}</div>
+                <div class="event-title-text">{ev['Tema']}</div>
+                <div class="space-tag-text">📍 {ev['Espaço']}</div>
+                {sec_html}
+                {resp_html}
+            </div>
+            """
+            st.markdown(card_content, unsafe_allow_html=True)
 
 # ABA 2: HORÁRIOS LIVRES / VAGOS
 with tab_vagos:
