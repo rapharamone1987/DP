@@ -177,76 +177,102 @@ def load_csv_from_github():
     content_b64 = res.json().get("content", "")
     content_bytes = base64.b64decode(content_b64)
 
-    df_csv = None
-    for enc in ["utf-8-sig", "utf-8", "latin1", "iso-8859-1", "cp1252"]:
-      try:
-        df_csv = pd.read_csv(
-            io.BytesIO(content_bytes), sep=";", encoding=enc, dtype=str
-        )
-        if len(df_csv.columns) > 1:
-          break
-        df_csv = pd.read_csv(
-            io.BytesIO(content_bytes), sep=",", encoding=enc, dtype=str
-        )
-        if len(df_csv.columns) > 1:
-          break
-      except Exception:
-        continue
+    # Decodificação flexível de enconding e delimitador
+    df_raw = None
+    for enc in ["utf-8-sig", "utf-8", "latin1", "cp1252"]:
+      for sep in [";", ",", "\t"]:
+        try:
+          temp_df = pd.read_csv(
+              io.BytesIO(content_bytes),
+              sep=sep,
+              encoding=enc,
+              dtype=str,
+              header=None,
+          )
+          if temp_df.shape[1] >= 3:
+            df_raw = temp_df
+            break
+        except Exception:
+          continue
+      if df_raw is not None:
+        break
 
-    if df_csv is None or df_csv.empty:
-      st.error("⚠️ O arquivo CSV foi encontrado, mas está vazio ou ilegível.")
+    if df_raw is None or df_raw.empty:
+      st.error("⚠️ O arquivo CSV está vazio ou não pôde ser lido.")
       return pd.DataFrame()
 
-    df_csv = df_csv.fillna("")
+    df_raw = df_raw.fillna("").astype(str)
 
-    df_csv.columns = [
-        str(c).replace("\ufeff", "").strip().title() for c in df_csv.columns
-    ]
+    # Tenta descobrir se a primeira linha é cabeçalho
+    primeira_linha = [str(x).lower().strip() for x in df_raw.iloc[0].values]
+    tem_cabecalho = any(
+        k in " ".join(primeira_linha)
+        for k in ["espaço", "espaco", "horario", "horário", "tema", "data"]
+    )
 
-    renames = {}
-    for col in df_csv.columns:
-      c_lower = col.lower()
-      if "espaco" in c_lower or "espaço" in c_lower or "local" in c_lower:
-        renames[col] = "Espaço"
-      elif "data" in c_lower or "dia" in c_lower:
-        renames[col] = "Data"
-      elif "horario" in c_lower or "horário" in c_lower or "hora" in c_lower:
-        renames[col] = "Horário"
-      elif "tema" in c_lower or "atividade" in c_lower or "evento" in c_lower:
-        renames[col] = "Tema"
-      elif "secretaria" in c_lower or "entidade" in c_lower:
-        renames[col] = "Secretaria"
-      elif "responsavel" in c_lower or "responsável" in c_lower:
-        renames[col] = "Responsável"
+    if tem_cabecalho:
+      # Promove a primeira linha a cabeçalho
+      headers_line = [str(x).strip() for x in df_raw.iloc[0].values]
+      df_data_rows = df_raw.iloc[1:].copy()
+      df_data_rows.columns = headers_line
+    else:
+      df_data_rows = df_raw.copy()
 
-    df_csv = df_csv.rename(columns=renames)
+    # Mapeamento de Colunas
+    col_map = {}
+    for c in df_data_rows.columns:
+      c_str = str(c).lower().strip()
+      if "espaco" in c_str or "espaço" in c_str or "local" in c_str:
+        col_map[c] = "Espaço"
+      elif "data" in c_str or "dia" in c_str:
+        col_map[c] = "Data"
+      elif "horario" in c_str or "horário" in c_str or "hora" in c_str:
+        col_map[c] = "Horário"
+      elif "tema" in c_str or "atividade" in c_str or "evento" in c_str:
+        col_map[c] = "Tema"
+      elif "secretaria" in c_str or "entidade" in c_str:
+        col_map[c] = "Secretaria"
+      elif "responsavel" in c_str or "responsável" in c_str:
+        col_map[c] = "Responsável"
 
-    cols_necessarias = [
-        "Espaço",
-        "Data",
-        "Horário",
-        "Tema",
-        "Secretaria",
-        "Responsável",
-    ]
-    for col in cols_necessarias:
-      if col not in df_csv.columns:
-        df_csv[col] = ""
+    df_mapped = df_data_rows.rename(columns=col_map)
 
-    df_csv = df_csv[cols_necessarias]
+    # Se faltaram colunas nomeadas, extrai por posição posicional
+    eventos_extraidos = []
+    for _, row in df_mapped.iterrows():
+      vals = [str(v).strip() for v in row.values if str(v).strip() != ""]
+      if not vals:
+        continue
 
-    df_csv = df_csv[
-        (df_csv["Espaço"].astype(str).str.strip() != "")
-        | (df_csv["Horário"].astype(str).str.strip() != "")
-    ]
+      espaco = str(row.get("Espaço", "")).strip()
+      data = str(row.get("Data", "")).strip()
+      horario_raw = str(row.get("Horário", "")).strip()
+      tema = str(row.get("Tema", "")).strip()
+      sec = str(row.get("Secretaria", "")).strip()
+      resp = str(row.get("Responsável", "")).strip()
 
-    df_csv["Horário"] = df_csv["Horário"].apply(clean_time_string)
+      # Fallback: Se o CSV não tinha cabeçalho, descobre as colunas pelas células da linha
+      if not horario_raw or not clean_time_string(horario_raw):
+        for v in row.values:
+          v_str = str(v).strip()
+          if clean_time_string(v_str):
+            horario_raw = v_str
+            break
 
-    def ajustar_vago(row):
-      t = str(row["Tema"]).strip()
-      if (
-          not t
-          or t.lower()
+      horario_limpo = clean_time_string(horario_raw)
+      if not horario_limpo:
+        continue
+
+      if not espaco and len(vals) > 0:
+        espaco = vals[0] if vals[0] != horario_raw else "Auditório Espaço Gov"
+      if not data:
+        data = "Sábado 29/08"
+      if not tema and len(vals) > 2:
+        tema = vals[2]
+
+      is_vago = (
+          not tema
+          or tema.lower()
           in [
               "livre",
               "vago",
@@ -258,14 +284,27 @@ def load_csv_from_github():
               "",
               "-",
           ]
-          or t.startswith("🔓")
-      ):
-        return "🔓 HORÁRIO VAGO"
-      return t
+          or tema.startswith("🔓")
+      )
 
-    df_csv["Tema"] = df_csv.apply(ajustar_vago, axis=1)
+      eventos_extraidos.append({
+          "Espaço": espaco if espaco else "Auditório Espaço Gov",
+          "Data": data if data else "Sábado 29/08",
+          "Horário": horario_limpo,
+          "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
+          "Secretaria": sec if not is_vago else "",
+          "Responsável": resp if not is_vago else "",
+      })
 
-    return merge_consecutive_events(df_csv)
+    df_final = pd.DataFrame(eventos_extraidos)
+    if df_final.empty:
+      st.error(
+          "⚠️ O arquivo CSV foi lido, mas nenhuma linha com horário válido foi"
+          " encontrada."
+      )
+      return pd.DataFrame()
+
+    return merge_consecutive_events(df_final)
 
   except Exception as e:
     st.error(f"⚠️ Erro ao processar o CSV do GitHub: {e}")
