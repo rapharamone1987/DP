@@ -16,9 +16,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ID ÚNICO DA SUA PLANILHA NO GOOGLE SHEETS
+# LINK RAW DA SUA IMAGEM NO GITHUB
+URL_IMAGEM_FUNDO = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/bg_expointer.jpg"
+
+# ID DA PLANILHA NO GOOGLE SHEETS
 SHEET_ID = "1WfuAKCRfdGx2jPV_Y0bJYDfolRCJTqyE"
-CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
+CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
 
 ORDEM_DIAS = [
     "Sábado 29/08",
@@ -62,77 +65,85 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# Leitura Rápida e Sem Erros via CSV Publicado
-@st.cache_data(ttl=30)
+# Leitura Flexível do CSV
+@st.cache_data(ttl=15)
 def load_data_from_google_sheets():
   try:
     df = pd.read_csv(CSV_URL)
+    if df.empty:
+      return pd.DataFrame()
+
     df = df.dropna(how="all").fillna("")
+
+    col_map = {}
+    for c in df.columns:
+      c_clean = str(c).strip().lower()
+      if "espaço" in c_clean or "espaco" in c_clean or "local" in c_clean:
+        col_map["Espaço"] = c
+      elif "data" in c_clean or "dia" in c_clean:
+        col_map["Data"] = c
+      elif "horário" in c_clean or "horario" in c_clean or "hora" in c_clean:
+        col_map["Horário"] = c
+      elif (
+          "tema" in c_clean
+          or "atividade" in c_clean
+          or "evento" in c_clean
+          or "programação" in c_clean
+      ):
+        col_map["Tema"] = c
+      elif "secretaria" in c_clean or "entidade" in c_clean or "org" in c_clean:
+        col_map["Secretaria"] = c
+      elif "responsável" in c_clean or "responsavel" in c_clean:
+        col_map["Responsável"] = c
+
+    cols_orig = list(df.columns)
+    col_espaco = col_map.get("Espaço", cols_orig[0] if len(cols_orig) > 0 else "")
+    col_data = col_map.get("Data", cols_orig[1] if len(cols_orig) > 1 else "")
+    col_horario = col_map.get(
+        "Horário", cols_orig[2] if len(cols_orig) > 2 else ""
+    )
+    col_tema = col_map.get("Tema", cols_orig[3] if len(cols_orig) > 3 else "")
+    col_sec = col_map.get(
+        "Secretaria", cols_orig[4] if len(cols_orig) > 4 else ""
+    )
+    col_resp = col_map.get(
+        "Responsável", cols_orig[5] if len(cols_orig) > 5 else ""
+    )
 
     df_clean = []
     for idx, row in df.iterrows():
-      cols = [str(c) for c in row.values]
+      espaco = str(row[col_espaco]).strip() if col_espaco else ""
+      data = str(row[col_data]).strip() if col_data else ""
+      horario_raw = str(row[col_horario]).strip() if col_horario else ""
+      tema = str(row[col_tema]).strip() if col_tema else ""
+      sec = str(row[col_sec]).strip() if col_sec else ""
+      resp = str(row[col_resp]).strip() if col_resp else ""
 
-      horario_raw = str(
-          row.get("Horário", cols[2] if len(cols) > 2 else "")
-      ).strip()
-      tema = str(row.get("Tema", cols[3] if len(cols) > 3 else "")).strip()
-      espaco = str(row.get("Espaço", cols[0] if len(cols) > 0 else "")).strip()
-      data = str(row.get("Data", cols[1] if len(cols) > 1 else "")).strip()
-      sec = str(row.get("Secretaria", cols[4] if len(cols) > 4 else "")).strip()
-      resp = str(
-          row.get("Responsável", cols[5] if len(cols) > 5 else "")
-      ).strip()
-
-      if any(
-          d.lower() in horario_raw.lower()
-          for d in [
-              "sábado",
-              "domingo",
-              "segunda",
-              "terça",
-              "quarta",
-              "quinta",
-              "sexta",
-              "29/08",
-              "30/08",
-              "31/08",
-              "01/09",
-              "02/09",
-              "03/09",
-              "04/09",
-              "05/09",
-              "06/09",
-          ]
+      if (
+          horario_raw.lower() in ["horário", "horario", "hora"]
+          or data.lower() == "data"
       ):
         continue
 
       horario_limpo = clean_time_string(horario_raw)
+      if not horario_limpo:
+        horario_limpo = horario_raw
 
-      if horario_limpo and horario_raw.lower() != "horário":
-        is_vago = (
-            not tema
-            or tema.lower()
-            in [
-                "livre",
-                "vago",
-                "disponível",
-                "horário vago",
-                "nan",
-                "none",
-                "",
-            ]
-            or tema.startswith("🔓")
-        )
+      is_vago = (
+          not tema
+          or tema.lower()
+          in ["livre", "vago", "disponível", "horário vago", "nan", "none", ""]
+          or tema.startswith("🔓")
+      )
 
-        df_clean.append({
-            "Espaço": espaco,
-            "Data": data,
-            "Horário": horario_limpo,
-            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-            "Secretaria": sec if not is_vago else "",
-            "Responsável": resp if not is_vago else "",
-        })
+      df_clean.append({
+          "Espaço": espaco,
+          "Data": data,
+          "Horário": horario_limpo,
+          "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
+          "Secretaria": sec if not is_vago else "",
+          "Responsável": resp if not is_vago else "",
+      })
 
     return pd.DataFrame(df_clean)
 
@@ -259,19 +270,76 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# Estilização CSS
-custom_css = """
+# Estilização CSS com Imagem do GitHub no Fundo
+custom_css = f"""
 <style>
-    .stApp { background-color: #f8fafc !important; font-family: 'Segoe UI', system-ui, sans-serif; }
-    .header-banner { background: linear-gradient(135deg, #064e3b 0%, #15803d 100%) !important; border-radius: 16px; padding: 28px 20px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); margin-bottom: 24px; border-bottom: 5px solid #eab308; }
-    .header-logo-title { font-size: 2.1rem !important; font-weight: 900 !important; color: #ffffff !important; margin: 0 !important; }
-    .header-subtitle { color: #dcfce7 !important; font-size: 1.05rem !important; margin-top: 8px !important; font-weight: 600 !important; }
-    label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p { color: #0f172a !important; font-weight: 700 !important; }
-    div[data-baseweb="tab-highlight"] { background-color: #15803d !important; }
-    .event-card-vago { background-color: rgba(248, 250, 252, 0.95) !important; border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 6px solid #d97706 !important; border: 1px dashed #f59e0b; }
-    .card-time-vago { color: #d97706 !important; font-weight: 800 !important; font-size: 0.9rem !important; }
-    .cal-header { background-color: #064e3b !important; color: #ffffff !important; text-align: center; padding: 10px; font-weight: 800; border-radius: 8px; margin-bottom: 12px; font-size: 0.95rem; }
-    .cal-event-box { background-color: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1 !important; border-left: 5px solid #15803d !important; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 0.85rem; }
+    .stApp {{
+        background: url("{URL_IMAGEM_FUNDO}") no-repeat center center fixed !important;
+        background-size: cover !important;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }}
+
+    .header-banner {{
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(21, 128, 61, 0.95) 100%) !important;
+        border-radius: 16px;
+        padding: 32px 20px;
+        text-align: center;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        margin-bottom: 24px;
+        border-bottom: 5px solid #eab308;
+        backdrop-filter: blur(4px);
+    }}
+    
+    .header-logo-title {{
+        font-size: 2.2rem !important;
+        font-weight: 900 !important;
+        color: #ffffff !important;
+        margin: 0 !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }}
+
+    div[data-baseweb="select"] > div, input {{
+        background-color: rgba(255, 255, 255, 0.92) !important;
+        color: #0f172a !important;
+        border-radius: 8px !important;
+    }}
+
+    label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {{
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }}
+
+    .cal-event-box {{
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border: 1px solid #cbd5e1 !important;
+        border-left: 5px solid #15803d !important;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+    }}
+
+    .event-card-vago {{
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 12px;
+        border-left: 6px solid #d97706 !important;
+        border: 1px dashed #f59e0b;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+    }}
+
+    .cal-header {{
+        background-color: rgba(6, 78, 59, 0.95) !important;
+        color: #ffffff !important;
+        text-align: center;
+        padding: 10px;
+        font-weight: 800;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }}
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
@@ -279,24 +347,27 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # Carregamento dos dados
 df_data = load_data_from_google_sheets()
 
-# Banner
+# Banner Principal Sem o Subtítulo
 banner_html = """
 <div class="header-banner">
     <div class="header-logo-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
-    <div class="header-subtitle">Painel Interativo de Eventos & Gestão de Horários</div>
 </div>
 """
 st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Verifique se a planilha está aberta para leitura"
-      " pública."
+      "⚠️ Nenhum dado carregado. Certifique-se de que a planilha está pública em"
+      " 'Compartilhar' -> 'Qualquer pessoa com o link'."
   )
   st.stop()
 
-todos_dias = [d for d in ORDEM_DIAS if d in df_data["Data"].unique()]
-todos_espacos = sorted(list(df_data["Espaço"].unique()))
+# Filtros e Mapeamentos
+dias_encontrados = list(df_data["Data"].unique())
+todos_dias = [
+    d for d in ORDEM_DIAS if d in dias_encontrados
+] + [d for d in dias_encontrados if d not in ORDEM_DIAS and d]
+todos_espacos = sorted([e for e in df_data["Espaço"].unique() if e])
 todas_sec = sorted(
     [
         s
@@ -305,7 +376,6 @@ todas_sec = sorted(
     ]
 )
 
-# Filtros Gerais
 st.markdown("### 🔍 Pesquisar e Filtrar Programação")
 with st.container():
   col_busca, col_dias = st.columns([2, 2])
@@ -353,7 +423,7 @@ if espacos_sel:
 if sec_sel:
   df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
 
-# Ordenação Cronológica
+# Ordenação
 df_filtered["Hora_Sort"] = df_filtered["Horário"].apply(extract_start_time)
 df_filtered["Data_Cat"] = pd.Categorical(
     df_filtered["Data"], categories=ORDEM_DIAS, ordered=True
@@ -407,14 +477,15 @@ with tab_calendar:
   if df_grid.empty:
     st.info("Nenhum evento agendado para exibir nesta visão.")
   else:
-    dias_para_exibir = [d for d in ORDEM_DIAS if d in df_grid["Data"].unique()]
+    dias_para_exibir = [
+        d for d in todos_dias if d in df_grid["Data"].unique()
+    ]
     num_dias = len(dias_para_exibir)
 
     if num_dias == 0:
       st.info("Nenhum dia correspondente para os filtros selecionados.")
     else:
       grid_cols = st.columns(num_dias)
-
       for idx, d in enumerate(dias_para_exibir):
         with grid_cols[idx]:
           st.markdown(
@@ -484,7 +555,7 @@ with tab_edit:
   st.markdown("### 🔒 Gestão & Edição da Planilha")
   st.info(
       "Como os dados estão sincronizados em tempo real, as edições devem ser"
-      " feitas diretamente no Google Sheets para evitar conflitos."
+      " feitas diretamente no Google Sheets."
   )
 
   st.link_button(
@@ -493,5 +564,5 @@ with tab_edit:
   )
 
   st.divider()
-  st.markdown("#### Tabela de Dados Atualizada em Tempo Real")
+  st.markdown("#### Tabela de Dados Carregada")
   st.dataframe(df_data, use_container_width=True)
