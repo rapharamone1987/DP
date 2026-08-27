@@ -259,19 +259,23 @@ def load_excel_from_github():
 
     res = requests.get(api_url, headers=headers)
     if res.status_code != 200:
+      st.error(f"⚠️ Erro HTTP ao buscar arquivo no GitHub: {res.status_code}")
       return pd.DataFrame()
 
     content_b64 = res.json().get("content", "")
-    sha = res.json().get("sha", "")
+    if not content_b64:
+      st.error("⚠️ O arquivo no GitHub retornou conteúdo vazio.")
+      return pd.DataFrame()
+
     content_bytes = base64.b64decode(content_b64)
     excel_file = pd.ExcelFile(io.BytesIO(content_bytes), engine="openpyxl")
 
-    # SE JÁ FOI CONSOLIDADO: Lê direto a tabela única limpa
+    # CASO 1: Se a planilha já for a versão unificada
     if "Programacao_Consolidada" in excel_file.sheet_names:
       df_clean = excel_file.parse("Programacao_Consolidada").fillna("")
       return merge_consecutive_events(df_clean)
 
-    # PRIMEIRA VEZ: Processa as abas originais e limpa o problema do "Arena"
+    # CASO 2: Se for a planilha original com várias abas
     todos_eventos = []
     for sheet_name in excel_file.sheet_names:
       if "escala" in sheet_name.lower() or "equipe" in sheet_name.lower():
@@ -339,30 +343,10 @@ def load_excel_from_github():
             "Responsável": resp.strip() if not is_vago else "",
         })
 
-    df_consolidado = merge_consecutive_events(pd.DataFrame(todos_eventos))
-
-    # GRAVAÇÃO AUTOMÁTICA DA PRIMEIRA VEZ NO GITHUB
-    if GITHUB_TOKEN and not df_consolidado.empty:
-      buffer = io.BytesIO()
-      with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        df_consolidado.to_excel(
-            writer, sheet_name="Programacao_Consolidada", index=False
-        )
-
-      buffer.seek(0)
-      new_b64 = base64.b64encode(buffer.read()).decode("utf-8")
-      payload = {
-          "message": "Automação: Consolidação inicial em aba única",
-          "content": new_b64,
-          "sha": sha,
-          "branch": "main",
-      }
-      requests.put(api_url, headers=headers, json=payload)
-
-    return df_consolidado
+    return merge_consecutive_events(pd.DataFrame(todos_eventos))
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao carregar/converter planilha: {e}")
+    st.error(f"⚠️ Falha ao ler arquivo Excel: {e}")
     return pd.DataFrame()
 
 
@@ -644,9 +628,6 @@ custom_css = f"""
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Carregamento dos dados
-df_data = load_excel_from_github()
-
 banner_html = """
 <div class="rs-banner-card">
     <div class="rs-banner-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
@@ -654,7 +635,13 @@ banner_html = """
 """
 st.markdown(banner_html, unsafe_allow_html=True)
 
+# Carregamento dos dados
+df_data = load_excel_from_github()
+
 if df_data.empty:
+  st.warning(
+      "⚠️ Nenhum dado foi carregado da planilha. Verifique o arquivo no GitHub."
+  )
   st.stop()
 
 # Filtros Globais
