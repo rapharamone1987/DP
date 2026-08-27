@@ -1,5 +1,7 @@
 import base64
+import datetime
 import io
+import json
 import re
 import urllib.request
 import pandas as pd
@@ -7,8 +9,8 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
+import requests
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
 
 # 1. Configuração Inicial da Página
 st.set_page_config(
@@ -18,8 +20,32 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Imagem de Fundo (GitHub Raw)
-URL_RAW_IMG = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/Screenshot_20260825-095320~2.jpg"
+# Configurações do Repositório GitHub
+GITHUB_REPO = st.secrets.get("GITHUB_REPO", "raphaelsilveiraduarte/dp")
+GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
+FILE_EXCEL_PATH = "Grade Expointer 2026.xlsx"
+URL_RAW_EXCEL = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{urllib.parse.quote(FILE_EXCEL_PATH)}"
+URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
+
+ORDEM_DIAS = [
+    "Sábado 29/08",
+    "Domingo 30/08",
+    "Segunda 31/08",
+    "Terça 01/09",
+    "Quarta 02/09",
+    "Quinta 03/09",
+    "Sexta 04/09",
+    "Sábado 05/09",
+    "Domingo 06/09",
+    "Outros",
+]
+
+space_mapping = {
+    "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
+    "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
+    "Agenda ARENA ESPAÇO GOV": "Arena Espaço Gov",
+    "Agenda BANCADA ESPAÇO GOV": "Bancada Espaço Gov",
+}
 
 
 @st.cache_data(ttl=3600)
@@ -36,27 +62,6 @@ img_b64 = load_background_base64(URL_RAW_IMG)
 bg_style = (
     f"data:image/jpeg;base64,{img_b64}" if img_b64 else URL_RAW_IMG
 )
-
-ORDEM_DIAS = [
-    "Sábado 29/08",
-    "Domingo 30/08",
-    "Segunda 31/08",
-    "Terça 01/09",
-    "Quarta 02/09",
-    "Quinta 03/09",
-    "Sexta 04/09",
-    "Sábado 05/09",
-    "Domingo 06/09",
-    "Outros",
-]
-
-# Dicionário de Mapeamento dos Espaços para as Abas do Sheets
-space_mapping = {
-    "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
-    "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
-    "Agenda ARENA ESPAÇO GOV": "Arena Espaço Gov",
-    "Agenda BANCADA ESPAÇO GOV": "Bancada Espaço Gov",
-}
 
 
 def clean_time_string(time_str):
@@ -87,34 +92,29 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# CARREGAMENTO MULTI-ABAS COM SUPORTE A SPACE_MAPPING
+# CARREGAMENTO DO EXCEL BASE DIRETO DO GITHUB
 @st.cache_data(ttl=15)
-def consolidate_all_sheets():
+def load_excel_from_github():
   try:
-    conn = st.connection("gsheets", type=GSheetsConnection)
-    all_sheets = conn.read(worksheet=None, header=None)
-
-    sheets_dict = (
-        all_sheets if isinstance(all_sheets, dict) else {"Geral": all_sheets}
+    req = urllib.request.Request(
+        URL_RAW_EXCEL, headers={"User-Agent": "Mozilla/5.0"}
     )
+    with urllib.request.urlopen(req) as resp:
+      content = resp.read()
+
+    excel_file = pd.ExcelFile(io.BytesIO(content), engine="openpyxl")
     all_events = []
 
-    for sheet_name, df_raw in sheets_dict.items():
-      if df_raw is None or df_raw.empty:
+    for sheet_name in excel_file.sheet_names:
+      df_sheet = excel_file.parse(sheet_name, header=None)
+      if df_sheet.empty:
         continue
 
-      df_raw = df_raw.fillna("").astype(str)
-
-      # Mapeia o Espaço correspondente ao nome da Aba
+      df_sheet = df_sheet.fillna("").astype(str)
       current_espaco = space_mapping.get(sheet_name, sheet_name)
-
       current_data = "A Definir"
-      for d in ORDEM_DIAS:
-        if d.lower() in sheet_name.lower():
-          current_data = d
-          break
 
-      for idx, row in df_raw.iterrows():
+      for idx, row in df_sheet.iterrows():
         row_vals = [
             str(v).strip() for v in row.values if str(v).strip() != ""
         ]
@@ -122,8 +122,6 @@ def consolidate_all_sheets():
           continue
 
         line_str = " ".join(row_vals)
-
-        # Detecta se a linha traz o nome de um dia/data
         for d in ORDEM_DIAS:
           if d.lower() in line_str.lower():
             current_data = d
@@ -134,7 +132,6 @@ def consolidate_all_sheets():
         col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
         col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
 
-        # Ignora linhas de cabeçalho
         if col0.lower() in [
             "horário",
             "horario",
@@ -148,7 +145,6 @@ def consolidate_all_sheets():
           continue
 
         horario_limpo = clean_time_string(col0)
-
         if horario_limpo:
           tema = col1
           sec = col2
@@ -185,8 +181,86 @@ def consolidate_all_sheets():
     return pd.DataFrame(all_events)
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao consolidar as abas da planilha: {e}")
+    st.error(f"⚠️ Erro ao carregar arquivo do GitHub: {e}")
     return pd.DataFrame()
+
+
+# SALVAMENTO E REGISTRO DE ALTERAÇÕES VIA GITHUB API
+def commit_changes_to_github(updated_df, change_log_notes=""):
+  if not GITHUB_TOKEN:
+    st.error(
+        "❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud."
+    )
+    return False
+
+  headers = {
+      "Authorization": f"token {GITHUB_TOKEN}",
+      "Accept": "application/vnd.github.v3+json",
+  }
+
+  timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+  try:
+    # 1. Gera o arquivo Excel consolidado em memória
+    excel_buffer = io.BytesIO()
+    with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+      for space_name, group in updated_df.groupby("Espaço"):
+        orig_sheet = next(
+            (
+                k
+                for k, v in space_mapping.items()
+                if str(v).lower() == str(space_name).lower()
+            ),
+            f"Agenda {space_name}",
+        )
+        sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
+        group.to_excel(writer, sheet_name=sheet_title, index=False)
+
+    excel_buffer.seek(0)
+    excel_b64 = base64.b64encode(excel_buffer.read()).decode("utf-8")
+
+    # 2. Busca o SHA do arquivo atual no GitHub para atualizar
+    get_file_url = (
+        f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_EXCEL_PATH}"
+    )
+    res = requests.get(get_file_url, headers=headers)
+    sha = res.json().get("sha", "") if res.status_code == 200 else ""
+
+    # 3. Atualiza o Excel principal no GitHub
+    update_data = {
+        "message": f"Atualização da grade de eventos ({timestamp})",
+        "content": excel_b64,
+        "branch": "main",
+    }
+    if sha:
+      update_data["sha"] = sha
+
+    requests.put(get_file_url, headers=headers, data=json.dumps(update_data))
+
+    # 4. Registra um arquivo individual no Histórico de Alterações
+    log_content = {
+        "data_alteracao": timestamp,
+        "observacoes": change_log_notes,
+        "total_eventos": len(updated_df),
+        "eventos": updated_df.to_dict(orient="records"),
+    }
+    log_b64 = base64.b64encode(
+        json.dumps(log_content, ensure_ascii=False, indent=2).encode("utf-8")
+    ).decode("utf-8")
+
+    log_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/historico_alteracoes/alteracao_{timestamp}.json"
+    log_data = {
+        "message": f"Registro de histórico de alteração ({timestamp})",
+        "content": log_b64,
+        "branch": "main",
+    }
+    requests.put(log_file_url, headers=headers, data=json.dumps(log_data))
+
+    return True
+
+  except Exception as e:
+    st.error(f"⚠️ Erro no commit para o GitHub: {e}")
+    return False
 
 
 def generate_pdf_report(df_export, doc_title_info):
@@ -307,7 +381,7 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# INJEÇÃO CSS DO FUNDO
+# ESTILIZAÇÃO CSS
 custom_css = f"""
 <style>
     html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
@@ -383,8 +457,8 @@ custom_css = f"""
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Carrega e consolida
-df_data = consolidate_all_sheets()
+# Carregamento dos dados
+df_data = load_excel_from_github()
 
 # Banner Principal
 banner_html = """
@@ -396,8 +470,7 @@ st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Verifique as credenciais no Secrets do"
-      " Streamlit Cloud."
+      "⚠️ Nenhum dado carregado. Verifique a existência do arquivo no GitHub."
   )
   st.stop()
 
@@ -499,10 +572,10 @@ st.sidebar.divider()
 tab_calendar, tab_vagos, tab_edit = st.tabs([
     "📅 Visão Calendário",
     "🔓 Horários Livres / Vagos",
-    "🔒 Edição Direta do App",
+    "🔒 Edição & Versionamento",
 ])
 
-# ABA 1: CALENDÁRIO COM GRID POR DIA
+# ABA 1: CALENDÁRIO
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -586,15 +659,19 @@ with tab_vagos:
                 """
         cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
-# ABA 3: EDIÇÃO DIRETA E SALVAMENTO ADAPTADO PARA O GOOGLE SHEETS
+# ABA 3: EDIÇÃO COM VERSIONAMENTO NO GITHUB
 with tab_edit:
-  st.markdown("### 🔒 Edição Interativa da Grade de Eventos")
+  st.markdown("### 🔒 Edição & Versionamento Automático")
   senha = st.text_input("Digite a senha de administrador:", type="password")
 
   if senha == "expointer2026":
     st.success(
-        "🔓 Acesso liberado! Edite os dados na tabela abaixo e clique no botão"
-        " para salvar na planilha."
+        "🔓 Acesso liberado! Edite os dados na tabela e registre a alteração."
+    )
+
+    notes = st.text_input(
+        "Motivo / Descrição da Alteração (Auditoria):",
+        placeholder="Ex: Ajuste no horário do painel SEDUC",
     )
 
     edited_df = st.data_editor(
@@ -615,40 +692,18 @@ with tab_edit:
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
             "Responsável": st.column_config.TextColumn("Responsável"),
         },
-        key="editor_sheets",
+        key="editor_github",
     )
 
-    if st.button("💾 Salvar Alterações na Planilha"):
-      try:
-        conn = st.connection("gsheets", type=GSheetsConnection)
-
-        # Agrupa os dados editados por "Espaço" mantendo a lógica de abas
-        for space_name, group in edited_df.groupby("Espaço"):
-          # Busca o nome original da aba via space_mapping ou gera um válido
-          orig_sheet = next(
-              (
-                  k
-                  for k, v in space_mapping.items()
-                  if str(v).lower() == str(space_name).lower()
-              ),
-              f"Agenda {space_name}",
+    if st.button("💾 Salvar & Registrar Versão no GitHub"):
+      with st.spinner("Enviando alterações e registrando histórico..."):
+        if commit_changes_to_github(edited_df, notes):
+          st.success(
+              "✅ Planilha atualizada e novo arquivo de histórico registrado"
+              " no GitHub!"
           )
-          sheet_title = re.sub(r"[\\/*?:\[\]]", "_", orig_sheet)[:31]
-
-          clean_group = group.copy()
-
-          # Atualiza a aba correspondente no Google Sheets
-          conn.update(worksheet=sheet_title, data=clean_group)
-
-        st.success(
-            "✅ Alterações salvas mantendo todas as abas e espaços no Google"
-            " Sheets!"
-        )
-        st.cache_data.clear()
-        st.rerun()
-
-      except Exception as e:
-        st.error(f"⚠️ Erro ao salvar as abas no Google Sheets: {e}")
+          st.cache_data.clear()
+          st.rerun()
 
   elif senha:
     st.error("❌ Senha incorreta.")
