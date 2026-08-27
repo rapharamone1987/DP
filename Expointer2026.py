@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Imagem de fundo do repositório
+# Imagem de fundo no GitHub (Raw)
 URL_IMAGEM_FUNDO = "https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/bg_expointer.jpg"
 
 ORDEM_DIAS = [
@@ -61,62 +61,59 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# Leitura via GSheetsConnection (Privada/Autenticada)
-@st.cache_data(ttl=15)
+# Leitura tratando cabeçalhos e colunas sem depender do nome da linha 1
+@st.cache_data(ttl=10)
 def load_data_from_google_sheets():
   try:
     conn = st.connection("gsheets", type=GSheetsConnection)
-    df = conn.read(ttl=15)
+    df = conn.read(ttl=10)
 
     if df is None or df.empty:
       return pd.DataFrame()
 
     df = df.dropna(how="all").fillna("")
 
-    col_map = {}
-    for c in df.columns:
+    # Mapeamento inteligente de colunas
+    cols = list(df.columns)
+
+    # Identifica onde está cada dado pela ordem ou por busca flexível
+    col_espaco = cols[0] if len(cols) > 0 else "Espaço"
+    col_data = cols[1] if len(cols) > 1 else "Data"
+    col_horario = cols[2] if len(cols) > 2 else "Horário"
+    col_tema = cols[3] if len(cols) > 3 else "Tema"
+    col_sec = cols[4] if len(cols) > 4 else "Secretaria"
+    col_resp = cols[5] if len(cols) > 5 else "Responsável"
+
+    for c in cols:
       c_clean = str(c).strip().lower()
       if "espaço" in c_clean or "espaco" in c_clean or "local" in c_clean:
-        col_map["Espaço"] = c
+        col_espaco = c
       elif "data" in c_clean or "dia" in c_clean:
-        col_map["Data"] = c
+        col_data = c
       elif "horário" in c_clean or "horario" in c_clean or "hora" in c_clean:
-        col_map["Horário"] = c
+        col_horario = c
       elif (
           "tema" in c_clean
           or "atividade" in c_clean
           or "evento" in c_clean
           or "programação" in c_clean
       ):
-        col_map["Tema"] = c
+        col_tema = c
       elif "secretaria" in c_clean or "entidade" in c_clean or "org" in c_clean:
-        col_map["Secretaria"] = c
+        col_sec = c
       elif "responsável" in c_clean or "responsavel" in c_clean:
-        col_map["Responsável"] = c
-
-    cols_orig = list(df.columns)
-    col_espaco = col_map.get("Espaço", cols_orig[0] if len(cols_orig) > 0 else "")
-    col_data = col_map.get("Data", cols_orig[1] if len(cols_orig) > 1 else "")
-    col_horario = col_map.get(
-        "Horário", cols_orig[2] if len(cols_orig) > 2 else ""
-    )
-    col_tema = col_map.get("Tema", cols_orig[3] if len(cols_orig) > 3 else "")
-    col_sec = col_map.get(
-        "Secretaria", cols_orig[4] if len(cols_orig) > 4 else ""
-    )
-    col_resp = col_map.get(
-        "Responsável", cols_orig[5] if len(cols_orig) > 5 else ""
-    )
+        col_resp = c
 
     df_clean = []
     for idx, row in df.iterrows():
-      espaco = str(row[col_espaco]).strip() if col_espaco else ""
-      data = str(row[col_data]).strip() if col_data else ""
-      horario_raw = str(row[col_horario]).strip() if col_horario else ""
-      tema = str(row[col_tema]).strip() if col_tema else ""
-      sec = str(row[col_sec]).strip() if col_sec else ""
-      resp = str(row[col_resp]).strip() if col_resp else ""
+      espaco = str(row.get(col_espaco, "")).strip()
+      data = str(row.get(col_data, "")).strip()
+      horario_raw = str(row.get(col_horario, "")).strip()
+      tema = str(row.get(col_tema, "")).strip()
+      sec = str(row.get(col_sec, "")).strip()
+      resp = str(row.get(col_resp, "")).strip()
 
+      # Pula a linha se for a repetição do cabeçalho
       if (
           horario_raw.lower() in ["horário", "horario", "hora"]
           or data.lower() == "data"
@@ -150,7 +147,6 @@ def load_data_from_google_sheets():
     return pd.DataFrame()
 
 
-# Gravação Direta no Google Sheets via App
 def save_data_to_google_sheets(updated_df):
   try:
     conn = st.connection("gsheets", type=GSheetsConnection)
@@ -279,24 +275,25 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# Estilização CSS com Imagem no Fundo
+# Estilização CSS que Força a Imagem de Fundo sobre o Dark Mode
 custom_css = f"""
 <style>
-    .stApp {{
+    /* Força a Imagem no Fundo da Tela */
+    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{
         background: url("{URL_IMAGEM_FUNDO}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif;
     }}
 
+    /* Card Principal */
     .header-banner {{
         background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(21, 128, 61, 0.95) 100%) !important;
         border-radius: 16px;
-        padding: 32px 20px;
+        padding: 30px 20px;
         text-align: center;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
         margin-bottom: 24px;
         border-bottom: 5px solid #eab308;
-        backdrop-filter: blur(4px);
     }}
     
     .header-logo-title {{
@@ -304,11 +301,45 @@ custom_css = f"""
         font-weight: 900 !important;
         color: #ffffff !important;
         margin: 0 !important;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    }}
+
+    /* Estilo dos Cabeçalhos das Colunas da Grade */
+    .cal-header {{
+        background-color: #064e3b !important;
+        color: #ffffff !important;
+        text-align: center;
+        padding: 12px 8px;
+        font-weight: 800;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        font-size: 0.95rem;
+    }}
+
+    /* Caixas de Eventos */
+    .cal-event-box {{
+        background-color: rgba(255, 255, 255, 0.96) !important;
+        border: 1px solid #cbd5e1 !important;
+        border-left: 5px solid #15803d !important;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }}
+
+    .event-card-vago {{
+        background-color: rgba(255, 255, 255, 0.96) !important;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 12px;
+        border-left: 6px solid #d97706 !important;
+        border: 1px dashed #f59e0b;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     }}
 
     div[data-baseweb="select"] > div, input {{
-        background-color: rgba(255, 255, 255, 0.92) !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
         color: #0f172a !important;
         border-radius: 8px !important;
     }}
@@ -317,37 +348,6 @@ custom_css = f"""
         color: #ffffff !important;
         font-weight: 800 !important;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-    }}
-
-    .cal-event-box {{
-        background-color: rgba(255, 255, 255, 0.95) !important;
-        border: 1px solid #cbd5e1 !important;
-        border-left: 5px solid #15803d !important;
-        padding: 12px;
-        margin-bottom: 10px;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
-    }}
-
-    .event-card-vago {{
-        background-color: rgba(255, 255, 255, 0.95) !important;
-        border-radius: 10px;
-        padding: 14px;
-        margin-bottom: 12px;
-        border-left: 6px solid #d97706 !important;
-        border: 1px dashed #f59e0b;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
-    }}
-
-    .cal-header {{
-        background-color: rgba(6, 78, 59, 0.95) !important;
-        color: #ffffff !important;
-        text-align: center;
-        padding: 10px;
-        font-weight: 800;
-        border-radius: 8px;
-        margin-bottom: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }}
 </style>
 """
@@ -366,17 +366,27 @@ st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Verifique as configurações de secrets do"
-      " Google Sheets no Streamlit Cloud."
+      "⚠️ Nenhum dado carregado. Verifique as configurações do Secrets no"
+      " Streamlit Cloud."
   )
   st.stop()
 
 # Filtros e Mapeamentos
-dias_encontrados = list(df_data["Data"].unique())
+dias_encontrados = [
+    d
+    for d in df_data["Data"].unique()
+    if d and str(d).strip().lower() != "data"
+]
 todos_dias = [
     d for d in ORDEM_DIAS if d in dias_encontrados
-] + [d for d in dias_encontrados if d not in ORDEM_DIAS and d]
-todos_espacos = sorted([e for e in df_data["Espaço"].unique() if e])
+] + [d for d in dias_encontrados if d not in ORDEM_DIAS]
+todos_espacos = sorted(
+    [
+        e
+        for e in df_data["Espaço"].unique()
+        if e and str(e).strip().lower() != "espaço"
+    ]
+)
 todas_sec = sorted(
     [
         s
@@ -472,7 +482,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição Direta do App",
 ])
 
-# ABA 1: CALENDÁRIO
+# ABA 1: CALENDÁRIO (CORRIGIDO CABEÇALHOS DAS DATAS)
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -497,8 +507,9 @@ with tab_calendar:
       grid_cols = st.columns(num_dias)
       for idx, d in enumerate(dias_para_exibir):
         with grid_cols[idx]:
+          # Renderiza o dia correspondente da coluna no topo do card verde
           st.markdown(
-              f'<div class="cal-header">{d}</div>', unsafe_allow_html=True
+              f'<div class="cal-header">📅 {d}</div>', unsafe_allow_html=True
           )
           evs_dia = df_grid[df_grid["Data"] == d]
           for _, ev in evs_dia.iterrows():
@@ -559,7 +570,7 @@ with tab_vagos:
                 """
         cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
 
-# ABA 3: EDIÇÃO DIRETA DENTRO DO APP
+# ABA 3: EDIÇÃO DIRETA
 with tab_edit:
   st.markdown("### 🔒 Edição Interativa da Grade de Eventos")
   senha = st.text_input("Digite a senha de administrador:", type="password")
