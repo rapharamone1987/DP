@@ -599,4 +599,299 @@ custom_css = f"""
         font-weight: 800;
         border-radius: 8px;
         margin-bottom: 12px;
-            
+        box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+        font-size: 0.9rem;
+        border: 1px solid #15803d;
+    }}
+
+    .cal-event-box {{
+        background-color: rgba(255, 255, 255, 0.96) !important;
+        border: 1px solid #cbd5e1 !important;
+        border-left: 6px solid #15803d !important;
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+    }}
+
+    .cal-event-box span {{
+        color: #15803d !important;
+        font-weight: 800 !important;
+        display: block;
+        margin-bottom: 4px;
+        text-shadow: none !important;
+    }}
+
+    .event-card-vago {{
+        background-color: rgba(255, 255, 255, 0.96) !important;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 12px;
+        border-left: 6px solid #15803d !important;
+        border: 1px dashed #16a34a;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+    }}
+
+    .card-time-vago {{
+        color: #15803d !important;
+        font-weight: 900 !important;
+        font-size: 0.9rem !important;
+        display: block !important;
+        margin-bottom: 6px !important;
+        text-shadow: none !important;
+    }}
+
+    div[data-baseweb="select"] > div, input {{
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        color: #0f172a !important;
+        border-radius: 8px !important;
+    }}
+
+    label, .stSelectbox label, .stMultiSelect label, .stTextInput label, div[data-testid="stMarkdownContainer"] p {{
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+    }}
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
+
+banner_html = """
+<div class="rs-banner-card">
+    <div class="rs-banner-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
+</div>
+"""
+st.markdown(banner_html, unsafe_allow_html=True)
+
+df_data = load_csv_from_github()
+
+if df_data.empty:
+    st.warning(
+        "⚠️ Nenhum dado foi carregado. Verifique o arquivo 'Grade Expointer 2026.csv' no GitHub."
+    )
+    st.stop()
+
+dias_encontrados = [d for d in df_data["Data"].unique() if d]
+todos_dias = [d for d in ORDEM_DIAS if d in dias_encontrados] + [d for d in dias_encontrados if d not in ORDEM_DIAS]
+todos_espacos = sorted([e for e in df_data["Espaço"].unique() if e])
+todas_sec = sorted([
+    s
+    for s in df_data["Secretaria"].unique()
+    if s and str(s).strip() != "🔓 HORÁRIO VAGO"
+])
+
+st.markdown("### 🔍 Pesquisar e Filtrar Programação")
+with st.container():
+    col_busca, col_dias = st.columns([2, 2])
+    with col_busca:
+        busca = st.text_input(
+            "🔎 Palavra-chave:", "", placeholder="Digite um tema ou termo..."
+        )
+    with col_dias:
+        dias_sel = st.multiselect(
+            "📅 Filtrar por Dia(s):",
+            todos_dias,
+            default=[],
+            placeholder="Selecione os dias...",
+        )
+
+    col_espaco, col_sec = st.columns(2)
+    with col_espaco:
+        espacos_sel = st.multiselect(
+            "📍 Filtrar por Espaço / Auditório:",
+            todos_espacos,
+            default=[],
+            placeholder="Selecione os locais...",
+        )
+    with col_sec:
+        sec_sel = st.multiselect(
+            "🏢 Filtrar por Secretaria / Entidade:",
+            todas_sec,
+            default=[],
+            placeholder="Selecione as entidades...",
+        )
+
+df_filtered = df_data.copy()
+
+if busca:
+    t = busca.lower()
+    df_filtered = df_filtered[
+        df_filtered["Tema"].astype(str).str.lower().str.contains(t)
+        | df_filtered["Espaço"].astype(str).str.lower().str.contains(t)
+        | df_filtered["Responsável"].astype(str).str.lower().str.contains(t)
+    ]
+if dias_sel:
+    df_filtered = df_filtered[df_filtered["Data"].isin(dias_sel)]
+if espacos_sel:
+    df_filtered = df_filtered[df_filtered["Espaço"].isin(espacos_sel)]
+if sec_sel:
+    df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
+
+df_filtered["Hora_Sort"] = df_filtered["Horário"].apply(extract_start_time)
+df_filtered["Data_Cat"] = pd.Categorical(
+    df_filtered["Data"], categories=ORDEM_DIAS, ordered=True
+)
+df_filtered = df_filtered.sort_values(
+    by=["Data_Cat", "Hora_Sort"]
+).drop(columns=["Data_Cat", "Hora_Sort"])
+
+df_agendados = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
+df_vagos_totais = df_filtered[df_filtered["Tema"] == "🔓 HORÁRIO VAGO"]
+
+st.sidebar.header("📄 Exportação & Gestão")
+if st.sidebar.button("⚙️ Gerar Relatório PDF"):
+    if not df_agendados.empty:
+        info_str = "Seleção Personalizada"
+        if espacos_sel:
+            info_str = f"Espaços: {', '.join(espacos_sel)}"
+        elif dias_sel:
+            info_str = f"Dias: {', '.join(dias_sel)}"
+        pdf_bytes = generate_pdf_report(df_agendados, info_str)
+        st.sidebar.download_button(
+            label="📥 Baixar PDF da Programação",
+            data=pdf_bytes,
+            file_name="agenda_expointer.pdf",
+            mime="application/pdf",
+        )
+    else:
+        st.sidebar.error("Nenhum evento agendado selecionado.")
+
+st.sidebar.divider()
+
+tab_calendar, tab_vagos, tab_edit = st.tabs([
+    "📅 Visão Calendário",
+    "🔓 Horários Livres / Vagos",
+    "🔒 Edição & Versionamento",
+])
+
+# ABA 1: CALENDÁRIO
+with tab_calendar:
+    dia_grid_sel = st.selectbox(
+        "📆 Destacar dia na grade:",
+        ["Exibir Todos Selecionados"] + todos_dias,
+        index=0,
+    )
+    df_grid = df_agendados.copy()
+    if dia_grid_sel != "Exibir Todos Selecionados":
+        df_grid = df_grid[df_grid["Data"] == dia_grid_sel]
+
+    if df_grid.empty:
+        st.info("Nenhum evento agendado para exibir nesta visão.")
+    else:
+        dias_unicos = [d for d in ORDEM_DIAS if d in df_grid["Data"].unique()]
+
+        if len(dias_unicos) == 0:
+            st.info("Nenhum dia correspondente para os filtros selecionados.")
+        else:
+            grid_cols = st.columns(len(dias_unicos))
+            for idx, d in enumerate(dias_unicos):
+                with grid_cols[idx]:
+                    st.markdown(
+                        f'<div class="cal-header">📅 {d}</div>', unsafe_allow_html=True
+                    )
+                    evs_dia = df_grid[df_grid["Data"] == d]
+                    for _, ev in evs_dia.iterrows():
+                        sec_val = (
+                            str(ev["Secretaria"]).strip()
+                            if pd.notna(ev["Secretaria"])
+                            else ""
+                        )
+                        resp_val = (
+                            str(ev["Responsável"]).strip()
+                            if pd.notna(ev["Responsável"])
+                            else ""
+                        )
+
+                        sec_display = (
+                            f'<div style="color:#334155; font-size:0.75rem;'
+                            f' font-weight:600; margin-top:4px;'>🏢 {sec_val}</div>'
+                            if sec_val and sec_val.lower() not in ["nan", "none", ""]
+                            else ""
+                        )
+                        resp_display = (
+                            f'<div style="color:#475569; font-size:0.75rem;'
+                            f' font-weight:500;'>👤 {resp_val}</div>'
+                            if resp_val and resp_val.lower() not in ["nan", "none", ""]
+                            else ""
+                        )
+
+                        st.markdown(
+                            f"""
+                            <div class="cal-event-box">
+                                <span>⏰ {ev['Horário']}</span>
+                                <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">{ev['Tema']}</div>
+                                <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
+                                {sec_display}
+                                {resp_display}
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+
+# ABA 2: HORÁRIOS LIVRES / VAGOS
+with tab_vagos:
+    st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
+    if df_vagos_totais.empty:
+        st.success("🎉 Todos os espaços estão ocupados para o filtro selecionado!")
+    else:
+        st.metric("Total de Horários Disponíveis", len(df_vagos_totais))
+        for data, grupo in df_vagos_totais.groupby("Data", sort=False):
+            st.markdown(f"#### 📅 {data}")
+            cols_vago = st.columns(3)
+            for idx, (_, row) in enumerate(grupo.iterrows()):
+                vago_html = f"""
+                        <div class="event-card-vago">
+                            <span class="card-time-vago">⏰ {row['Horário']}</span>
+                            <div style="font-weight:800; font-size:0.95rem; color:#b45309; margin-top:4px;">🔓 HORÁRIO DISPONÍVEL</div>
+                            <div style="color:#0369a1; font-weight:800; font-size:0.88rem; margin-top:2px;">📍 {row['Espaço']}</div>
+                        </div>
+                        """
+                cols_vago[idx % 3].markdown(vago_html, unsafe_allow_html=True)
+
+# ABA 3: EDIÇÃO COM VERSIONAMENTO
+with tab_edit:
+    st.markdown("### 🔒 Edição & Versionamento Automático")
+    senha = st.text_input("Digite a senha de administrador:", type="password")
+
+    if senha == ADMIN_PASSWORD:
+        st.success(
+            "🔓 Acesso liberado! Edite os dados na tabela e registre a alteração."
+        )
+
+        notes = st.text_input(
+            "Motivo / Descrição da Alteração (Auditoria):",
+            placeholder="Ex: Ajuste no horário do painel SEDUC",
+        )
+
+        edited_df = st.data_editor(
+            df_data,
+            use_container_width=True,
+            num_rows="dynamic",
+            column_config={
+                "Espaço": st.column_config.SelectboxColumn(
+                    "Espaço / Local", options=todos_espacos, required=True
+                ),
+                "Data": st.column_config.SelectboxColumn(
+                    "Dia", options=ORDEM_DIAS, required=True
+                ),
+                "Horário": st.column_config.TextColumn("Horário", required=True),
+                "Tema": st.column_config.TextColumn(
+                    "Atividade / Tema", required=True
+                ),
+                "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
+                "Responsável": st.column_config.TextColumn("Responsável"),
+            },
+            key="editor_github",
+        )
+
+        if st.button("💾 Salvar & Registrar Versão no GitHub"):
+            with st.spinner("Enviando alterações e registrando histórico..."):
+                if commit_changes_to_github(edited_df, notes):
+                    st.success(
+                        "✅ Arquivo CSV atualizado e novo registro salvo no GitHub!"
+                    )
+                    st.cache_data.clear()
+                    st.rerun()
+
+    elif senha:
+        st.error("❌ Senha incorreta.")
