@@ -218,106 +218,86 @@ def load_csv_from_github():
 
     res = requests.get(api_url, headers=headers, timeout=15)
     if not res.ok:
-      st.error(
-          f"⚠️ Erro HTTP {res.status_code} ao buscar '{FILE_CSV_PATH}' no"
-          f" GitHub: {res.text}"
-      )
+      st.error(f"⚠️ Erro HTTP {res.status_code} ao buscar arquivo no GitHub.")
       return pd.DataFrame()
 
     content_b64 = res.json().get("content", "")
     if not content_b64:
-      st.error("⚠️ Conteúdo do arquivo vazio no GitHub.")
       return pd.DataFrame()
 
     content_bytes = base64.b64decode(content_b64)
 
-    df_raw = None
+    text = ""
     for enc in ["utf-8-sig", "utf-8", "latin1", "cp1252"]:
-      for sep in [";", ",", "\t"]:
-        try:
-          temp_df = pd.read_csv(
-              io.BytesIO(content_bytes),
-              sep=sep,
-              encoding=enc,
-              dtype=str,
-              header=None,
+      try:
+        text = content_bytes.decode(enc)
+        if "Ã" in text or "¡" in text:
+          text = (
+              text.encode("latin1", errors="ignore")
+              .decode("utf-8", errors="ignore")
           )
-          if temp_df.shape[1] >= 2:
-            df_raw = temp_df
-            break
-        except Exception:
-          continue
-      if df_raw is not None:
         break
+      except Exception:
+        continue
 
-    if df_raw is None or df_raw.empty:
-      st.error("⚠️ O arquivo CSV está vazio ou não pôde ser lido.")
-      return pd.DataFrame()
-
-    df_raw = df_raw.fillna("").astype(str)
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
 
     current_space = "Auditório Espaço Gov"
     current_day = "Sábado 29/08"
-
     eventos = []
 
-    for _, row in df_raw.iterrows():
-      row_list = [str(v).strip() if pd.notna(v) else "" for v in row.values]
+    for line in lines:
+      clean_line = line.replace('"', "").strip()
 
-      if all((not x or x.lower() == "nan") for x in row_list):
+      space_check = detect_space_from_string(clean_line)
+      if space_check and not clean_time_string(clean_line):
+        current_space = space_check
+
+      day_check = detect_day_from_string(clean_line)
+      if day_check and not clean_time_string(clean_line):
+        current_day = day_check
         continue
 
-      full_line = " ".join([x for x in row_list if x and x.lower() != "nan"])
-
-      found_space = detect_space_from_string(full_line)
-      if (
-          found_space
-          and not clean_time_string(row_list[0])
-          and sum(1 for x in row_list if x and x.lower() != "nan") <= 2
-      ):
-        current_space = found_space
-        continue
-
-      found_day = detect_day_from_string(full_line)
-      if (
-          found_day
-          and not clean_time_string(row_list[0])
-          and sum(1 for x in row_list if x and x.lower() != "nan") <= 2
-      ):
-        current_day = found_day
-        continue
-
-      c_espaco = row_list[0] if len(row_list) > 0 else ""
-      c_data = row_list[1] if len(row_list) > 1 else ""
-      c_horario = row_list[2] if len(row_list) > 2 else ""
-      c_tema = row_list[3] if len(row_list) > 3 else ""
-      c_sec = row_list[4] if len(row_list) > 4 else ""
-      c_resp = row_list[5] if len(row_list) > 5 else ""
-
-      horario_limpo = clean_time_string(c_horario)
-
-      if not horario_limpo and clean_time_string(c_espaco):
-        horario_limpo = clean_time_string(c_espaco)
-        c_tema = c_data
-        c_sec = c_horario
-        c_resp = c_tema
-        c_espaco = current_space
-        c_data = current_day
-
-      if not horario_limpo:
-        continue
-
-      espaco_final = (
-          detect_space_from_string(c_espaco) or c_espaco or current_space
+      parts = (
+          [p.strip() for p in clean_line.split(";")]
+          if ";" in clean_line
+          else [p.strip() for p in clean_line.split(",")]
       )
-      data_final = detect_day_from_string(c_data) or c_data or current_day
 
-      if c_tema.lower() in ["tema", "atividade", "evento", "descrição"]:
+      idx_h = -1
+      horario_limpo = ""
+      for idx, p in enumerate(parts):
+        h = clean_time_string(p)
+        if h and p.lower() not in [
+            "horario",
+            "horário",
+            "hora",
+            "horã¡jrio",
+            "horã¡rio",
+        ]:
+          horario_limpo = h
+          idx_h = idx
+          break
+
+      if idx_h == -1:
+        continue
+
+      tema = parts[idx_h + 1] if len(parts) > idx_h + 1 else ""
+      sec = parts[idx_h + 2] if len(parts) > idx_h + 2 else ""
+      resp = parts[idx_h + 3] if len(parts) > idx_h + 3 else ""
+
+      if tema.lower() in [
+          "tema",
+          "atividade",
+          "evento",
+          "descrição",
+          "descricao",
+      ]:
         continue
 
       is_vago = (
-          not c_tema
-          or c_tema.lower()
+          not tema
+          or tema.lower()
           in [
               "livre",
               "vago",
@@ -329,30 +309,30 @@ def load_csv_from_github():
               "",
               "-",
           ]
-          or c_tema.startswith("🔓")
+          or tema.startswith("🔓")
       )
 
       eventos.append({
-          "Espaço": espaco_final,
-          "Data": data_final,
+          "Espaço": current_space,
+          "Data": current_day,
           "Horário": horario_limpo,
-          "Tema": "🔓 HORÁRIO VAGO" if is_vago else c_tema,
-          "Secretaria": c_sec if not is_vago else "",
-          "Responsável": c_resp if not is_vago else "",
+          "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
+          "Secretaria": sec if not is_vago else "",
+          "Responsável": resp if not is_vago else "",
       })
 
     df_final = pd.DataFrame(eventos)
     if df_final.empty:
       st.error(
-          "⚠️ O arquivo CSV foi lido, mas nenhuma linha com horário válido foi"
-          " identificada."
+          "⚠️ O CSV foi lido, mas nenhum evento com horário válido foi"
+          " encontrado."
       )
       return pd.DataFrame()
 
     return merge_consecutive_events(df_final)
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao processar o CSV do GitHub: {e}")
+    st.error(f"⚠️ Erro ao processar o CSV: {e}")
     return pd.DataFrame()
 
 
