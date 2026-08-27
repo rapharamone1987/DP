@@ -169,27 +169,40 @@ def load_csv_from_github():
     res = requests.get(api_url, headers=headers)
     if res.status_code != 200:
       st.error(
-          f"⚠️ Erro HTTP {res.status_code} ao buscar arquivo CSV no GitHub."
+          f"⚠️ Erro HTTP {res.status_code} ao buscar '{FILE_CSV_PATH}' no"
+          " GitHub."
       )
       return pd.DataFrame()
 
     content_b64 = res.json().get("content", "")
     content_bytes = base64.b64decode(content_b64)
 
-    # Tenta ler CSV com autodetecção de delimitador (vírgula ou ponto e vírgula)
-    try:
-      df_csv = pd.read_csv(
-          io.BytesIO(content_bytes), sep=None, engine="python", dtype=str
-      ).fillna("")
-    except Exception:
-      df_csv = pd.read_csv(
-          io.BytesIO(content_bytes), sep=";", dtype=str
-      ).fillna("")
+    df_csv = None
+    for enc in ["utf-8-sig", "utf-8", "latin1", "iso-8859-1", "cp1252"]:
+      try:
+        df_csv = pd.read_csv(
+            io.BytesIO(content_bytes), sep=";", encoding=enc, dtype=str
+        )
+        if len(df_csv.columns) > 1:
+          break
+        df_csv = pd.read_csv(
+            io.BytesIO(content_bytes), sep=",", encoding=enc, dtype=str
+        )
+        if len(df_csv.columns) > 1:
+          break
+      except Exception:
+        continue
 
-    # Normalização de nomes de colunas
-    df_csv.columns = [str(c).strip().title() for c in df_csv.columns]
+    if df_csv is None or df_csv.empty:
+      st.error("⚠️ O arquivo CSV foi encontrado, mas está vazio ou ilegível.")
+      return pd.DataFrame()
 
-    # Mapeia variações de cabeçalho
+    df_csv = df_csv.fillna("")
+
+    df_csv.columns = [
+        str(c).replace("\ufeff", "").strip().title() for c in df_csv.columns
+    ]
+
     renames = {}
     for col in df_csv.columns:
       c_lower = col.lower()
@@ -208,7 +221,6 @@ def load_csv_from_github():
 
     df_csv = df_csv.rename(columns=renames)
 
-    # Garante a presença de todas as colunas necessárias
     cols_necessarias = [
         "Espaço",
         "Data",
@@ -223,13 +235,11 @@ def load_csv_from_github():
 
     df_csv = df_csv[cols_necessarias]
 
-    # Limpeza de linhas inválidas ou vaziamente preenchidas
     df_csv = df_csv[
-        (df_csv["Espaço"].str.strip() != "")
-        | (df_csv["Horário"].str.strip() != "")
+        (df_csv["Espaço"].astype(str).str.strip() != "")
+        | (df_csv["Horário"].astype(str).str.strip() != "")
     ]
 
-    # Trata horários e identifica horários vagos
     df_csv["Horário"] = df_csv["Horário"].apply(clean_time_string)
 
     def ajustar_vago(row):
@@ -278,7 +288,7 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
 
   try:
     csv_buffer = io.StringIO()
-    updated_df.to_csv(csv_buffer, index=False)
+    updated_df.to_csv(csv_buffer, index=False, sep=";")
     csv_b64 = base64.b64encode(csv_buffer.getvalue().encode("utf-8")).decode(
         "utf-8"
     )
