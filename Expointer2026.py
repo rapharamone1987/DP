@@ -9,7 +9,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 
-# 1. Configuração Inicial da Página
+# 1. Configuração da Página
 st.set_page_config(
     page_title="EXPOINTER 2026 — Agenda Institucional",
     page_icon="🌾",
@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Imagem de Fundo (GitHub Raw)
+# Imagem de fundo do GitHub (Raw com %7E)
 FILE_NAME = "Screenshot_20260825-095320~2.jpg"
 URL_IMAGEM_FUNDO = f"https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/{urllib.parse.quote(FILE_NAME)}"
 
@@ -63,85 +63,118 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# CARREGAMENTO MULTI-ABAS CONSOLIDADO
-@st.cache_data(ttl=15)
-def load_all_sheets():
+# LEITURA DE MATRIZ CRUA EM TODAS AS ABAS (HEADER=NONE)
+@st.cache_data(ttl=10)
+def load_and_parse_raw_matrix():
   try:
     conn = st.connection("gsheets", type=GSheetsConnection)
 
-    # Lê todas as abas da planilha
-    all_worksheets = conn.read(worksheet=None)
+    # Lê todas as guias sem considerar a primeira linha como cabeçalho
+    all_worksheets = conn.read(worksheet=None, header=None)
     combined_rows = []
 
-    # Se retornar um dicionário de DataFrames (uma chave por aba)
     sheets_dict = (
         all_worksheets
         if isinstance(all_worksheets, dict)
         else {"Principal": all_worksheets}
     )
 
-    for sheet_name, df in sheets_dict.items():
-      if df is None or df.empty:
+    for sheet_name, df_raw in sheets_dict.items():
+      if df_raw is None or df_raw.empty:
         continue
 
-      df = df.fillna("").astype(str)
+      df_raw = df_raw.fillna("").astype(str)
 
-      # Mapeamento flexível de colunas por aba
-      col_espaco, col_data, col_horario, col_tema, col_sec, col_resp = (
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
+      current_day = (
+          sheet_name
+          if any(d.lower() in sheet_name.lower() for d in ORDEM_DIAS)
+          else "A Definir"
       )
+      current_space = "Espaço Gov RS"
 
-      for c in df.columns:
-        c_clean = str(c).strip().lower()
-        if any(k in c_clean for k in ["espaço", "espaco", "local", "auditório"]):
-          col_espaco = c
-        elif any(k in c_clean for k in ["data", "dia"]):
-          col_data = c
-        elif any(k in c_clean for k in ["horário", "horario", "hora"]):
-          col_horario = c
-        elif any(
-            k in c_clean
-            for k in ["tema", "atividade", "evento", "programação", "titulo"]
-        ):
-          col_tema = c
-        elif any(
-            k in c_clean
-            for k in ["secretaria", "entidade", "org", "órgão", "orgao"]
-        ):
-          col_sec = c
-        elif any(k in c_clean for k in ["responsável", "responsavel", "contato"]):
-          col_resp = c
-
-      # Processamento das linhas
-      for idx, row in df.iterrows():
-        espaco = str(row.get(col_espaco, "")).strip() if col_espaco else ""
-        data = str(row.get(col_data, "")).strip() if col_data else ""
-        horario_raw = str(row.get(col_horario, "")).strip() if col_horario else ""
-        tema = str(row.get(col_tema, "")).strip() if col_tema else ""
-        sec = str(row.get(col_sec, "")).strip() if col_sec else ""
-        resp = str(row.get(col_resp, "")).strip() if col_resp else ""
-
-        # Se 'data' ou 'espaco' não vieram na linha, usa o nome da Aba como fallback
-        if not data:
-          data = sheet_name if sheet_name != "Principal" else "A Definir"
-        if not espaco:
-          espaco = "Espaço Gov RS"
-
-        horario_limpo = clean_time_string(horario_raw)
-
-        # Filtra cabeçalhos repetidos
-        if (
-            horario_raw.lower() in ["horário", "horario", "hora"]
-            or tema.lower() in ["tema", "atividade", "evento"]
-        ):
+      for idx, row in df_raw.iterrows():
+        # Transforma a linha em lista limpa
+        vals = [str(v).strip() for v in row.values if str(v).strip()]
+        if not vals:
           continue
 
-        if not horario_limpo and not tema:
+        col0 = str(row.values[0]).strip() if len(row.values) > 0 else ""
+
+        # 1. Detecta cabeçalhos de Dia/Data em qualquer coluna da linha
+        day_match = None
+        for v in vals:
+          if any(
+              d.lower() in v.lower()
+              for d in [
+                  "sábado",
+                  "domingo",
+                  "segunda",
+                  "terça",
+                  "quarta",
+                  "quinta",
+                  "sexta",
+                  "29/08",
+                  "30/08",
+                  "31/08",
+                  "01/09",
+                  "02/09",
+                  "03/09",
+                  "04/09",
+                  "05/09",
+                  "06/09",
+              ]
+          ):
+            day_match = v
+            break
+
+        if day_match and not clean_time_string(col0):
+          current_day = day_match
+          continue
+
+        # 2. Ignora subcabeçalhos visuais
+        if col0.lower() in [
+            "horário",
+            "horario",
+            "hora",
+            "espaço",
+            "local",
+            "tema",
+            "atividade",
+        ]:
+          continue
+
+        # 3. Mapeamento por posição relativa da matriz
+        horario_limpo = clean_time_string(col0)
+
+        col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
+        col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
+        col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
+
+        # Ajuste inteligente de colunas caso o horário esteja na Col 0
+        if horario_limpo:
+          tema = col1
+          secretaria = col2
+          responsavel = col3
+        else:
+          # Se o horário não estiver na Col 0, tenta achar em outra coluna
+          horario_alt = clean_time_string(col1)
+          if horario_alt:
+            horario_limpo = horario_alt
+            tema = col2
+            secretaria = col3
+            responsavel = (
+                str(row.values[4]).strip() if len(row.values) > 4 else ""
+            )
+          else:
+            tema = col0
+            secretaria = col1
+            responsavel = col2
+
+        if (
+            not horario_limpo
+            and not tema
+            or tema.lower() in ["horário", "secretaria", "responsável"]
+        ):
           continue
 
         is_vago = (
@@ -152,18 +185,18 @@ def load_all_sheets():
         )
 
         combined_rows.append({
-            "Espaço": espaco,
-            "Data": data,
+            "Espaço": current_space,
+            "Data": current_day,
             "Horário": horario_limpo if horario_limpo else "--:--",
             "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-            "Secretaria": sec if not is_vago else "",
-            "Responsável": resp if not is_vago else "",
+            "Secretaria": secretaria if not is_vago else "",
+            "Responsável": responsavel if not is_vago else "",
         })
 
     return pd.DataFrame(combined_rows)
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao carregar dados do Google Sheets: {e}")
+    st.error(f"⚠️ Erro ao processar matriz do Google Sheets: {e}")
     return pd.DataFrame()
 
 
@@ -295,7 +328,7 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO CSS
+# ESTILIZAÇÃO CSS FORÇADA COM IMAGEM DE FUNDO DO GITHUB
 custom_css = f"""
 <style>
     html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
@@ -371,8 +404,8 @@ custom_css = f"""
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Executa Carga
-df_data = load_all_sheets()
+# Processa Matriz
+df_data = load_and_parse_raw_matrix()
 
 # Banner Principal
 banner_html = """
@@ -490,7 +523,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição Direta do App",
 ])
 
-# ABA 1: CALENDÁRIO
+# ABA 1: CALENDÁRIO COM GRID POR DIA
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -612,5 +645,7 @@ with tab_edit:
         st.cache_data.clear()
         st.rerun()
 
+  elif senha:
+    st.error("❌ Senha incorreta.")
   elif senha:
     st.error("❌ Senha incorreta.")
