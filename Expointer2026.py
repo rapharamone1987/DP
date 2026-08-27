@@ -21,7 +21,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Configurações do Repositório GitHub
 GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 FILE_CSV_PATH = "Grade Expointer 2026.csv"
@@ -39,6 +38,18 @@ ORDEM_DIAS = [
     "Sábado 05/09",
     "Domingo 06/09",
 ]
+
+MAPA_DIAS = {
+    "29/08": "Sábado 29/08",
+    "30/08": "Domingo 30/08",
+    "31/08": "Segunda 31/08",
+    "01/09": "Terça 01/09",
+    "02/09": "Quarta 02/09",
+    "03/09": "Quinta 03/09",
+    "04/09": "Sexta 04/09",
+    "05/09": "Sábado 05/09",
+    "06/09": "Domingo 06/09",
+}
 
 
 @st.cache_data(ttl=3600)
@@ -95,6 +106,30 @@ def extract_end_time(horario_str):
     h, m = map(int, matches[0].split(":"))
     return f"{(h + 1) % 24:02d}:{m:02d}"
   return ""
+
+
+def detect_space_from_string(text):
+  t = text.lower()
+  if "admin" in t:
+    return "Auditório Administração"
+  elif "bancada" in t:
+    return "Bancada Espaço Gov"
+  elif "arena" in t:
+    return "Arena Espaço Gov"
+  elif "audit" in t or "espaço gov" in t or "espaco gov" in t:
+    return "Auditório Espaço Gov"
+  return None
+
+
+def detect_day_from_string(text):
+  t = text.lower()
+  for key, full_day in MAPA_DIAS.items():
+    if key in t:
+      return full_day
+  for d in ORDEM_DIAS:
+    if d.lower() in t:
+      return d
+  return None
 
 
 def merge_consecutive_events(df):
@@ -177,7 +212,6 @@ def load_csv_from_github():
     content_b64 = res.json().get("content", "")
     content_bytes = base64.b64decode(content_b64)
 
-    # Decodificação adaptativa
     df_raw = None
     for enc in ["utf-8-sig", "utf-8", "latin1", "cp1252"]:
       for sep in [";", ",", "\t"]:
@@ -189,7 +223,7 @@ def load_csv_from_github():
               dtype=str,
               header=None,
           )
-          if temp_df.shape[1] >= 3:
+          if temp_df.shape[1] >= 2:
             df_raw = temp_df
             break
         except Exception:
@@ -203,59 +237,13 @@ def load_csv_from_github():
 
     df_raw = df_raw.fillna("").astype(str)
 
-    # Verifica se a primeira linha traz nomes de colunas
-    primeira_linha = [str(x).lower().strip() for x in df_raw.iloc[0].values]
-    tem_cabecalho = any(
-        k in " ".join(primeira_linha)
-        for k in [
-            "espaço",
-            "espaco",
-            "horario",
-            "horário",
-            "tema",
-            "data",
-            "secretaria",
-        ]
-    )
-
-    if tem_cabecalho:
-      df_data = df_raw.iloc[1:].copy()
-      df_data.columns = [str(x).strip() for x in df_raw.iloc[0].values]
-    else:
-      df_data = df_raw.copy()
-
-    # Mapeamento flexível das colunas pelo nome
-    col_map = {}
-    for c in df_data.columns:
-      c_str = str(c).lower().strip()
-      if "espaco" in c_str or "espaço" in c_str or "local" in c_str:
-        col_map[c] = "Espaço"
-      elif "data" in c_str or "dia" in c_str:
-        col_map[c] = "Data"
-      elif "horario" in c_str or "horário" in c_str or "hora" in c_str:
-        col_map[c] = "Horário"
-      elif (
-          "tema" in c_str
-          or "atividade" in c_str
-          or "evento" in c_str
-          or "descrição" in c_str
-          or "descricao" in c_str
-      ):
-        col_map[c] = "Tema"
-      elif (
-          "secretaria" in c_str
-          or "entidade" in c_str
-          or "órgão" in c_str
-          or "orgao" in c_str
-      ):
-        col_map[c] = "Secretaria"
-      elif "responsavel" in c_str or "responsável" in c_str:
-        col_map[c] = "Responsável"
-
-    df_mapped = df_data.rename(columns=col_map)
+    # Estado de rastreamento dinamico para linhas de contexto
+    current_space = "Auditório Espaço Gov"
+    current_day = "Sábado 29/08"
 
     eventos = []
-    for _, row in df_mapped.iterrows():
+
+    for _, row in df_raw.iterrows():
       row_vals = [
           str(v).strip()
           for v in row.values
@@ -264,53 +252,72 @@ def load_csv_from_github():
       if not row_vals:
         continue
 
-      espaco = str(row.get("Espaço", "")).strip()
-      data = str(row.get("Data", "")).strip()
-      horario_raw = str(row.get("Horário", "")).strip()
-      tema = str(row.get("Tema", "")).strip()
-      sec = str(row.get("Secretaria", "")).strip()
-      resp = str(row.get("Responsável", "")).strip()
+      full_line = " ".join(row_vals)
 
-      # Se faltar identificação explícita de colunas, realiza mapeamento posicional inteligente
-      if not tem_cabecalho or not horario_raw:
-        # Tenta achar qual coluna é o Horário
-        idx_h = -1
-        for idx, val in enumerate(row_vals):
-          if clean_time_string(val):
-            horario_raw = val
-            idx_h = idx
-            break
+      # 1. Verifica se a linha indica mudança de Espaço/Local
+      found_space = detect_space_from_string(full_line)
+      if (
+          found_space
+          and not clean_time_string(row_vals[0])
+          and len(row_vals) <= 2
+      ):
+        current_space = found_space
 
-        if idx_h != -1:
-          # Estrutura posicional padrão: [Espaço, Data, Horário, Tema, Secretaria, Responsável]
-          if idx_h == 2 and len(row_vals) >= 4:
-            if not espaco:
-              espaco = row_vals[0]
-            if not data:
-              data = row_vals[1]
-            if not tema and len(row_vals) > 3:
-              tema = row_vals[3]
-            if not sec and len(row_vals) > 4:
-              sec = row_vals[4]
-            if not resp and len(row_vals) > 5:
-              resp = row_vals[5]
-          # Estrutura posicional alternativa: [Horário, Tema, Secretaria, Responsável]
-          elif idx_h == 0 and len(row_vals) >= 2:
-            if not tema:
-              tema = row_vals[1]
-            if not sec and len(row_vals) > 2:
-              sec = row_vals[2]
-            if not resp and len(row_vals) > 3:
-              resp = row_vals[3]
-
-      horario_limpo = clean_time_string(horario_raw)
-      if not horario_limpo:
+      # 2. Verifica se a linha indica mudança de Data/Dia
+      found_day = detect_day_from_string(full_line)
+      if (
+          found_day
+          and not clean_time_string(row_vals[0])
+          and len(row_vals) <= 2
+      ):
+        current_day = found_day
         continue
 
-      if not espaco or espaco.lower() in ["nan", "none", ""]:
-        espaco = "Auditório Espaço Gov"
-      if not data or data.lower() in ["nan", "none", ""]:
-        data = "Sábado 29/08"
+      # 3. Descobre em qual coluna está o Horário
+      idx_h = -1
+      horario_limpo = ""
+      for idx, val in enumerate(row_vals):
+        h = clean_time_string(val)
+        if h and val.lower() not in [
+            "horario",
+            "horário",
+            "hora",
+            "espaço",
+            "data",
+        ]:
+          horario_limpo = h
+          idx_h = idx
+          break
+
+      if idx_h == -1:
+        continue
+
+      # Extrai dados em relação ao índice da coluna de Horário
+      espaco = (
+          row_vals[0]
+          if (idx_h > 0 and detect_space_from_string(row_vals[0]))
+          else current_space
+      )
+      data = (
+          row_vals[1]
+          if (idx_h > 1 and detect_day_from_string(row_vals[1]))
+          else current_day
+      )
+
+      tema = row_vals[idx_h + 1] if len(row_vals) > idx_h + 1 else ""
+      sec = row_vals[idx_h + 2] if len(row_vals) > idx_h + 2 else ""
+      resp = row_vals[idx_h + 3] if len(row_vals) > idx_h + 3 else ""
+
+      # Valida se a primeira coluna era o Espaço
+      if detect_space_from_string(row_vals[0]):
+        espaco = detect_space_from_string(row_vals[0])
+
+      # Valida se alguma coluna da linha trazia o Dia explicitamente
+      for v in row_vals:
+        d_found = detect_day_from_string(v)
+        if d_found:
+          data = d_found
+          break
 
       is_vago = (
           not tema
@@ -635,7 +642,6 @@ banner_html = """
 """
 st.markdown(banner_html, unsafe_allow_html=True)
 
-# Carregamento dos dados via CSV
 df_data = load_csv_from_github()
 
 if df_data.empty:
@@ -645,7 +651,6 @@ if df_data.empty:
   )
   st.stop()
 
-# Filtros Globais
 dias_encontrados = [d for d in df_data["Data"].unique() if d]
 todos_dias = [
     d for d in ORDEM_DIAS if d in dias_encontrados
@@ -704,7 +709,6 @@ if espacos_sel:
 if sec_sel:
   df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
 
-# Ordenação Cronológica
 df_filtered["Hora_Sort"] = df_filtered["Horário"].apply(extract_start_time)
 df_filtered["Data_Cat"] = pd.Categorical(
     df_filtered["Data"], categories=ORDEM_DIAS, ordered=True
@@ -716,7 +720,6 @@ df_filtered = df_filtered.sort_values(
 df_agendados = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
 df_vagos_totais = df_filtered[df_filtered["Tema"] == "🔓 HORÁRIO VAGO"]
 
-# Sidebar
 st.sidebar.header("📄 Exportação & Gestão")
 if st.sidebar.button("⚙️ Gerar Relatório PDF"):
   if not df_agendados.empty:
@@ -737,7 +740,6 @@ if st.sidebar.button("⚙️ Gerar Relatório PDF"):
 
 st.sidebar.divider()
 
-# Abas
 tab_calendar, tab_vagos, tab_edit = st.tabs([
     "📅 Visão Calendário",
     "🔓 Horários Livres / Vagos",
