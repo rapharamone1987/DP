@@ -540,9 +540,9 @@ custom_css = f"""
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
-    /* BANNER PRINCIPAL COM AS CORES DA BANDEIRA DO RIO GRANDE DO SUL (Verde, Vermelho, Amarelo) */
+    /* BANNER PRINCIPAL COM GRADIENTE SUAVE E OPACIDADE CONTROLADA (CORES DO RIO GRANDE DO SUL) */
     .rs-banner-card {{
-        background: linear-gradient(115deg, #0b6623 0%, #15803d 35%, #b91c1c 36%, #dc2626 68%, #eab308 69%, #f59e0b 100%) !important;
+        background: linear-gradient(135deg, rgba(11, 102, 35, 0.88) 0%, rgba(21, 128, 61, 0.85) 35%, rgba(185, 28, 28, 0.85) 68%, rgba(234, 179, 8, 0.88) 100%) !important;
         border-radius: 16px;
         padding: 38px 20px;
         text-align: center;
@@ -584,14 +584,33 @@ custom_css = f"""
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }}
 
+    /* GARANTE QUE O HORÁRIO NO CALENDÁRIO SEJA VERDE ESCURO */
+    .cal-event-box span {{
+        color: #15803d !important;
+        font-weight: 800 !important;
+        display: block;
+        margin-bottom: 4px;
+        text-shadow: none !important;
+    }}
+
     .event-card-vago {{
         background-color: rgba(255, 255, 255, 0.96) !important;
         border-radius: 10px;
         padding: 14px;
         margin-bottom: 12px;
-        border-left: 6px solid #d97706 !important;
-        border: 1px dashed #f59e0b;
+        border-left: 6px solid #15803d !important;
+        border: 1px dashed #16a34a;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+    }}
+
+    /* GARANTE COR VERDE VISÍVEL NO HORÁRIO DA ABA DE VAGOS */
+    .card-time-vago {{
+        color: #15803d !important;
+        font-weight: 900 !important;
+        font-size: 0.9rem !important;
+        display: block !important;
+        margin-bottom: 6px !important;
+        text-shadow: none !important;
     }}
 
     div[data-baseweb="select"] > div, input {{
@@ -778,7 +797,7 @@ with tab_calendar:
             st.markdown(
                 f"""
                 <div class="cal-event-box">
-                    <span style="color:#15803d; font-weight:800; display:block; margin-bottom:4px;">⏰ {ev['Horário']}</span>
+                    <span>⏰ {ev['Horário']}</span>
                     <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">{ev['Tema']}</div>
                     <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
                     {sec_display}
@@ -788,7 +807,7 @@ with tab_calendar:
                 unsafe_allow_html=True,
             )
 
-# ABA 2: HORÁRIOS LIVRES / VAGOS
+# ABA 2: HORÁRIOS LIVRES / VAGOS COM HORÁRIO EM VERDE VISÍVEL
 with tab_vagos:
   st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
   if df_vagos_totais.empty:
