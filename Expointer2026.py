@@ -40,7 +40,6 @@ ORDEM_DIAS = [
     "Domingo 06/09",
 ]
 
-# Dicionário inteligente para capturar qualquer variação de dia na planilha
 MAPA_RECONHECIMENTO_DIAS = {
     "29/08": "Sábado 29/08",
     "sabado 29": "Sábado 29/08",
@@ -91,10 +90,8 @@ def sanitize_space_name(raw_name):
 
 def detect_day_from_line(line_str):
   s = line_str.lower()
-  # Busca termos do mapa de reconhecimento
   for key, mapped_day in MAPA_RECONHECIMENTO_DIAS.items():
     if key in s:
-      # Diferencia Sábado 29 de Sábado 05
       if "sabado" in key or "sábado" in key:
         if "05" in s or "5" in s:
           return "Sábado 05/09"
@@ -220,7 +217,6 @@ def merge_consecutive_events(df):
   return res_df.drop(columns=cols_to_drop)
 
 
-# CARREGAMENTO INTELIGENTE DE TODOS OS DIAS DO EVENTO
 @st.cache_data(ttl=15)
 def load_excel_from_github():
   try:
@@ -271,7 +267,6 @@ def load_excel_from_github():
 
         line_str = " ".join(row_vals)
 
-        # Detecta mudança de dia na linha
         detected_day = detect_day_from_line(line_str)
         if detected_day:
           current_data = detected_day
@@ -538,47 +533,32 @@ bg_url_css = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 custom_css = f"""
 <style>
-    /* Fundo suave na página */
+    /* Fundo geral da aplicação */
     .stApp {{
         background: linear-gradient(rgba(15, 23, 42, 0.40), rgba(15, 23, 42, 0.40)), url("{bg_url_css}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
-    /* Card/Header Verde com Imagem de Fundo sobreposta */
-    .header-banner-container {{
-        position: relative;
-        background-color: #064e3b;
+    /* BANNER PRINCIPAL COM AS CORES DA BANDEIRA DO RIO GRANDE DO SUL (Verde, Vermelho, Amarelo) */
+    .rs-banner-card {{
+        background: linear-gradient(115deg, #0b6623 0%, #15803d 35%, #b91c1c 36%, #dc2626 68%, #eab308 69%, #f59e0b 100%) !important;
         border-radius: 16px;
-        overflow: hidden;
-        margin-bottom: 24px;
-        border-bottom: 5px solid #eab308;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-    }}
-
-    .header-banner-bg {{
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: url("{bg_url_css}") no-repeat center center;
-        background-size: cover;
-        opacity: 0.25;
-        z-index: 1;
-    }}
-
-    .header-banner-content {{
-        position: relative;
-        z-index: 2;
-        padding: 35px 20px;
+        padding: 38px 20px;
         text-align: center;
-        background: linear-gradient(135deg, rgba(6, 78, 59, 0.85) 0%, rgba(21, 128, 61, 0.85) 100%);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+        margin-bottom: 26px;
+        border-bottom: 6px solid #facc15;
+        position: relative;
     }}
-    
-    .header-logo-title {{
+
+    .rs-banner-title {{
         font-size: 2.2rem !important;
         font-weight: 900 !important;
         color: #ffffff !important;
         margin: 0 !important;
-        text-shadow: 0 3px 6px rgba(0,0,0,0.9);
+        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.95);
+        letter-spacing: 0.5px;
     }}
 
     .cal-header {{
@@ -632,13 +612,10 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # Carregamento dos dados
 df_data = load_excel_from_github()
 
-# Banner Principal com Imagem Garantida
+# Banner com as Cores do Rio Grande do Sul
 banner_html = """
-<div class="header-banner-container">
-    <div class="header-banner-bg"></div>
-    <div class="header-banner-content">
-        <div class="header-logo-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
-    </div>
+<div class="rs-banner-card">
+    <div class="rs-banner-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
 </div>
 """
 st.markdown(banner_html, unsafe_allow_html=True)
