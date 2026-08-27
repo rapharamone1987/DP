@@ -3,6 +3,7 @@ import datetime
 import io
 import json
 import re
+import urllib.parse
 import urllib.request
 import pandas as pd
 from reportlab.lib import colors
@@ -25,8 +26,7 @@ GITHUB_REPO = st.secrets.get("GITHUB_REPO", "raphaelsilveiraduarte/dp")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 FILE_EXCEL_PATH = "Grade Expointer 2026.xlsx"
 
-# URLs com encoding para evitar HTTP 404
-URL_RAW_EXCEL = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Grade%20Expointer%202026.xlsx"
+# URLs
 URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
 
 ORDEM_DIAS = [
@@ -53,7 +53,10 @@ space_mapping = {
 @st.cache_data(ttl=3600)
 def load_background_base64(url):
   try:
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    headers = {"User-Agent": "Mozilla/5.0"}
+    if GITHUB_TOKEN:
+      headers["Authorization"] = f"token {GITHUB_TOKEN}"
+    req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req) as resp:
       return base64.b64encode(resp.read()).decode("utf-8")
   except Exception:
@@ -61,9 +64,7 @@ def load_background_base64(url):
 
 
 img_b64 = load_background_base64(URL_RAW_IMG)
-bg_style = (
-    f"data:image/jpeg;base64,{img_b64}" if img_b64 else URL_RAW_IMG
-)
+bg_style = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 
 def clean_time_string(time_str):
@@ -94,17 +95,39 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# CARREGAMENTO SEGURO DO EXCEL DO GITHUB
+# CARREGAMENTO DO EXCEL VIA GITHUB API AUTENTICADA
 @st.cache_data(ttl=15)
 def load_excel_from_github():
   try:
-    req = urllib.request.Request(
-        URL_RAW_EXCEL, headers={"User-Agent": "Mozilla/5.0"}
-    )
-    with urllib.request.urlopen(req) as resp:
-      content = resp.read()
+    encoded_path = urllib.parse.quote(FILE_EXCEL_PATH)
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
 
-    excel_file = pd.ExcelFile(io.BytesIO(content), engine="openpyxl")
+    headers = {"Accept": "application/vnd.github.v3+json"}
+    if GITHUB_TOKEN:
+      headers["Authorization"] = f"token {GITHUB_TOKEN}"
+
+    res = requests.get(api_url, headers=headers)
+
+    if res.status_code == 200:
+      content_b64 = res.json().get("content", "")
+      content_bytes = base64.b64decode(content_b64)
+      excel_file = pd.ExcelFile(io.BytesIO(content_bytes), engine="openpyxl")
+    else:
+      # Tenta via URL Raw autenticada se a API falhar
+      raw_url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{encoded_path}"
+      raw_req = urllib.request.Request(
+          raw_url,
+          headers={
+              "Authorization": f"token {GITHUB_TOKEN}"
+              if GITHUB_TOKEN
+              else ""
+          },
+      )
+      with urllib.request.urlopen(raw_req) as resp:
+        excel_file = pd.ExcelFile(
+            io.BytesIO(resp.read()), engine="openpyxl"
+        )
+
     all_events = []
 
     for sheet_name in excel_file.sheet_names:
@@ -183,10 +206,7 @@ def load_excel_from_github():
     return pd.DataFrame(all_events)
 
   except Exception as e:
-    st.error(
-        "⚠️ Não foi possível baixar 'Grade Expointer 2026.xlsx' direto do GitHub"
-        f" ({e}). Verifique se o arquivo está na raiz do repositório."
-    )
+    st.error(f"⚠️ Erro ao acessar '{FILE_EXCEL_PATH}' no GitHub: {e}")
     return pd.DataFrame()
 
 
@@ -382,17 +402,22 @@ def generate_pdf_report(df_export, doc_title_info):
 
 
 # ESTILIZAÇÃO CSS
+css_bg_clause = (
+    f'background: url("{bg_style}") no-repeat center center fixed !important;'
+    ' background-size: cover !important;'
+    if bg_style
+    else "background-color: #f8fafc !important;"
+)
+
 custom_css = f"""
 <style>
     html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
-        background: url("{bg_style}") no-repeat center center fixed !important;
-        background-size: cover !important;
+        {css_bg_clause}
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
     .header-banner {{
-        background: linear-gradient(135deg, rgba(6, 78, 59, 0.93) 0%, rgba(21, 128, 61, 0.93) 100%), url("{bg_style}") no-repeat center center !important;
-        background-size: cover !important;
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.93) 0%, rgba(21, 128, 61, 0.93) 100%) !important;
         border-radius: 16px;
         padding: 30px 20px;
         text-align: center;
