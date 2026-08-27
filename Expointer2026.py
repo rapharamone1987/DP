@@ -88,6 +88,39 @@ def sanitize_space_name(raw_name):
   return clean.strip().title()
 
 
+def sanitize_field_value(val):
+  if not val or pd.isna(val):
+    return ""
+  s = str(val).strip()
+  s_lower = s.lower()
+  # Filtra sujeiras conhecidas de parsing incorreto
+  if s_lower in [
+      "nan",
+      "none",
+      "null",
+      "",
+      "-",
+      "--",
+      "livre",
+      "vago",
+      "disponível",
+      "disponivel",
+      "horário vago",
+      "horario vago",
+      "secretaria",
+      "responsável",
+      "responsavel",
+      "tema",
+      "atividade",
+      "horario",
+      "horário",
+  ]:
+    return ""
+  if re.match(r"^\b(?:[01]?\d|2[0-3])[:h][0-5]\d\b", s_lower):
+    return ""
+  return s
+
+
 def detect_day_from_line(line_str):
   s = line_str.lower()
   for key, mapped_day in MAPA_RECONHECIMENTO_DIAS.items():
@@ -217,6 +250,7 @@ def merge_consecutive_events(df):
   return res_df.drop(columns=cols_to_drop)
 
 
+# CARREGAMENTO COM SANITIZAÇÃO RIGOROSA
 @st.cache_data(ttl=15)
 def load_excel_from_github():
   try:
@@ -276,6 +310,7 @@ def load_excel_from_github():
         col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
         col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
 
+        # Descarta linhas de títulos de tabela
         if col0.lower() in [
             "horário",
             "horario",
@@ -290,46 +325,32 @@ def load_excel_from_github():
 
         horario_limpo = clean_time_string(col0)
         if horario_limpo:
-          tema = col1
-          sec = col2
-          resp = col3
+          tema_raw = col1
+          sec_raw = col2
+          resp_raw = col3
         else:
           alt_horario = clean_time_string(col1)
           if alt_horario:
             horario_limpo = alt_horario
-            tema = col2
-            sec = col3
-            resp = str(row.values[4]).strip() if len(row.values) > 4 else ""
+            tema_raw = col2
+            sec_raw = col3
+            resp_raw = str(row.values[4]).strip() if len(row.values) > 4 else ""
           else:
             continue
 
-        tema_clean = tema.strip().lower()
-        is_vago = (
-            not tema
-            or tema_clean
-            in [
-                "livre",
-                "vago",
-                "disponível",
-                "disponivel",
-                "horário vago",
-                "horario vago",
-                "nan",
-                "none",
-                "",
-                "-",
-                "--",
-            ]
-            or tema.startswith("🔓")
-        )
+        tema_clean = sanitize_field_value(tema_raw)
+        sec_clean = sanitize_field_value(sec_raw)
+        resp_clean = sanitize_field_value(resp_raw)
+
+        is_vago = not tema_clean or tema_clean.startswith("🔓")
 
         all_events.append({
             "Espaço": current_espaco,
             "Data": current_data,
             "Horário": horario_limpo,
-            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema.strip(),
-            "Secretaria": sec.strip() if not is_vago else "",
-            "Responsável": resp.strip() if not is_vago else "",
+            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema_clean,
+            "Secretaria": sec_clean if not is_vago else "",
+            "Responsável": resp_clean if not is_vago else "",
         })
 
     df_raw = pd.DataFrame(all_events)
@@ -533,14 +554,12 @@ bg_url_css = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 custom_css = f"""
 <style>
-    /* Fundo geral da aplicação */
     .stApp {{
         background: linear-gradient(rgba(15, 23, 42, 0.40), rgba(15, 23, 42, 0.40)), url("{bg_url_css}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
-    /* BANNER PRINCIPAL COM GRADIENTE SUAVE E OPACIDADE CONTROLADA (CORES DO RIO GRANDE DO SUL) */
     .rs-banner-card {{
         background: linear-gradient(135deg, rgba(11, 102, 35, 0.88) 0%, rgba(21, 128, 61, 0.85) 35%, rgba(185, 28, 28, 0.85) 68%, rgba(234, 179, 8, 0.88) 100%) !important;
         border-radius: 16px;
@@ -584,7 +603,6 @@ custom_css = f"""
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }}
 
-    /* GARANTE QUE O HORÁRIO NO CALENDÁRIO SEJA VERDE ESCURO */
     .cal-event-box span {{
         color: #15803d !important;
         font-weight: 800 !important;
@@ -603,7 +621,6 @@ custom_css = f"""
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }}
 
-    /* GARANTE COR VERDE VISÍVEL NO HORÁRIO DA ABA DE VAGOS */
     .card-time-vago {{
         color: #15803d !important;
         font-weight: 900 !important;
@@ -631,7 +648,6 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # Carregamento dos dados
 df_data = load_excel_from_github()
 
-# Banner com as Cores do Rio Grande do Sul
 banner_html = """
 <div class="rs-banner-card">
     <div class="rs-banner-title">EXPOINTER 2026 — Programação Institucional - Espaços Gov RS</div>
@@ -648,13 +664,11 @@ todos_dias = [
     d for d in ORDEM_DIAS if d in dias_encontrados
 ] + [d for d in dias_encontrados if d not in ORDEM_DIAS]
 todos_espacos = sorted([e for e in df_data["Espaço"].unique() if e])
-todas_sec = sorted(
-    [
-        s
-        for s in df_data["Secretaria"].unique()
-        if s and str(s).strip() != "🔓 HORÁRIO VAGO"
-    ]
-)
+todas_sec = sorted([
+    s
+    for s in df_data["Secretaria"].unique()
+    if s and str(s).strip() != "🔓 HORÁRIO VAGO"
+])
 
 st.markdown("### 🔍 Pesquisar e Filtrar Programação")
 with st.container():
@@ -743,7 +757,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição & Versionamento",
 ])
 
-# ABA 1: CALENDÁRIO COM TODOS OS DIAS DO EVENTO
+# ABA 1: CALENDÁRIO SEM FALSOS RESPONSÁVEIS
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -770,27 +784,19 @@ with tab_calendar:
           )
           evs_dia = df_grid[df_grid["Data"] == d]
           for _, ev in evs_dia.iterrows():
-            sec_val = (
-                str(ev["Secretaria"]).strip()
-                if pd.notna(ev["Secretaria"])
-                else ""
-            )
-            resp_val = (
-                str(ev["Responsável"]).strip()
-                if pd.notna(ev["Responsável"])
-                else ""
-            )
+            sec_val = sanitize_field_value(ev["Secretaria"])
+            resp_val = sanitize_field_value(ev["Responsável"])
 
             sec_display = (
                 f'<div style="color:#334155; font-size:0.75rem;'
                 f' font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
-                if sec_val and sec_val.lower() not in ["nan", "none", ""]
+                if sec_val
                 else ""
             )
             resp_display = (
                 f'<div style="color:#475569; font-size:0.75rem;'
                 f' font-weight:500;">👤 {resp_val}</div>'
-                if resp_val and resp_val.lower() not in ["nan", "none", ""]
+                if resp_val
                 else ""
             )
 
@@ -807,7 +813,7 @@ with tab_calendar:
                 unsafe_allow_html=True,
             )
 
-# ABA 2: HORÁRIOS LIVRES / VAGOS COM HORÁRIO EM VERDE VISÍVEL
+# ABA 2: HORÁRIOS LIVRES / VAGOS
 with tab_vagos:
   st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
   if df_vagos_totais.empty:
