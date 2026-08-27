@@ -21,12 +21,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Repositório GitHub
+# Configurações do Repositório GitHub
 GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 FILE_EXCEL_PATH = "Grade Expointer 2026.xlsx"
 
-# URLs
 URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
 
 ORDEM_DIAS = [
@@ -42,12 +41,24 @@ ORDEM_DIAS = [
     "Outros",
 ]
 
+# Mapeamento e Sanitização Estrita de Nomes de Espaço
 space_mapping = {
     "Agenda Auditório ADMINISTRAÇÃO": "Auditório Administração",
     "Agenda Auditório ESPAÇO GOV": "Auditório Espaço Gov",
     "Agenda ARENA ESPAÇO GOV": "Arena Espaço Gov",
     "Agenda BANCADA ESPAÇO GOV": "Bancada Espaço Gov",
 }
+
+
+def sanitize_space_name(raw_name):
+  if not raw_name:
+    return "Espaço Geral"
+  name = str(raw_name).strip()
+  if name in space_mapping:
+    return space_mapping[name]
+  # Remove prefixos 'Agenda ' ou 'Agenda Auditório '
+  clean = re.sub(r"^agenda\s+(auditório\s+)?", "", name, flags=re.IGNORECASE)
+  return clean.strip().title()
 
 
 @st.cache_data(ttl=3600)
@@ -102,19 +113,16 @@ def extract_end_time(horario_str):
   if len(matches) >= 2:
     return matches[1]
   elif len(matches) == 1:
-    # Se só tem hora inicial (ex: 09:00), estima término de 1h
     h, m = map(int, matches[0].split(":"))
     return f"{(h + 1) % 24:02d}:{m:02d}"
   return ""
 
 
-# AGRUPAMENTO DE HORÁRIOS SUBSEQUENTES
 def merge_consecutive_events(df):
   if df.empty:
     return df
 
   merged_rows = []
-  # Agrupa por Espaço, Data e Tema/Secretaria/Responsável
   for (espaco, data), group in df.groupby(["Espaço", "Data"], sort=False):
     group = group.copy()
     group["Hora_Start"] = group["Horário"].apply(extract_start_time)
@@ -128,18 +136,15 @@ def merge_consecutive_events(df):
         current_event["Hora_Inicio"] = extract_start_time(row["Horário"])
         current_event["Hora_Fim"] = extract_end_time(row["Horário"])
       else:
-        # Verifica se é o mesmo evento continuado
         same_theme = current_event["Tema"] == row["Tema"]
         same_sec = current_event["Secretaria"] == row["Secretaria"]
         same_resp = current_event["Responsável"] == row["Responsável"]
 
-        if same_theme and same_sec and same_resp:
-          # Atualiza a hora final estendida
+        if same_theme and same_sec and same_resp and row["Tema"] != "🔓 HORÁRIO VAGO":
           new_end = extract_end_time(row["Horário"])
           if new_end:
             current_event["Hora_Fim"] = new_end
         else:
-          # Finaliza o evento anterior e formata o horário
           if current_event["Hora_Inicio"] and current_event["Hora_Fim"]:
             current_event["Horário"] = (
                 f"{current_event['Hora_Inicio']} -"
@@ -163,7 +168,7 @@ def merge_consecutive_events(df):
   return res_df.drop(columns=cols_to_drop)
 
 
-# CARREGAMENTO DO EXCEL IGNORANDO 'ESCALAS EQUIPE'
+# CARREGAMENTO DO EXCEL COM CORREÇÃO DE LEITURA DE VAGOS E ESPAÇOS SANITIZADOS
 @st.cache_data(ttl=15)
 def load_excel_from_github():
   try:
@@ -198,7 +203,6 @@ def load_excel_from_github():
     all_events = []
 
     for sheet_name in excel_file.sheet_names:
-      # IGNORA A ABA DE ESCALAS/EQUIPE
       if "escala" in sheet_name.lower() or "equipe" in sheet_name.lower():
         continue
 
@@ -207,7 +211,7 @@ def load_excel_from_github():
         continue
 
       df_sheet = df_sheet.fillna("").astype(str)
-      current_espaco = space_mapping.get(sheet_name, sheet_name)
+      current_espaco = sanitize_space_name(sheet_name)
       current_data = "A Definir"
 
       for idx, row in df_sheet.iterrows():
@@ -255,13 +259,24 @@ def load_excel_from_github():
           else:
             continue
 
-        if not tema or tema.lower() in ["tema", "atividade", "horário"]:
-          continue
-
+        # TRATAMENTO RIGOROSO DE HORÁRIOS LIVRES / VAGOS
+        tema_clean = tema.strip().lower()
         is_vago = (
             not tema
-            or tema.lower()
-            in ["livre", "vago", "disponível", "horário vago", "nan", "none", ""]
+            or tema_clean
+            in [
+                "livre",
+                "vago",
+                "disponível",
+                "disponivel",
+                "horário vago",
+                "horario vago",
+                "nan",
+                "none",
+                "",
+                "-",
+                "--",
+            ]
             or tema.startswith("🔓")
         )
 
@@ -269,9 +284,9 @@ def load_excel_from_github():
             "Espaço": current_espaco,
             "Data": current_data,
             "Horário": horario_limpo,
-            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-            "Secretaria": sec if not is_vago else "",
-            "Responsável": resp if not is_vago else "",
+            "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema.strip(),
+            "Secretaria": sec.strip() if not is_vago else "",
+            "Responsável": resp.strip() if not is_vago else "",
         })
 
     df_raw = pd.DataFrame(all_events)
@@ -472,19 +487,18 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO COM OPACIDADE E IMAGEM DE FUNDO NO BANNER
+# ESTILIZAÇÃO CSS (OPACIDADE REVIZORADA DE 0.75 PARA 0.40 E ROLL-GRID)
 bg_url_css = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 custom_css = f"""
 <style>
-    /* Fundo geral com Overlay/Opacidade suave */
+    /* Redução mínima da opacidade para clarear a imagem de fundo */
     .stApp {{
-        background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), url("{bg_url_css}") no-repeat center center fixed !important;
+        background: linear-gradient(rgba(15, 23, 42, 0.40), rgba(15, 23, 42, 0.40)), url("{bg_url_css}") no-repeat center center fixed !important;
         background-size: cover !important;
         font-family: 'Segoe UI', system-ui, sans-serif !important;
     }}
 
-    /* Card/Banner Inicial com Imagem de Fundo Integrada */
     .header-banner {{
         background: linear-gradient(135deg, rgba(6, 78, 59, 0.88) 0%, rgba(21, 128, 61, 0.88) 100%), url("{bg_url_css}") no-repeat center center !important;
         background-size: cover !important;
@@ -504,6 +518,14 @@ custom_css = f"""
         text-shadow: 0 3px 6px rgba(0,0,0,0.9);
     }}
 
+    /* Suporte a Rolagem Horizontal no Grid Multi-Dias */
+    .grid-container-scroll {{
+        display: flex;
+        overflow-x: auto;
+        gap: 12px;
+        padding-bottom: 12px;
+    }}
+
     .cal-header {{
         background-color: #064e3b !important;
         color: #ffffff !important;
@@ -513,7 +535,7 @@ custom_css = f"""
         border-radius: 8px;
         margin-bottom: 12px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-        font-size: 1rem;
+        font-size: 0.95rem;
         border: 1px solid #15803d;
     }}
 
@@ -667,7 +689,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição & Versionamento",
 ])
 
-# ABA 1: CALENDÁRIO
+# ABA 1: CALENDÁRIO EXIBINDO TODOS OS DIAS SEM CORTAR
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
@@ -686,6 +708,7 @@ with tab_calendar:
     if len(dias_unicos) == 0:
       st.info("Nenhum dia correspondente para os filtros selecionados.")
     else:
+      # Cria colunas dinâmicas para todos os dias encontrados na planilha
       grid_cols = st.columns(len(dias_unicos))
       for idx, d in enumerate(dias_unicos):
         with grid_cols[idx]:
@@ -731,7 +754,7 @@ with tab_calendar:
                 unsafe_allow_html=True,
             )
 
-# ABA 2: HORÁRIOS VAGOS
+# ABA 2: HORÁRIOS LIVRES / VAGOS DETECTADOS COM SUCESSO
 with tab_vagos:
   st.markdown("### 🔓 Consulta de Horários Livres para Agendamento")
   if df_vagos_totais.empty:
