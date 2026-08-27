@@ -1,0 +1,6487 @@
+{
+  "data_alteracao": "20260827_213359",
+  "observacoes": "teste 2",
+  "total_linhas": 810,
+  "eventos": [
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 29/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 30/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "09:00",
+      "Tema": "Projeto Desenvolve Angus,projeto para Jovens estudantes agrários",
+      "Secretaria": "Associação de Angus",
+      "Responsável": "Katiulci Santos"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "10:00",
+      "Tema": "Projeto Desenvolve Angus,projeto para Jovens estudantes agrários",
+      "Secretaria": "Associação de Angus",
+      "Responsável": "Katiulci Santos"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "11:00",
+      "Tema": "Projeto Desenvolve Angus,projeto para Jovens estudantes agrários",
+      "Secretaria": "Associação de Angus",
+      "Responsável": "Katiulci Santos"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "12:00",
+      "Tema": "Projeto Desenvolve Angus,projeto para Jovens estudantes agrários",
+      "Secretaria": "Associação de Angus",
+      "Responsável": "Katiulci Santos"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "13:00",
+      "Tema": "Projeto Desenvolve Angus,projeto para Jovens estudantes agrários",
+      "Secretaria": "Associação de Angus",
+      "Responsável": "Katiulci Santos"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Segunda 31/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "09:00",
+      "Tema": "Apresentação dos Projetos Pedagógicos e Científicos desenvolvidos nas Escolas Estaduais",
+      "Secretaria": "SEDUC",
+      "Responsável": "Claudia Feijo"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Terça 01/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "09:00",
+      "Tema": "Reunião da SES com  Federação da Santa Casa,Hospitais Filantropicos,Coordenadores e Diretores",
+      "Secretaria": "SES",
+      "Responsável": "Lisiane Rodrigues"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "10:00",
+      "Tema": "Reunião da SES com  Federação da Santa Casa,Hospitais Filantropicos,Coordenadores e Diretores",
+      "Secretaria": "SES",
+      "Responsável": "Lisiane Rodrigues"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "11:00",
+      "Tema": "Reunião da SES com  Federação da Santa Casa,Hospitais Filantropicos,Coordenadores e Diretores",
+      "Secretaria": "SES",
+      "Responsável": "Lisiane Rodrigues"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "12:00",
+      "Tema": "Reunião da SES com  Federação da Santa Casa,Hospitais Filantropicos,Coordenadores e Diretores",
+      "Secretaria": "SES",
+      "Responsável": "Lisiane Rodrigues"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "13:00",
+      "Tema": "Reunião da SES com  Federação da Santa Casa,Hospitais Filantropicos,Coordenadores e Diretores",
+      "Secretaria": "SES",
+      "Responsável": "Lisiane Rodrigues"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "14:00",
+      "Tema": "Reunião da SES com  Federação da Santa Casa,Hospitais Filantropicos,Coordenadores e Diretores",
+      "Secretaria": "SES",
+      "Responsável": "Lisiane Rodrigues"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "15:00",
+      "Tema": "Reunião da SES com  Federação da Santa Casa,Hospitais Filantropicos,Coordenadores e Diretores",
+      "Secretaria": "SES",
+      "Responsável": "Lisiane Rodrigues"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "16:00",
+      "Tema": "Reunião da SES com  Federação da Santa Casa,Hospitais Filantropicos,Coordenadores e Diretores",
+      "Secretaria": "SES",
+      "Responsável": "Lisiane Rodrigues"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quarta 02/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "09:00",
+      "Tema": "MAPA - Segurança Juridica e a Contribuição dos Bioinsumos para Mitigar os efeitos das Mudanças Climaticas",
+      "Secretaria": "MAPA",
+      "Responsável": "Beatris Kuchenbecker"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "10:00",
+      "Tema": "MAPA - Segurança Juridica e a Contribuição dos Bioinsumos para Mitigar os efeitos das Mudanças Climaticas",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "11:00",
+      "Tema": "MAPA - Segurança Juridica e a Contribuição dos Bioinsumos para Mitigar os efeitos das Mudanças Climaticas",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "12:00",
+      "Tema": "MAPA - Segurança Juridica e a Contribuição dos Bioinsumos para Mitigar os efeitos das Mudanças Climaticas",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "13:00",
+      "Tema": "5º Seminário do SISBI-POA",
+      "Secretaria": "MAPA",
+      "Responsável": "Beatris Kuchenbecker"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Quinta 03/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "14:00",
+      "Tema": "Ciclo de Palestras e Debates - Comissão de Agriculltura e Reforma Agraria -CRRA - do Senado Federal ( Gabinete Luis carlos  Heinze)",
+      "Secretaria": "Senado Federal",
+      "Responsável": "Lucas Sena"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "15:00",
+      "Tema": "Ciclo de Palestras e Debates - Comissão de Agriculltura e Reforma Agraria -CRRA - do Senado Federal ( Gabinete Luis carlos  Heinze)",
+      "Secretaria": "Senado Federal",
+      "Responsável": "Lucas Sena"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "16:00",
+      "Tema": "Ciclo de Palestras e Debates - Comissão de Agriculltura e Reforma Agraria -CRRA - do Senado Federal ( Gabinete Luis carlos  Heinze)",
+      "Secretaria": "Senado Federal",
+      "Responsável": "Lucas Sena"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "17:00",
+      "Tema": "Ciclo de Palestras e Debates - Comissão de Agriculltura e Reforma Agraria -CRRA - do Senado Federal ( Gabinete Luis carlos  Heinze)",
+      "Secretaria": "Senado Federal",
+      "Responsável": "Lucas Sena"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sexta 04/09",
+      "Horário": "18:00",
+      "Tema": "Ciclo de Palestras e Debates - Comissão de Agriculltura e Reforma Agraria -CRRA - do Senado Federal ( Gabinete Luis carlos  Heinze)",
+      "Secretaria": "Senado Federal",
+      "Responsável": "Lucas Sena"
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Sábado 05/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ADMINISTRAÇÃO",
+      "Data": "Domingo 06/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "16:00",
+      "Tema": "Agrocultura - A raiz tem Futuro",
+      "Secretaria": "-",
+      "Responsável": "Amanda Leones"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "09:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "SSB",
+      "Responsável": "Yasmin Bastos"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "10:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "11:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "12:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "13:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "14:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "15:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "16:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "17:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "18:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "09:00",
+      "Tema": "Painel do Agronegócio do Rio Grande do Sul - 2026",
+      "Secretaria": "SPGG/DEE/SUPLAN",
+      "Responsável": "Sergio Leusin Junior"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "10:00",
+      "Tema": "RS Cyber Shied: Segurança Cibernética na Administração Pública Estadual",
+      "Secretaria": "SPGG/PROCERGS/DSTI",
+      "Responsável": "Nielson Luis de Paula Carramilo"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "11:00",
+      "Tema": "Apresentação da Radiografia da Agropecuária Gaúcha 2026 (RAG)",
+      "Secretaria": "DGSP/Seapi",
+      "Responsável": "Eduardo Geyer"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "13:00",
+      "Tema": "Integração Lavoura-Pecuária (ILP) - Tecnologia, gestão e resultados na prática",
+      "Secretaria": "SEAPI",
+      "Responsável": "Jackson Freitas"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "14:00",
+      "Tema": "Entrega do Selo Ambiental",
+      "Secretaria": "IRGA",
+      "Responsável": "Denise Cabral"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "15:00",
+      "Tema": "Entrega do Selo Ambiental",
+      "Secretaria": "IRGA",
+      "Responsável": "Denise Cabral"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "16:00",
+      "Tema": "Ações e resultados do Projeto Reflora: UFRGS/UFSM/PUCRS/UNISC/Embrapii/UFV/CMPC/SEMA",
+      "Secretaria": "SEAPI/ DDPA",
+      "Responsável": "Jackson Freitas"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "17:00",
+      "Tema": "Capacidade Territorial para Inovação e o Desenvolvimento",
+      "Secretaria": "SICT",
+      "Responsável": "Rogerio Assis Brasil"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "09:00",
+      "Tema": "Prevenção das Intoxicações no Campo",
+      "Secretaria": "SES SEVS",
+      "Responsável": "Vanda Garibotti"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "10:00",
+      "Tema": "RS e China: oportunidades para as proteínas animais e a atuação da Invest RS na Ásia s/ parceira com ABPA e ABIEC",
+      "Secretaria": "Invest",
+      "Responsável": "Tulius Tsangaropulos"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "11:00",
+      "Tema": "Serviços e funcionalidades da GurIA para usuários AGRO",
+      "Secretaria": "SPGG/EDP/DG",
+      "Responsável": "Fernando Bartelle"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "12:00",
+      "Tema": "Futuro do Campo - Diagnóstico da Juventude Rural no RS",
+      "Secretaria": "SDR",
+      "Responsável": "Guilherme Geanez"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "13:00",
+      "Tema": "Panorama e Perspectivas do Mercado de Carbono no Setor Agropecuário",
+      "Secretaria": "SEAPI",
+      "Responsável": "Jackson Freitas"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "14:00",
+      "Tema": "Erva-Mate do Alto Taquari: Ciência,Cooperação e Desenvolvimento Territorial",
+      "Secretaria": "SEAPI",
+      "Responsável": "Jackson Freitas"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "15:00",
+      "Tema": "Monitoramento Climático e Hidrológico na prevenção de riscos",
+      "Secretaria": "SPGG/DSTR/PROCERGS",
+      "Responsável": "Luciana Hann Menezes"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "16:00",
+      "Tema": "Do Campo ao SAF",
+      "Secretaria": "Invest",
+      "Responsável": "Tulius Tsangaropulos"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "17:00",
+      "Tema": "Lançamento DBIO",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "10:00",
+      "Tema": "Irrigação e Gestão de Recursos Hidricos / Sub Secretaria de Irrigação",
+      "Secretaria": "SEAPI",
+      "Responsável": "Davi Teixeira"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "11:00",
+      "Tema": "Irrigação e Gestao de Recursos Hidricos / Sub Secretaria de Irrigação",
+      "Secretaria": "SEAPI",
+      "Responsável": "Davi  Teixeira"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "12:00",
+      "Tema": "Infraestrutura e Logistica para Sustentação do Agro: O Papel Estratégico das Ferrovias",
+      "Secretaria": "SELT",
+      "Responsável": "Bruna Peralta"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "13:00",
+      "Tema": "Fórum Gaúcho de Mudanças Climáticas",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "14:00",
+      "Tema": "Fórum Gaúcho de Mudanças Climáticas",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "15:00",
+      "Tema": "Fórum Gaúcho de Mudanças Climáticas",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "16:00",
+      "Tema": "Censo das Agroindústrias do Programa Estadual de Agroindústria Familiar (Peaf)",
+      "Secretaria": "SDR",
+      "Responsável": "Guilherme Granez"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "17:00",
+      "Tema": "Setor Vitivinícola: Estratégias de Proteção Setorial frente ao Acordo Mercosul - União Européia",
+      "Secretaria": "Seapi e Consevitis",
+      "Responsável": "Cristina Carniel"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "09:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "10:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "11:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "12:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "13:00",
+      "Tema": "Do Campo aos Territórios: Agricultura Familiar e Pontos Populares na Promoção da Segurança Alimentar",
+      "Secretaria": "SEDES",
+      "Responsável": "Vanusa Rosa"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "15:00",
+      "Tema": "Bioenergias: Hidrogênio Verde, Biodiesel, Etanol e Metanol Verde",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "16:00",
+      "Tema": "Combustíveis de Baixo Carbono: Biogás, Biometano e Gás Natural",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "17:00",
+      "Tema": "Agricultura Regenerativa: produitvidade, competitividade e resiliência para o agro gaúcho",
+      "Secretaria": "Syngenta/SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "17:00",
+      "Tema": "(Pre) Lançamento do Projeto AGROSUMMIT da UFPEL",
+      "Secretaria": "UFPEL/AGRONOMIA",
+      "Responsável": "Pablo Martins"
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "14:00",
+      "Tema": "Coletiva encerramento Expointer",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Auditório ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "09:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "10:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "11:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "12:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "13:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "14:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "15:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "16:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "17:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "18:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "09:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "10:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "11:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "12:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "13:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "14:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "15:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "16:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "17:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "18:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "09:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "South Summit Brazil",
+      "Responsável": "Yasmin Bastos"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "09:30",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "10:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "10:30",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "11:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "11:30",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "12:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "12:30",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "13:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "13:30",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "14:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "14:30",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "15:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "15:30",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "16:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "16:30",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "17:00",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "17:30",
+      "Tema": "Trilha do Agro - SOUTH SUMMIT BRAZIL",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "18:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "09:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "10:00",
+      "Tema": "EIXO 1- Credito e Financiamento: BADESUL (Todos os Programas Agro+ Empresarial) BRDE( BRDE Agronegocio Empresarial/Convenios/Maquinas e Equipamentos)",
+      "Secretaria": "SEDEC",
+      "Responsável": "Tais Teixeira"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "10:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "11:30",
+      "Tema": "Eixo 4 - Apresentação da FUNDOPEM-Desenvolvimento Industrial",
+      "Secretaria": "SEDEC",
+      "Responsável": "Tais Teixeira"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "12:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "13:00",
+      "Tema": "Biocombustivel",
+      "Secretaria": "SEAPI/EMBRAPA TRIGO/SSGL/DDPA",
+      "Responsável": "Altamir"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "13:30",
+      "Tema": "Mercosul–União Europeia: oportunidades para a indústria gaúcha",
+      "Secretaria": "Invest",
+      "Responsável": "Tulius Tsangaropulos"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "14:00",
+      "Tema": "Compras Publicas e sua relação com Cadeias Produtivas do Agronegócio no RS",
+      "Secretaria": "SPGG/SUBSEC/CELIC",
+      "Responsável": "Paulo Lunardi"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "14:30",
+      "Tema": "Soluçoes Digitais e Integração entre Estado e Municipios",
+      "Secretaria": "SPGG/DGD/STI",
+      "Responsável": "Nielson Luis de Paula Carramilo"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "15:00",
+      "Tema": "Histórico de atuação em derivas de 2,4D e herbicidas hormonais no Estado: Estratégias de Mitigação de danos e resultados",
+      "Secretaria": "SEAPI/DDV",
+      "Responsável": "Ricardo Felicetti"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "15:30",
+      "Tema": "Apresentação para escolas: Expointer Carbono Neutro por CRVR",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana winter"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "16:00",
+      "Tema": "Apresentação para escolas: Expointer Carbono Neutro por CRVR",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana winter"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "16:30",
+      "Tema": "Troca de Saberes: Rota dos Butiazais e Escolas Desafio do Butiá",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana winter"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "17:00",
+      "Tema": "Troca de Saberes: Rota dos Butiazais e Escolas Desafio do Butiá",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana winter"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "17:30",
+      "Tema": "Feira Digital Sabor Gaúcho: Conectando Agroindústrias a Novos Mercados",
+      "Secretaria": "SDR",
+      "Responsável": "Guilherme Granez"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "18:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "09:00",
+      "Tema": "Agrominerais e Transição para uma Agroindústria de Baixo Carbono",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana winter"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "09:30",
+      "Tema": "Agrominerais e Transição para uma Agroindústria de Baixo Carbono",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana winter"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "10:00",
+      "Tema": "Consevitis/Seapi",
+      "Secretaria": "CONSEVITIS/SEAPI",
+      "Responsável": "Cristina Carniel"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "10:30",
+      "Tema": "O que realmente gera valor em um Imovel Rural?",
+      "Secretaria": "SPGG/DEAPE",
+      "Responsável": "Rolnei Viceinte Coradini"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "11:00",
+      "Tema": "Economia Criativa: A Importancia dos dados na construção de Politicas Publica",
+      "Secretaria": "SEDAC",
+      "Responsável": "Juliana Sehn"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "11:30",
+      "Tema": "Planos de Desenvolvimento Regional da Industria Cultural e Criativa-Diagnostico Inicial",
+      "Secretaria": "SEDAC",
+      "Responsável": "Juliana Sehn"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "12:00",
+      "Tema": "Serviços Publicos do Futuro:Como atender melhor uma Sociedade em Transformação",
+      "Secretaria": "SERG/AGERGS",
+      "Responsável": "Bruno Pancot"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "12:30",
+      "Tema": "Serviços Publicos do Futuro:Como atender melhor uma Sociedade em Transformação",
+      "Secretaria": "SERG/AGERGS",
+      "Responsável": "Bruno Pancot"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "13:00",
+      "Tema": "Expofeira Três de Maio",
+      "Secretaria": "Pref. Tres de Maio",
+      "Responsável": "Janis Gabinete"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "13:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "14:00",
+      "Tema": "Modelos de Atendimentos ao Cidadão e Canais de Prestação de Serviços Publicos no RS",
+      "Secretaria": "SPGG/DIRGE/SUAD",
+      "Responsável": "Sonia Sacconi"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "14:30",
+      "Tema": "O Papel da Consolidação dos limites Municipais enquanto Ferramenta de Planejamento",
+      "Secretaria": "SPGG/SUPLAN/DEPLAN",
+      "Responsável": "Luciana Dal Forno Gianluppi"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "15:00",
+      "Tema": "Regularização Fundiária e Habitação: Instrumentos de Desenvolvimento Humano e Social",
+      "Secretaria": "SEHAB",
+      "Responsável": "Maria Emilia"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "15:30",
+      "Tema": "Consevitis/Seapi",
+      "Secretaria": "CONSEVITIS/SEAPI",
+      "Responsável": "Cristina Carniel"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "16:00",
+      "Tema": "Asssinaturas e Lançamentos: Cursos Hídricos e Segurança de Barragens",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "16:30",
+      "Tema": "Asssinaturas e Lançamentos: Cursos Hídricos e Segurança de Barragens",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "17:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "18:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "09:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "SICT",
+      "Responsável": "Nadiele Pires"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "09:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "10:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "10:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "11:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "11:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "12:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "12:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "13:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "13:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "14:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "14:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "15:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "15:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "16:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "16:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "17:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "17:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "18:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "09:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "SICT",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "09:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "10:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "10:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "11:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "11:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "12:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "12:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "13:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "13:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "14:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "14:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "15:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "15:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "16:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "16:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "17:00",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "17:30",
+      "Tema": "Centro Agro",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "18:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "09:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "10:30",
+      "Tema": "Apresentação da Expointer Carbono Neutro por CRVR e entrega do Selo ONU à Fenasoja",
+      "Secretaria": "SEMA",
+      "Responsável": "Luana Winter"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "11:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "12:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "13:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "14:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "15:00",
+      "Tema": "Lançamento da Plataforma de Mapeamento Automático de Pasto Apícola",
+      "Secretaria": "Mais Abelhas Apicultura e Consultoria Ambiental ltda",
+      "Responsável": "Betina Blochtein"
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "15:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "16:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "17:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "18:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "09:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "10:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "11:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "12:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "13:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "14:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "15:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "16:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "17:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Arena ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "18:30",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "09:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "10:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "11:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "12:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "13:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "14:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "15:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "16:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "17:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "18:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "09:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "10:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "11:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "12:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "13:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "14:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "15:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "16:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SES",
+      "Responsável": "Alexandre Neves"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "17:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "18:00",
+      "Tema": "Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública",
+      "Secretaria": "SEAPI/Ed.SANITARIA",
+      "Responsável": "Felipe Campos"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "09:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "10:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "11:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "12:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "13:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "14:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "15:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "16:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "17:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "18:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "09:00",
+      "Tema": "Assistir e SUS Gaucho:Panorama de Fila de Espera para Acesso a Consultas Especializadas",
+      "Secretaria": "SES",
+      "Responsável": "Marcelo Reidel"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "10:00",
+      "Tema": "Promoção da Doação de Sangue",
+      "Secretaria": "SES",
+      "Responsável": "Katia Brodt"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "11:00",
+      "Tema": "Promoção da Doação de Sangue",
+      "Secretaria": "SES",
+      "Responsável": "Katia Brodt"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "12:00",
+      "Tema": "Promoçao da Doação de Sangue",
+      "Secretaria": "SES",
+      "Responsável": "Katia Brodt"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "09:00",
+      "Tema": "Promoção da doação de Sangue",
+      "Secretaria": "SES",
+      "Responsável": "Katia Brodt"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "10:00",
+      "Tema": "Promoção da Doação de Sangue",
+      "Secretaria": "SES",
+      "Responsável": "Katia Brodt"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "11:00",
+      "Tema": "Promoção da Doação de Sangue",
+      "Secretaria": "SES",
+      "Responsável": "Katia Brodt"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "12:00",
+      "Tema": "Promoção da Doação de Sangue",
+      "Secretaria": "SES",
+      "Responsável": "Katia Brodt"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "13:00",
+      "Tema": "Promoção da Doação de Sangue",
+      "Secretaria": "SES",
+      "Responsável": "Katia Brodt"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "14:00",
+      "Tema": "Ativação Guria",
+      "Secretaria": "SPGG/EDP",
+      "Responsável": "Fernando Bartelle"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "15:00",
+      "Tema": "Ativação Guria",
+      "Secretaria": "SPGG/EDP",
+      "Responsável": "Fernando Bartelle"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "16:00",
+      "Tema": "Ativação Guria",
+      "Secretaria": "SPGG/EDP",
+      "Responsável": "Fernando Bartelle"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "17:00",
+      "Tema": "Ativação Guria",
+      "Secretaria": "SPGG/EDP",
+      "Responsável": "Fernando Bartelle"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "18:00",
+      "Tema": "Ativação Guria",
+      "Secretaria": "SPGG/EDP",
+      "Responsável": "Fernando Bartelle"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "09:00",
+      "Tema": "Programa de Transplantes no RS",
+      "Secretaria": "SES / DRE",
+      "Responsável": "Suelen Arduin"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "10:00",
+      "Tema": "Programa de Transplantes no RS",
+      "Secretaria": "SES /DRE",
+      "Responsável": "Suelen Arduin"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "11:00",
+      "Tema": "Programa de Transplantes no RS",
+      "Secretaria": "SES / DRE",
+      "Responsável": "Suelen Arduin"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "12:00",
+      "Tema": "Programa de Transplantes no RS",
+      "Secretaria": "SES/ DRE",
+      "Responsável": "Suelen Arduin"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "13:00",
+      "Tema": "Escola de Saude Publica - Educação em Saude Coletiva em Movimento",
+      "Secretaria": "SES",
+      "Responsável": "leticia Ikeda"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "14:00",
+      "Tema": "Escola de Saude Publica - Educação em Saude Coletiva em Movimento",
+      "Secretaria": "SES",
+      "Responsável": "leticia Ikeda"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "15:00",
+      "Tema": "Escola de Saude Publica - Educação em Saude Coletiva em Movimento",
+      "Secretaria": "SES",
+      "Responsável": "leticia Ikeda"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "16:00",
+      "Tema": "Escola de Saude Publica - Educação em Saude Coletiva em Movimento",
+      "Secretaria": "SES",
+      "Responsável": "leticia Ikeda"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "09:00",
+      "Tema": "Exposição de Animais Peçonhentos Vivos,do Centro de Informação Toxicologica do RS/CEVS",
+      "Secretaria": "SES / CEVS",
+      "Responsável": "Katia Moura"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "10:00",
+      "Tema": "Exposição de Animais Peçonhentos Vivos,do Centro de Informação Toxicologica do RS/CEVS",
+      "Secretaria": "SES / CEVS",
+      "Responsável": "Katia Moura"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "11:00",
+      "Tema": "Exposição de Animais Peçonhentos Vivos,do Centro de Informação Toxicologica do RS/CEVS",
+      "Secretaria": "SES / CEVS",
+      "Responsável": "Katia Moura"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "12:00",
+      "Tema": "Exposição de Animais Peçonhentos Vivos,do Centro de Informação Toxicologica do RS/CEVS",
+      "Secretaria": "SES / CEVS",
+      "Responsável": "Katia Moura"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "14:00",
+      "Tema": "Orientação de Solicitação Digital de Medicamentos a Populaçao(Farmacia Digital)",
+      "Secretaria": "SES",
+      "Responsável": "Alexandre Neves"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "15:00",
+      "Tema": "Orientação de Solicitação Digital de Medicamentos a Populaçao(Farmacia Digital)",
+      "Secretaria": "SES",
+      "Responsável": "Alexandre Neves"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "16:00",
+      "Tema": "Orientação de Solicitação Digital de Medicamentos a Populaçao(Farmacia Digital)",
+      "Secretaria": "SES",
+      "Responsável": "Alexandre Neves"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "17:00",
+      "Tema": "Orientação de Solicitação Digital de Medicamentos a Populaçao(Farmacia Digital)",
+      "Secretaria": "SES",
+      "Responsável": "Alexandre Neves"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "09:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "10:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "11:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "12:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "13:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "14:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "15:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "16:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "17:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "18:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "09:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "10:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "11:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "12:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "13:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "14:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "15:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "16:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "17:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Bancada ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "18:00",
+      "Tema": "Exposição de Materiais de Divulgação da Defesa Civil",
+      "Secretaria": "Defesa Civil",
+      "Responsável": "Tenente Sabrina Ribas"
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "09:00",
+      "Tema": "South Summit Brazil",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "09:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "10:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "11:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "12:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 1 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "09:00",
+      "Tema": "South Summit Brazil",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "09:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "10:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "11:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "12:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 2 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 29/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 30/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Segunda 31/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Terça 01/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quarta 02/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Quinta 03/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "09:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "10:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "11:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "12:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sexta 04/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Sábado 05/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "Sala de reunião 3 ESPAÇO GOV",
+      "Data": "Domingo 06/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 29/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 30/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Segunda 31/08",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Terça 01/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quarta 02/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Quinta 03/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "09:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "10:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "11:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "12:00",
+      "Tema": "DESFILE CAMPEÃS",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sexta 04/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Sábado 05/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "09:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "10:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "11:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "12:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "13:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "14:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "15:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "16:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "17:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    },
+    {
+      "Espaço": "ESTANDE SEAPI E SEMA",
+      "Data": "Domingo 06/09",
+      "Horário": "18:00",
+      "Tema": "🔓 HORÁRIO VAGO",
+      "Secretaria": "",
+      "Responsável": ""
+    }
+  ]
+}
