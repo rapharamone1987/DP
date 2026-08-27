@@ -21,7 +21,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Configurações do Repositório GitHub
 GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 FILE_EXCEL_PATH = "Grade Expointer 2026.xlsx"
@@ -69,19 +68,6 @@ MAPA_RECONHECIMENTO_DIAS = {
     "06/09": "Domingo 06/09",
     "domingo 06": "Domingo 06/09",
 }
-
-TERMOS_IGNORAR_EXATOS = [
-    "características do espaço",
-    "caracteristicas do espaço",
-    "lugares",
-    "telão",
-    "som",
-    "paz no campo",
-    "pavilhão internacional",
-    "estande de governo",
-    "horário",
-    "horario",
-]
 
 
 def map_sheet_to_space(sheet_name):
@@ -251,22 +237,38 @@ def load_excel_from_github():
       return pd.DataFrame()
 
     content_b64 = res.json().get("content", "")
-    if not content_b64:
-      st.error("⚠️ O arquivo no GitHub retornou conteúdo vazio.")
-      return pd.DataFrame()
-
     content_bytes = base64.b64decode(content_b64)
     excel_file = pd.ExcelFile(io.BytesIO(content_bytes), engine="openpyxl")
 
-    # CASO 1: Se a planilha já for a versão unificada
+    # Se já existir uma aba limpa e válida chamada Programacao_Consolidada
     if "Programacao_Consolidada" in excel_file.sheet_names:
-      df_clean = excel_file.parse("Programacao_Consolidada").fillna("")
-      return merge_consecutive_events(df_clean)
+      df_clean = excel_file.parse("Programacao_Consolidada")
 
-    # CASO 2: Se for a planilha original com várias abas
+      # Garante nomes corretos das colunas
+      df_clean.columns = [str(c).strip() for c in df_clean.columns]
+      cols_esperadas = [
+          "Espaço",
+          "Data",
+          "Horário",
+          "Tema",
+          "Secretaria",
+          "Responsável",
+      ]
+
+      if all(col in df_clean.columns for col in cols_esperadas):
+        # Remove eventuais linhas onde a própria palavra "Espaço" ou "Horário" foi gravada como dado
+        df_clean = df_clean[df_clean["Espaço"] != "Espaço"]
+        df_clean = df_clean[df_clean["Horário"] != "Horário"]
+        return merge_consecutive_events(df_clean.fillna(""))
+
+    # Lê todas as abas normais do Excel
     todos_eventos = []
     for sheet_name in excel_file.sheet_names:
-      if "escala" in sheet_name.lower() or "equipe" in sheet_name.lower():
+      if (
+          "escala" in sheet_name.lower()
+          or "equipe" in sheet_name.lower()
+          or sheet_name == "Programacao_Consolidada"
+      ):
         continue
 
       espaco_fixo = map_sheet_to_space(sheet_name)
@@ -281,8 +283,16 @@ def load_excel_from_github():
         line_str = " ".join(vals)
         line_lower = line_str.lower().strip()
 
-        # Descarta apenas títulos institucionais exatos
-        if line_lower in TERMOS_IGNORAR_EXATOS:
+        # Descartar cabeçalhos soltos nas células
+        if any(
+            t in line_lower
+            for t in [
+                "características do espaço",
+                "paz no campo",
+                "pavilhão internacional",
+                "estande de governo",
+            ]
+        ):
           continue
 
         detected_day = detect_day_from_line(line_str)
@@ -295,15 +305,13 @@ def load_excel_from_github():
         col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
         col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
 
-        # Descarta a linha de cabeçalho da tabela interna
+        # Ignorar linhas com títulos de coluna
         if col0.lower() in [
             "horario",
             "horário",
             "hora",
-        ] and col1.lower() in [
-            "tema",
-            "atividade",
-            "evento",
+            "espaço",
+            "espaço / local",
         ]:
           continue
 
@@ -875,9 +883,6 @@ with tab_edit:
           )
           st.cache_data.clear()
           st.rerun()
-
-  elif senha:
-    st.error("❌ Senha incorreta.")
 
   elif senha:
     st.error("❌ Senha incorreta.")
