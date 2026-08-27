@@ -9,7 +9,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 
-# 1. Configuração da Página
+# 1. Configuração Inicial da Página
 st.set_page_config(
     page_title="EXPOINTER 2026 — Agenda Institucional",
     page_icon="🌾",
@@ -17,10 +17,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# IMAGEM DE FUNDO DO GITHUB (URL CODIFICADA)
+# Imagem de Fundo (GitHub Raw)
 FILE_NAME = "Screenshot_20260825-095320~2.jpg"
-FILE_NAME_ENCODED = urllib.parse.quote(FILE_NAME)
-URL_IMAGEM_FUNDO = f"https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/{FILE_NAME_ENCODED}"
+URL_IMAGEM_FUNDO = f"https://raw.githubusercontent.com/raphaelsilveiraduarte/dp/main/{urllib.parse.quote(FILE_NAME)}"
 
 ORDEM_DIAS = [
     "Sábado 29/08",
@@ -64,100 +63,104 @@ def extract_start_time(horario_str):
   return "99:99"
 
 
-# LEITURA ESPECIAL PARA A MATRIZ VISUAL DA PLANILHA
-@st.cache_data(ttl=10)
-def load_data_from_google_sheets():
+# CARREGAMENTO MULTI-ABAS CONSOLIDADO
+@st.cache_data(ttl=15)
+def load_all_sheets():
   try:
     conn = st.connection("gsheets", type=GSheetsConnection)
-    df_raw = conn.read(ttl=10)
 
-    if df_raw is None or df_raw.empty:
-      return pd.DataFrame()
+    # Lê todas as abas da planilha
+    all_worksheets = conn.read(worksheet=None)
+    combined_rows = []
 
-    df_raw = df_raw.fillna("")
+    # Se retornar um dicionário de DataFrames (uma chave por aba)
+    sheets_dict = (
+        all_worksheets
+        if isinstance(all_worksheets, dict)
+        else {"Principal": all_worksheets}
+    )
 
-    df_clean = []
-    current_day = "A Definir"
-    current_space = "Espaço Gov RS"
-
-    # Percorre cada linha tratando a estrutura matricial da planilha
-    for idx, row in df_raw.iterrows():
-      row_vals = [str(val).strip() for val in row.values if str(val).strip()]
-
-      if not row_vals:
+    for sheet_name, df in sheets_dict.items():
+      if df is None or df.empty:
         continue
 
-      first_val = str(row.values[0]).strip()
+      df = df.fillna("").astype(str)
 
-      # 1. Verifica se a linha é um Divisor de Dia (ex: "Sábado 29/08", "01/09", etc)
-      if any(
-          d.lower() in first_val.lower()
-          for d in [
-              "sábado",
-              "domingo",
-              "segunda",
-              "terça",
-              "quarta",
-              "quinta",
-              "sexta",
-              "29/08",
-              "30/08",
-              "31/08",
-              "01/09",
-              "02/09",
-              "03/09",
-              "04/09",
-              "05/09",
-              "06/09",
-          ]
-      ):
-        current_day = first_val
-        continue
-
-      # 2. Ignora linhas de subcabeçalho
-      if first_val.lower() in [
-          "horário",
-          "horario",
-          "hora",
-          "espaço",
-          "local",
-          "tema",
-      ]:
-        continue
-
-      # 3. Processa a linha do evento
-      horario_limpo = clean_time_string(first_val)
-
-      # Mapeamento por posição das colunas no Sheets
-      # Col 0: Horário | Col 1: Tema/Evento | Col 2: Secretaria | Col 3: Responsável / Contato
-      val_col1 = str(row.values[1]).strip() if len(row.values) > 1 else ""
-      val_col2 = str(row.values[2]).strip() if len(row.values) > 2 else ""
-      val_col3 = str(row.values[3]).strip() if len(row.values) > 3 else ""
-
-      tema = val_col1
-      secretaria = val_col2
-      responsavel = val_col3
-
-      # Se o tema estiver vazio ou for considerado vago
-      is_vago = (
-          not tema
-          or tema.lower()
-          in ["livre", "vago", "disponível", "horário vago", "nan", "none", ""]
-          or tema.startswith("🔓")
+      # Mapeamento flexível de colunas por aba
+      col_espaco, col_data, col_horario, col_tema, col_sec, col_resp = (
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
       )
 
-      # Adiciona apenas se houver pelo menos um horário ou tema válido
-      if horario_limpo or tema:
-        df_clean.append({
-            "Espaço": current_space,
-            "Data": current_day,
+      for c in df.columns:
+        c_clean = str(c).strip().lower()
+        if any(k in c_clean for k in ["espaço", "espaco", "local", "auditório"]):
+          col_espaco = c
+        elif any(k in c_clean for k in ["data", "dia"]):
+          col_data = c
+        elif any(k in c_clean for k in ["horário", "horario", "hora"]):
+          col_horario = c
+        elif any(
+            k in c_clean
+            for k in ["tema", "atividade", "evento", "programação", "titulo"]
+        ):
+          col_tema = c
+        elif any(
+            k in c_clean
+            for k in ["secretaria", "entidade", "org", "órgão", "orgao"]
+        ):
+          col_sec = c
+        elif any(k in c_clean for k in ["responsável", "responsavel", "contato"]):
+          col_resp = c
+
+      # Processamento das linhas
+      for idx, row in df.iterrows():
+        espaco = str(row.get(col_espaco, "")).strip() if col_espaco else ""
+        data = str(row.get(col_data, "")).strip() if col_data else ""
+        horario_raw = str(row.get(col_horario, "")).strip() if col_horario else ""
+        tema = str(row.get(col_tema, "")).strip() if col_tema else ""
+        sec = str(row.get(col_sec, "")).strip() if col_sec else ""
+        resp = str(row.get(col_resp, "")).strip() if col_resp else ""
+
+        # Se 'data' ou 'espaco' não vieram na linha, usa o nome da Aba como fallback
+        if not data:
+          data = sheet_name if sheet_name != "Principal" else "A Definir"
+        if not espaco:
+          espaco = "Espaço Gov RS"
+
+        horario_limpo = clean_time_string(horario_raw)
+
+        # Filtra cabeçalhos repetidos
+        if (
+            horario_raw.lower() in ["horário", "horario", "hora"]
+            or tema.lower() in ["tema", "atividade", "evento"]
+        ):
+          continue
+
+        if not horario_limpo and not tema:
+          continue
+
+        is_vago = (
+            not tema
+            or tema.lower()
+            in ["livre", "vago", "disponível", "horário vago", "nan", "none", ""]
+            or tema.startswith("🔓")
+        )
+
+        combined_rows.append({
+            "Espaço": espaco,
+            "Data": data,
             "Horário": horario_limpo if horario_limpo else "--:--",
             "Tema": "🔓 HORÁRIO VAGO" if is_vago else tema,
-            "Secretaria": secretaria if not is_vago else "",
-            "Responsável": responsavel if not is_vago else "",
+            "Secretaria": sec if not is_vago else "",
+            "Responsável": resp if not is_vago else "",
         })
 
-    return pd.DataFrame(df_clean)
+    return pd.DataFrame(combined_rows)
 
   except Exception as e:
     st.error(f"⚠️ Erro ao carregar dados do Google Sheets: {e}")
@@ -170,7 +173,7 @@ def save_data_to_google_sheets(updated_df):
     conn.update(data=updated_df)
     return True
   except Exception as e:
-    st.error(f"⚠️ Erro ao salvar alterações no Google Sheets: {e}")
+    st.error(f"⚠️ Erro ao salvar no Google Sheets: {e}")
     return False
 
 
@@ -292,7 +295,7 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO CSS FORÇADA COM IMAGEM DE FUNDO E CABEÇALHOS VERDES
+# ESTILIZAÇÃO CSS
 custom_css = f"""
 <style>
     html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stMain"] {{
@@ -302,12 +305,12 @@ custom_css = f"""
     }}
 
     .header-banner {{
-        background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(21, 128, 61, 0.95) 100%), url("{URL_IMAGEM_FUNDO}") no-repeat center center !important;
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.92) 0%, rgba(21, 128, 61, 0.92) 100%), url("{URL_IMAGEM_FUNDO}") no-repeat center center !important;
         background-size: cover !important;
         border-radius: 16px;
         padding: 32px 20px;
         text-align: center;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
         margin-bottom: 24px;
         border-bottom: 5px solid #eab308;
     }}
@@ -368,8 +371,8 @@ custom_css = f"""
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Carregamento dos dados
-df_data = load_data_from_google_sheets()
+# Executa Carga
+df_data = load_all_sheets()
 
 # Banner Principal
 banner_html = """
@@ -381,33 +384,22 @@ st.markdown(banner_html, unsafe_allow_html=True)
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado carregado. Verifique a configuração do Secrets no"
+      "⚠️ Nenhum dado carregado. Verifique as credenciais no Secrets do"
       " Streamlit Cloud."
   )
   st.stop()
 
-# Mapeamento de Dias Encontrados
-dias_encontrados = [
-    d
-    for d in df_data["Data"].unique()
-    if d and str(d).strip().lower() not in ["data", "nan", "none", ""]
-]
+# Filtros Globais
+dias_encontrados = [d for d in df_data["Data"].unique() if d]
 todos_dias = [
     d for d in ORDEM_DIAS if d in dias_encontrados
 ] + [d for d in dias_encontrados if d not in ORDEM_DIAS]
-
-todos_espacos = sorted(
-    [
-        e
-        for e in df_data["Espaço"].unique()
-        if e and str(e).strip().lower() not in ["espaço", "nan", "none", ""]
-    ]
-)
+todos_espacos = sorted([e for e in df_data["Espaço"].unique() if e])
 todas_sec = sorted(
     [
         s
         for s in df_data["Secretaria"].unique()
-        if s and str(s).strip() not in ["🔓 HORÁRIO VAGO", "nan", "none", ""]
+        if s and str(s).strip() != "🔓 HORÁRIO VAGO"
     ]
 )
 
@@ -458,7 +450,7 @@ if espacos_sel:
 if sec_sel:
   df_filtered = df_filtered[df_filtered["Secretaria"].isin(sec_sel)]
 
-# Ordenação
+# Ordenação Cronológica
 df_filtered["Hora_Sort"] = df_filtered["Horário"].apply(extract_start_time)
 df_filtered["Data_Cat"] = pd.Categorical(
     df_filtered["Data"], categories=ORDEM_DIAS, ordered=True
@@ -470,7 +462,7 @@ df_filtered = df_filtered.sort_values(
 df_agendados = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
 df_vagos_totais = df_filtered[df_filtered["Tema"] == "🔓 HORÁRIO VAGO"]
 
-# Menu Lateral
+# Sidebar
 st.sidebar.header("📄 Exportação & Gestão")
 if st.sidebar.button("⚙️ Gerar Relatório PDF"):
   if not df_agendados.empty:
@@ -498,7 +490,7 @@ tab_calendar, tab_vagos, tab_edit = st.tabs([
     "🔒 Edição Direta do App",
 ])
 
-# ABA 1: CALENDÁRIO COM COLUNAS DE DIAS
+# ABA 1: CALENDÁRIO
 with tab_calendar:
   dia_grid_sel = st.selectbox(
       "📆 Destacar dia na grade:",
