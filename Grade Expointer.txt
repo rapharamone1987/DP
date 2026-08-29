@@ -810,6 +810,6 @@ Auditório ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 30/08;15:00;BANDA BRIGADA MILITAR;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;16:00;Agrocultura - A raiz tem Futuro;-;Amanda Leones;Glaucia Nasser ( empresa do Agronegocio formada em Comercio Exterior);False;11 98612-9583
+Auditório ESPAÇO GOV;Domingo 30/08;16:00;Agrocultura - A raiz tem Futuro;-;Amanda Leones;Glaucia Nasser ( empresária do Agronegocio formada em Comercio Exterior);False;11 98612-9583
 Auditório ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
