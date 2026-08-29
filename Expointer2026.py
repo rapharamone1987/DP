@@ -800,7 +800,10 @@ with tab_edit:
             ),
             "APRESENTAÇÕES": st.column_config.CheckboxColumn(
                 "Apresentação OK?",
-                help="Marque se a apresentação do evento já foi recebida e conferida",
+                help=(
+                    "Marque se a apresentação do evento já foi recebida e"
+                    " conferida"
+                ),
                 default=False,
             ),
         },
