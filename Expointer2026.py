@@ -24,7 +24,8 @@ GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 ADMIN_PASSWORD = st.secrets.get("ADMIN_PASSWORD", "expointer2026")
 
-FILE_CSV_PATH = "Grade Expointer.csv"
+# Nome atualizado para ler o arquivo .txt do GitHub
+FILE_CSV_PATH = "Grade Expointer.txt"
 URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
 
 ORDEM_DIAS = [
@@ -57,7 +58,7 @@ def load_background_base64(url):
 img_b64 = load_background_base64(URL_RAW_IMG)
 
 
-# 2. Leitura e Processamento do CSV
+# 2. Leitura e Processamento do Arquivo TXT do GitHub
 @st.cache_data(ttl=15)
 def load_csv_from_github():
   try:
@@ -84,10 +85,14 @@ def load_csv_from_github():
 
     content_bytes = base64.b64decode(content_b64)
 
+    # Lê o arquivo TXT estruturado com separador ';'
     df = pd.read_csv(
         io.BytesIO(content_bytes), sep=";", encoding="utf-8-sig", dtype=str
     )
     df = df.fillna("")
+
+    if "Painelistas" not in df.columns:
+      df["Painelistas"] = ""
 
     df["Tema"] = df["Tema"].apply(
         lambda x: "🔓 HORÁRIO VAGO"
@@ -99,13 +104,12 @@ def load_csv_from_github():
     return df
 
   except Exception as e:
-    st.error(f"⚠️ Erro ao carregar arquivo CSV: {e}")
+    st.error(f"⚠️ Erro ao carregar arquivo no GitHub: {e}")
     return pd.DataFrame()
 
 
 # Funções Auxiliares para Agrupamento e Ordenação
 def extract_time_val(time_str):
-  """Extrai o horário inicial como int (ex: '09:30' -> 930) para ordenação precisa."""
   if not time_str:
     return 9999
   m = re.search(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", str(time_str))
@@ -116,7 +120,7 @@ def extract_time_val(time_str):
 
 
 def merge_consecutive_events(df):
-  """Consolida horários subsequentes para eventos idênticos."""
+  """Consolida horários subsequentes para eventos idênticos na mesma data e espaço."""
   if df.empty:
     return df
 
@@ -147,9 +151,13 @@ def merge_consecutive_events(df):
             str(current_event.get("Responsável")).strip().lower()
             == str(row.get("Responsável")).strip().lower()
         )
+        same_pain = (
+            str(current_event.get("Painelistas")).strip().lower()
+            == str(row.get("Painelistas")).strip().lower()
+        )
         not_vago = row.get("Tema") != "🔓 HORÁRIO VAGO"
 
-        if same_theme and same_sec and same_resp and not_vago:
+        if same_theme and same_sec and same_resp and same_pain and not_vago:
           current_event["Hora_Fim"] = str(row["Horário"]).strip()
         else:
           if (
@@ -190,7 +198,7 @@ def merge_consecutive_events(df):
   return res_df.drop(columns=cols_to_drop)
 
 
-# 3. Commit de Alterações para o GitHub
+# 3. Commit de Alterações para o GitHub (salva em Grade Expointer.txt)
 def commit_changes_to_github(updated_df, change_log_notes=""):
   if not GITHUB_TOKEN:
     st.error("❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud.")
@@ -265,10 +273,10 @@ def generate_pdf_report(df_export, doc_title_info):
   doc = SimpleDocTemplate(
       buffer,
       pagesize=landscape(A4),
-      rightMargin=30,
-      leftMargin=30,
-      topMargin=30,
-      bottomMargin=30,
+      rightMargin=25,
+      leftMargin=25,
+      topMargin=25,
+      bottomMargin=25,
   )
   elements = []
   styles = getSampleStyleSheet()
@@ -293,7 +301,7 @@ def generate_pdf_report(df_export, doc_title_info):
   cell_header_style = ParagraphStyle(
       "CellHeader",
       parent=styles["Normal"],
-      fontSize=10,
+      fontSize=9,
       textColor=colors.white,
       fontName="Helvetica-Bold",
       alignment=1,
@@ -337,6 +345,7 @@ def generate_pdf_report(df_export, doc_title_info):
       Paragraph("Espaço / Auditório", cell_header_style),
       Paragraph("Atividade / Tema", cell_header_style),
       Paragraph("Organização / Responsável", cell_header_style),
+      Paragraph("Painelista(s)", cell_header_style),
   ]]
 
   for _, row in df_export.iterrows():
@@ -346,15 +355,23 @@ def generate_pdf_report(df_export, doc_title_info):
         if row["Secretaria"]
         else row["Responsável"]
     )
+    pain_str = (
+        str(row["Painelistas"]).strip()
+        if pd.notna(row.get("Painelistas"))
+        and str(row.get("Painelistas")).strip().lower() not in ["nan", "none", ""]
+        else "-"
+    )
+
     table_data.append([
         Paragraph(f"<b>{row['Data']}</b>", cell_meta_style),
         Paragraph(row["Horário"], cell_time_style),
         Paragraph(row["Espaço"], cell_meta_style),
         Paragraph(row["Tema"], cell_title_style),
         Paragraph(org_resp if org_resp else "-", cell_meta_style),
+        Paragraph(pain_str, cell_meta_style),
     ])
 
-  t = Table(table_data, colWidths=[90, 80, 130, 320, 160], repeatRows=1)
+  t = Table(table_data, colWidths=[80, 75, 120, 270, 140, 110], repeatRows=1)
   t.setStyle(
       TableStyle([
           ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#064e3b")),
@@ -378,7 +395,7 @@ def generate_pdf_report(df_export, doc_title_info):
   return buffer
 
 
-# ESTILIZAÇÃO CSS (Bandeira RS com amarelo corrigido e tom opaco/fosco elegante)
+# ESTILIZAÇÃO CSS
 bg_url_css = f"data:image/jpeg;base64,{img_b64}" if img_b64 else ""
 
 custom_css = f"""
@@ -483,7 +500,6 @@ custom_css = f"""
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Banner em duas linhas centralizado
 banner_html = """
 <div class="rs-banner-card">
     <div class="rs-banner-title-1">EXPOINTER 2026</div>
@@ -496,7 +512,7 @@ df_data = load_csv_from_github()
 
 if df_data.empty:
   st.warning(
-      "⚠️ Nenhum dado foi carregado. Verifique o arquivo 'Grade Expointer.csv' no"
+      "⚠️ Nenhum dado foi carregado. Verifique o arquivo 'Grade Expointer.txt' no"
       " GitHub."
   )
   st.stop()
@@ -517,7 +533,7 @@ with st.container():
   col_busca, col_dias = st.columns([2, 2])
   with col_busca:
     busca = st.text_input(
-        "🔎 Palavra-chave:", "", placeholder="Digite um tema ou termo..."
+        "🔎 Palavra-chave:", "", placeholder="Digite tema, responsável, painelista..."
     )
   with col_dias:
     dias_sel = st.multiselect(
@@ -551,6 +567,7 @@ if busca:
       df_filtered["Tema"].astype(str).str.lower().str.contains(t)
       | df_filtered["Espaço"].astype(str).str.lower().str.contains(t)
       | df_filtered["Responsável"].astype(str).str.lower().str.contains(t)
+      | df_filtered["Painelistas"].astype(str).str.lower().str.contains(t)
   ]
 if dias_sel:
   df_filtered = df_filtered[df_filtered["Data"].isin(dias_sel)]
@@ -563,23 +580,45 @@ df_agendados = df_filtered[df_filtered["Tema"] != "🔓 HORÁRIO VAGO"]
 df_vagos_totais = df_filtered[df_filtered["Tema"] == "🔓 HORÁRIO VAGO"]
 
 st.sidebar.header("📄 Exportação & Gestão")
-if st.sidebar.button("⚙️ Gerar Relatório PDF"):
-  if not df_agendados.empty:
-    info_str = "Seleção Personalizada"
-    if espacos_sel:
-      info_str = f"Espaços: {', '.join(espacos_sel)}"
-    elif dias_sel:
-      info_str = f"Dias: {', '.join(dias_sel)}"
-    df_pdf = merge_consecutive_events(df_agendados)
-    pdf_bytes = generate_pdf_report(df_pdf, info_str)
-    st.sidebar.download_button(
-        label="📥 Baixar PDF da Programação",
-        data=pdf_bytes,
-        file_name="agenda_expointer.pdf",
-        mime="application/pdf",
-    )
-  else:
-    st.sidebar.error("Nenhum evento agendado selecionado.")
+
+filtros_pdf_list = []
+if busca:
+  filtros_pdf_list.append(f"Busca: '{busca}'")
+if dias_sel:
+  filtros_pdf_list.append(f"Dias: {', '.join(dias_sel)}")
+if espacos_sel:
+  filtros_pdf_list.append(f"Espaços: {', '.join(espacos_sel)}")
+if sec_sel:
+  filtros_pdf_list.append(f"Secretarias: {', '.join(sec_sel)}")
+
+info_str_pdf = (
+    " | ".join(filtros_pdf_list)
+    if filtros_pdf_list
+    else "Programação Completa (Todos os Eventos)"
+)
+
+if not df_agendados.empty:
+  df_pdf_prepared = merge_consecutive_events(df_agendados)
+
+  df_pdf_prepared["Day_Order"] = df_pdf_prepared["Data"].apply(
+      lambda d: ORDEM_DIAS.index(d) if d in ORDEM_DIAS else 99
+  )
+  df_pdf_prepared["Time_Order"] = df_pdf_prepared["Horário"].apply(
+      extract_time_val
+  )
+  df_pdf_prepared = df_pdf_prepared.sort_values(
+      by=["Day_Order", "Time_Order", "Espaço"]
+  )
+
+  pdf_bytes = generate_pdf_report(df_pdf_prepared, info_str_pdf)
+  st.sidebar.download_button(
+      label="📥 Baixar PDF da Programação",
+      data=pdf_bytes,
+      file_name="agenda_expointer_filtrada.pdf",
+      mime="application/pdf",
+  )
+else:
+  st.sidebar.info("Nenhum evento agendado com os filtros atuais.")
 
 st.sidebar.divider()
 
@@ -620,7 +659,6 @@ with tab_calendar:
           )
           evs_dia = df_grid_merged[df_grid_merged["Data"] == d].copy()
 
-          # Ordenação estrita crescente por horário
           evs_dia["Order_Key"] = evs_dia["Horário"].apply(extract_time_val)
           evs_dia = evs_dia.sort_values(by="Order_Key")
 
@@ -633,6 +671,11 @@ with tab_calendar:
             resp_val = (
                 str(ev["Responsável"]).strip()
                 if pd.notna(ev["Responsável"])
+                else ""
+            )
+            pain_val = (
+                str(ev["Painelistas"]).strip()
+                if pd.notna(ev.get("Painelistas"))
                 else ""
             )
 
@@ -648,6 +691,12 @@ with tab_calendar:
                 if resp_val and resp_val.lower() not in ["nan", "none", ""]
                 else ""
             )
+            pain_display = (
+                f'<div style="color:#0284c7; font-size:0.75rem;'
+                f' font-weight:600; margin-top:2px;">🎙️ {pain_val}</div>'
+                if pain_val and pain_val.lower() not in ["nan", "none", ""]
+                else ""
+            )
 
             st.markdown(
                 f"""
@@ -657,6 +706,7 @@ with tab_calendar:
                     <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
                     {sec_display}
                     {resp_display}
+                    {pain_display}
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -703,7 +753,6 @@ with tab_edit:
         " rapidamente qualquer dia ou espaço."
     )
 
-    # Filtros para a tabela de edição
     col_f1, col_f2 = st.columns(2)
     with col_f1:
       edit_filter_dia = st.selectbox(
@@ -714,7 +763,6 @@ with tab_edit:
           "📍 Filtrar tabela por Espaço:", ["Todos"] + todos_espacos, index=0
       )
 
-    # Prepara sub-conjunto filtrado para edição rápida
     df_to_edit = df_data.copy()
     if edit_filter_dia != "Todos":
       df_to_edit = df_to_edit[df_to_edit["Data"] == edit_filter_dia]
@@ -743,16 +791,17 @@ with tab_edit:
             ),
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
             "Responsável": st.column_config.TextColumn("Responsável"),
+            "Painelistas": st.column_config.TextColumn(
+                "Painelistas / Palestrantes"
+            ),
         },
         key="editor_github",
     )
 
     if st.button("💾 Salvar & Registrar Versão no GitHub"):
       with st.spinner("Mesclando alterações e salvando no GitHub..."):
-        # Mescla as alterações feitas no subconjunto de volta ao dataframe principal
         df_final_save = df_data.copy()
 
-        # Remove as linhas antigas que pertencem aos filtros selecionados e insere as editadas
         if edit_filter_dia != "Todos" and edit_filter_espaco != "Todos":
           cond = (df_final_save["Data"] == edit_filter_dia) & (
               df_final_save["Espaço"] == edit_filter_espaco
@@ -774,11 +823,10 @@ with tab_edit:
 
         if commit_changes_to_github(df_final_save, notes):
           st.success(
-              "✅ Arquivo CSV atualizado e novo registro salvo no GitHub!"
+              "✅ Arquivo TXT atualizado e novo registro salvo no GitHub!"
           )
           st.cache_data.clear()
           st.rerun()
 
   elif senha:
     st.error("❌ Senha incorreta.")
-    
