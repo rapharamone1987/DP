@@ -369,16 +369,6 @@ Bancada ESPAÇO GOV;Segunda 31/08;15:00;Exposição de Materiais de Divulgação
 Bancada ESPAÇO GOV;Segunda 31/08;16:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
 Bancada ESPAÇO GOV;Segunda 31/08;17:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
 Bancada ESPAÇO GOV;Segunda 31/08;18:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Terça 01/09;09:00;Promoção da Doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
-Bancada ESPAÇO GOV;Terça 01/09;10:00;Promoção da Doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
-Bancada ESPAÇO GOV;Terça 01/09;11:00;Promoção da Doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
-Bancada ESPAÇO GOV;Terça 01/09;12:00;Promoçao da Doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
-Bancada ESPAÇO GOV;Terça 01/09;13:00;🔓 HORÁRIO VAGO;;;;False;
-Bancada ESPAÇO GOV;Terça 01/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-Bancada ESPAÇO GOV;Terça 01/09;15:00;🔓 HORÁRIO VAGO;;;;False;
-Bancada ESPAÇO GOV;Terça 01/09;16:00;🔓 HORÁRIO VAGO;;;;False;
-Bancada ESPAÇO GOV;Terça 01/09;17:00;🔓 HORÁRIO VAGO;;;;False;
-Bancada ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Bancada ESPAÇO GOV;Quarta 02/09;09:00;Promoção da doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
 Bancada ESPAÇO GOV;Quarta 02/09;10:00;Promoção da doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
 Bancada ESPAÇO GOV;Quarta 02/09;11:00;Promoção da doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
@@ -809,3 +799,13 @@ Arena ESPAÇO GOV;Quarta 02/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;17:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;18:30;🔓 HORÁRIO VAGO;;;;False;
+Bancada ESPAÇO GOV;Terça 01/09;09:00;Promoção da Doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
+Bancada ESPAÇO GOV;Terça 01/09;10:00;Promoção da Doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
+Bancada ESPAÇO GOV;Terça 01/09;11:00;Promoção da Doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
+Bancada ESPAÇO GOV;Terça 01/09;12:00;Promoção da Doação de Sangue;SES;Katia Brodt;;False;katia-brodt@saude.rs.gov.br
+Bancada ESPAÇO GOV;Terça 01/09;13:00;🔓 HORÁRIO VAGO;;;;False;
+Bancada ESPAÇO GOV;Terça 01/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+Bancada ESPAÇO GOV;Terça 01/09;15:00;🔓 HORÁRIO VAGO;;;;False;
+Bancada ESPAÇO GOV;Terça 01/09;16:00;🔓 HORÁRIO VAGO;;;;False;
+Bancada ESPAÇO GOV;Terça 01/09;17:00;🔓 HORÁRIO VAGO;;;;False;
+Bancada ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
