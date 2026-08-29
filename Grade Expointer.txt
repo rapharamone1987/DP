@@ -599,96 +599,6 @@ Arena ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;17:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;18:30;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;09:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;10:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;11:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;12:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;13:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;14:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;15:00;BANDA DA BRIGADA MILITAR;Brigada Militar;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;15:30;BANDA DA BRIGADA MILITAR;Brigada Militar;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;16:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;17:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Domingo 30/08;18:30;🔓 HORÁRIO VAGO;;;;False;
-Bancada ESPAÇO GOV;Domingo 30/08;09:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Bancada ESPAÇO GOV;Domingo 30/08;10:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Bancada ESPAÇO GOV;Domingo 30/08;11:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Bancada ESPAÇO GOV;Domingo 30/08;12:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Bancada ESPAÇO GOV;Domingo 30/08;13:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Bancada ESPAÇO GOV;Domingo 30/08;14:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Bancada ESPAÇO GOV;Domingo 30/08;15:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Bancada ESPAÇO GOV;Domingo 30/08;16:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Bancada ESPAÇO GOV;Domingo 30/08;17:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Bancada ESPAÇO GOV;Domingo 30/08;18:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;15:00;BANDA BRIGADA MILITAR;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;16:00;Agrocultura - A raiz tem Futuro;-;Amanda Leones;Glaucia Nasser ( empresária do Agronegocio formada em Comercio Exterior);False;11 98612-9583
-Auditório ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Terça 01/09;09:00;Apresentação dos Projetos Pedagógicos e Científicos desenvolvidos nas Escolas Estaduais;SEDUC;Claudia Feijo;-;False;51981621989
 Auditório ADMINISTRAÇÃO;Terça 01/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Terça 01/09;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -813,3 +723,93 @@ Arena ESPAÇO GOV;Quarta 02/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;17:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;18:30;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;09:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;10:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;11:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;12:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;13:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;14:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;15:00;BANDA DA BRIGADA MILITAR;Brigada Militar;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;15:30;BANDA DA BRIGADA MILITAR;Brigada Militar;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;16:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;17:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Domingo 30/08;18:30;🔓 HORÁRIO VAGO;;;;False;
+Bancada ESPAÇO GOV;Domingo 30/08;09:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Bancada ESPAÇO GOV;Domingo 30/08;10:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Bancada ESPAÇO GOV;Domingo 30/08;11:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Bancada ESPAÇO GOV;Domingo 30/08;12:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Bancada ESPAÇO GOV;Domingo 30/08;13:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Bancada ESPAÇO GOV;Domingo 30/08;14:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Bancada ESPAÇO GOV;Domingo 30/08;15:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Bancada ESPAÇO GOV;Domingo 30/08;16:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Bancada ESPAÇO GOV;Domingo 30/08;17:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Bancada ESPAÇO GOV;Domingo 30/08;18:00;Exposição de Atividades Educativas de Interesse da Defesa Agropecuária e Saúde Pública;SEAPI/Ed.SANITARIA;Felipe Campos;;False;51985155831
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;15:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;16:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Domingo 30/08;12:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Domingo 30/08;13:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Domingo 30/08;14:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Domingo 30/08;15:00;BANDA BRIGADA MILITAR;;;;False;
+Auditório ESPAÇO GOV;Domingo 30/08;16:00;Agrocultura - A raiz tem Futuro;-;Amanda Leones;Glaucia Nasser ( empresária do Agronegocio formada em Comercio Exterior);True;11 98612-9583
+Auditório ESPAÇO GOV;Domingo 30/08;17:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Domingo 30/08;18:00;🔓 HORÁRIO VAGO;;;;False;
