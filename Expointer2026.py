@@ -92,6 +92,9 @@ def load_csv_from_github():
     if "Painelistas" not in df.columns:
       df["Painelistas"] = ""
 
+    if "CONTATO" not in df.columns:
+      df["CONTATO"] = ""
+
     # Garante a existência da coluna APRESENTAÇÕES (boolean/checkbox)
     if "APRESENTAÇÕES" not in df.columns:
       df["APRESENTAÇÕES"] = False
@@ -673,7 +676,6 @@ with tab_calendar:
                 else ""
             )
 
-            # Badge discreto indicando se a apresentação está OK (na visão restrita/de controle)
             pres_ok = ev.get("APRESENTAÇÕES", False)
             pres_badge = (
                 '<span style="background-color:#16a34a; color:#ffffff;'
@@ -747,8 +749,8 @@ with tab_edit:
 
   if senha == ADMIN_PASSWORD:
     st.success(
-        "🔓 Acesso liberado! Marque a caixa 'APRESENTAÇÕES' dos eventos cujos"
-        " arquivos já foram recebidos e validados."
+        "🔓 Acesso liberado! Visualize e edite os dados internos, contatos dos"
+        " responsáveis e controle das apresentações."
     )
 
     col_f1, col_f2 = st.columns(2)
@@ -769,7 +771,7 @@ with tab_edit:
 
     notes = st.text_input(
         "Motivo / Descrição da Alteração (Auditoria):",
-        placeholder="Ex: Confirmação do recebimento da apresentação da SEDUC",
+        placeholder="Ex: Atualização do WhatsApp do responsável da SEDUC",
     )
 
     edited_subset = st.data_editor(
@@ -789,6 +791,10 @@ with tab_edit:
             ),
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
             "Responsável": st.column_config.TextColumn("Responsável (Interno)"),
+            "CONTATO": st.column_config.TextColumn(
+                "Contato (Telefone / WhatsApp / E-mail)",
+                help="Telefone ou contato restrito do responsável",
+            ),
             "Painelistas": st.column_config.TextColumn(
                 "Painelistas / Palestrantes"
             ),
