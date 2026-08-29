@@ -24,8 +24,7 @@ GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 ADMIN_PASSWORD = st.secrets.get("ADMIN_PASSWORD", "expointer2026")
 
-FILE_TXT_PATH = "Grade Expointer.txt"
-FILE_CSV_PATH = "Grade Expointer.csv"
+FILE_CSV_PATH = "Grade Expointer.txt"
 URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
 
 ORDEM_DIAS = [
@@ -39,6 +38,59 @@ ORDEM_DIAS = [
     "Sábado 05/09",
     "Domingo 06/09",
 ]
+
+# MAPA AUTOMÁTICO DE CONTATOS EXTRAÍDOS DA PLANILHA EXCEL
+MAPA_CONTATOS_XLSX = {
+    "Alexandre Neves": "51992677814",
+    "Amanda Leones": "11 98612-9583",
+    "Beatris Kuchenbecker": "5198776642",
+    "Betina Blochtein": "51999598524",
+    "Bruna Peralta": "51989103810",
+    "Bruno Pancot": "54996235253",
+    "Claudia Feijo": "51981621989",
+    "Cristina Carniel": "54 99953-0353",
+    "Davi  Teixeira": "51999566677",
+    "Davi Teixeira": "51999566677",
+    "Denise Cabral": "51981263234",
+    "Eduardo Geyer": "51984040800",
+    "Felipe Campos": "51985155831",
+    "Fernando Bartelle": "51979969991",
+    "Guilherme Geanez": "(55) 991855432",
+    "Guilherme Granez": "(55) 991855432",
+    "Jackson Freitas": "51981039727",
+    "Juliana Sehn": "51984458985",
+    "Katia Brodt": "katia-brodt@saude.rs.gov.br",
+    "Katia Moura": "51999673397",
+    "Katiulci Santos": "51981944326",
+    "Leticia Ikeda": "51999848235",
+    "Lisiane Rodrigues": "51998090267",
+    "Luana Winter": "51992996032",
+    "Luana winter": "51992996032",
+    "Lucas Sena": "55-999052284",
+    "Luciana Hann Menezes": "51993114520",
+    "Marcelo Reidel": "marcelo-reidel@saude.rs.gov.br",
+    "Maria Emilia": "maria-portella@sehab.rs.gov.br | 519999199958",
+    "Marilise Souza": "51984779195",
+    "Nadiele Pires": "11 97702-4693",
+    "Nielson Luis de Paula Carramilo": "991440416",
+    "Pablo Martins": "5331160967",
+    "Paulo Lunardi": "51996272927",
+    "Ricardo Felicetti": "5132886295",
+    "Rogerio Assis Brasil": "51991472323",
+    "Rolnei Viceinte Coradini": "51982404482",
+    "SS": "suelen-arduin@saude.rs.gov.br",
+    "Sergio Leusin Junior": "51991295878",
+    "Sonia Sacconi": "61998300109",
+    "Suelen Arduin": "suelen-arduin@saude.rs.gov.br",
+    "Tais Teixeira": "51986878194",
+    "Tani Ranieri": "51992752370",
+    "Tenente Sabrina Ribas": "51993774053",
+    "Tulius Tsangaropulos": "51989926830",
+    "Vanda Garibotti": "51999775853",
+    "Vanusa Rosa": "51991515739",
+    "Yasmin Bastos": "(51) 99648-3659",
+    "leticia Ikeda": "leticia-ikeda@saude.rs.gov.br",
+}
 
 
 @st.cache_data(ttl=3600)
@@ -58,105 +110,85 @@ def load_background_base64(url):
 img_b64 = load_background_base64(URL_RAW_IMG)
 
 
-# 2. Leitura e Cruzamento do TXT com os Contatos do CSV do GitHub
+# 2. Leitura e Processamento do Arquivo TXT do GitHub
 @st.cache_data(ttl=15)
-def load_data_and_contacts_from_github():
+def load_csv_from_github():
   try:
+    encoded_path = urllib.parse.quote(FILE_CSV_PATH)
+    api_url = (
+        f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
+    )
+
     headers = {"Accept": "application/vnd.github.v3+json"}
     if GITHUB_TOKEN:
       headers["Authorization"] = f"token {GITHUB_TOKEN}"
 
-    # Carrega TXT Principal
-    enc_txt = urllib.parse.quote(FILE_TXT_PATH)
-    res_txt = requests.get(
-        f"https://api.github.com/repos/{GITHUB_REPO}/contents/{enc_txt}",
-        headers=headers,
-        timeout=15,
-    )
-    if not res_txt.ok:
-      st.error(f"⚠️ Erro ao buscar '{FILE_TXT_PATH}' no GitHub.")
+    res = requests.get(api_url, headers=headers, timeout=15)
+    if not res.ok:
+      st.error(
+          f"⚠️ Erro HTTP {res.status_code} ao buscar '{FILE_CSV_PATH}' no"
+          " GitHub."
+      )
       return pd.DataFrame()
 
-    bytes_txt = base64.b64decode(res_txt.json().get("content", ""))
-    df_txt = pd.read_csv(
-        io.BytesIO(bytes_txt), sep=";", encoding="utf-8-sig", dtype=str
-    ).fillna("")
+    content_b64 = res.json().get("content", "")
+    if not content_b64:
+      return pd.DataFrame()
 
-    # Busca o CSV original no GitHub SOMENTE para extrair a coluna de contatos
-    contacts_map = {}
-    enc_csv = urllib.parse.quote(FILE_CSV_PATH)
-    res_csv = requests.get(
-        f"https://api.github.com/repos/{GITHUB_REPO}/contents/{enc_csv}",
-        headers=headers,
-        timeout=15,
+    content_bytes = base64.b64decode(content_b64)
+
+    df = pd.read_csv(
+        io.BytesIO(content_bytes), sep=";", encoding="utf-8-sig", dtype=str
     )
+    df = df.fillna("")
 
-    if res_csv.ok:
-      bytes_csv = base64.b64decode(res_csv.json().get("content", ""))
-      df_csv = pd.read_csv(
-          io.BytesIO(bytes_csv), sep=";", encoding="utf-8-sig", dtype=str
-      ).fillna("")
+    if "Painelistas" not in df.columns:
+      df["Painelistas"] = ""
 
-      # Mapeia contatos do CSV por chave (Espaço, Data, Horário) ou por Tema
-      for _, r in df_csv.iterrows():
-        esp = str(r.get("Espaço", "")).strip()
-        data = str(r.get("Data", "")).strip()
-        horario = str(r.get("Horário", "")).strip()
-        tema = str(r.get("Tema", "")).strip()
+    if "CONTATO" not in df.columns:
+      df["CONTATO"] = ""
 
-        # Tenta achar telefone/contato no CSV (pode estar na coluna Painelistas, Contato ou Responsável)
-        joined_str = " ".join([str(v) for v in r.values])
-        phones = re.findall(
-            r"\(?\d{2}\)?\s*\d{4,5}[-\s]?\d{4}|\b\d{8,11}\b", joined_str
-        )
-        if phones:
-          c_str = ", ".join(list(set(phones)))
-          contacts_map[(esp, data, horario)] = c_str
-          if len(tema) > 5:
-            norm_t = re.sub(r"\W+", "", tema.lower())
-            contacts_map[norm_t] = c_str
+    # Preenche a coluna CONTATO automaticamente se estiver vazia
+    def resolve_contato(row):
+      existing = str(row.get("CONTATO", "")).strip()
+      if existing:
+        return existing
 
-    # Preenche a coluna CONTATO no df_txt usando os dados do CSV
-    def attach_contact(row):
-      esp = str(row.get("Espaço", "")).strip()
-      data = str(row.get("Data", "")).strip()
-      horario = str(row.get("Horário", "")).strip()
-      tema = str(row.get("Tema", "")).strip()
+      resp = str(row.get("Responsável", "")).strip()
+      if resp in MAPA_CONTATOS_XLSX:
+        return MAPA_CONTATOS_XLSX[resp]
 
-      if (esp, data, horario) in contacts_map:
-        return contacts_map[(esp, data, horario)]
+      # Busca aproximada por nome limpo
+      norm_resp = re.sub(r"\W+", "", resp.lower())
+      for k, v in MAPA_CONTATOS_XLSX.items():
+        if re.sub(r"\W+", "", k.lower()) == norm_resp:
+          return v
 
-      norm_t = re.sub(r"\W+", "", tema.lower())
-      if norm_t in contacts_map:
-        return contacts_map[norm_t]
+      return ""
 
-      return str(row.get("CONTATO", "")).strip()
+    df["CONTATO"] = df.apply(resolve_contato, axis=1)
 
-    df_txt["CONTATO"] = df_txt.apply(attach_contact, axis=1)
-
-    if "Painelistas" not in df_txt.columns:
-      df_txt["Painelistas"] = ""
-
-    if "APRESENTAÇÕES" not in df_txt.columns:
-      df_txt["APRESENTAÇÕES"] = False
+    # Garante a existência da coluna APRESENTAÇÕES (boolean/checkbox)
+    if "APRESENTAÇÕES" not in df.columns:
+      df["APRESENTAÇÕES"] = False
     else:
-      df_txt["APRESENTAÇÕES"] = df_txt["APRESENTAÇÕES"].apply(
+      df["APRESENTAÇÕES"] = df["APRESENTAÇÕES"].apply(
           lambda x: True
           if str(x).strip().lower() in ["true", "1", "sim", "ok"]
           else False
       )
 
-    df_txt["Tema"] = df_txt["Tema"].apply(
+    df["Tema"] = df["Tema"].apply(
         lambda x: "🔓 HORÁRIO VAGO"
         if not str(x).strip()
         or str(x).strip().lower() in ["vago", "livre", "nan", "none", "", "-"]
         else str(x).strip()
     )
 
-    return df_txt
+    return df
 
   except Exception as e:
-    st.error(f"⚠️ Erro no processamento do GitHub: {e}")
+    st.error(f"⚠️ Erro ao carregar arquivo no GitHub: {e}")
     return pd.DataFrame()
 
 
@@ -257,7 +289,7 @@ def commit_changes_to_github(updated_df, change_log_notes=""):
   timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
   try:
-    encoded_filename = urllib.parse.quote(FILE_TXT_PATH)
+    encoded_filename = urllib.parse.quote(FILE_CSV_PATH)
     get_file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_filename}"
     res = requests.get(get_file_url, headers=headers, timeout=10)
 
@@ -552,10 +584,13 @@ banner_html = """
 """
 st.markdown(banner_html, unsafe_allow_html=True)
 
-df_data = load_data_and_contacts_from_github()
+df_data = load_csv_from_github()
 
 if df_data.empty:
-  st.warning("⚠️ Nenhum dado foi carregado do GitHub.")
+  st.warning(
+      "⚠️ Nenhum dado foi carregado. Verifique o arquivo 'Grade Expointer.txt' no"
+      " GitHub."
+  )
   st.stop()
 
 dias_encontrados = [d for d in df_data["Data"].unique() if d]
@@ -787,8 +822,8 @@ with tab_edit:
 
   if senha == ADMIN_PASSWORD:
     st.success(
-        "🔓 Acesso liberado! Os contatos extraídos do arquivo CSV original"
-        " estão visíveis abaixo na coluna CONTATO."
+        "🔓 Acesso liberado! Os contatos dos responsáveis foram recuperados"
+        " automaticamente da planilha original e exibidos na coluna CONTATO."
     )
 
     col_f1, col_f2 = st.columns(2)
@@ -809,7 +844,7 @@ with tab_edit:
 
     notes = st.text_input(
         "Motivo / Descrição da Alteração (Auditoria):",
-        placeholder="Ex: Atualização do WhatsApp do responsável da SEDUC",
+        placeholder="Ex: Atualização do contato e recebimento da apresentação",
     )
 
     edited_subset = st.data_editor(
@@ -830,11 +865,8 @@ with tab_edit:
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
             "Responsável": st.column_config.TextColumn("Responsável (Interno)"),
             "CONTATO": st.column_config.TextColumn(
-                "Contato (Extraído do CSV)",
-                help=(
-                    "Telefone/WhatsApp restrito do responsável puxado do CSV"
-                    " original"
-                ),
+                "Contato (Telefone / WhatsApp / E-mail)",
+                help="Contato do responsável (Telefone/WhatsApp/Email)",
             ),
             "Painelistas": st.column_config.TextColumn(
                 "Painelistas / Palestrantes"
@@ -876,7 +908,7 @@ with tab_edit:
 
         if commit_changes_to_github(df_final_save, notes):
           st.success(
-              "✅ Arquivo TXT atualizado e novo registro salvo no GitHub!"
+              "✅ Arquivo TXT atualizado com todos os contatos salvos no GitHub!"
           )
           st.cache_data.clear()
           st.rerun()
