@@ -24,7 +24,6 @@ GITHUB_REPO = st.secrets.get("GITHUB_REPO", "rapharamone1987/DP")
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 ADMIN_PASSWORD = st.secrets.get("ADMIN_PASSWORD", "expointer2026")
 
-# Nome atualizado para ler o arquivo .txt do GitHub
 FILE_CSV_PATH = "Grade Expointer.txt"
 URL_RAW_IMG = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/Screenshot_20260825-095320~2.jpg"
 
@@ -85,7 +84,6 @@ def load_csv_from_github():
 
     content_bytes = base64.b64decode(content_b64)
 
-    # Lê o arquivo TXT estruturado com separador ';'
     df = pd.read_csv(
         io.BytesIO(content_bytes), sep=";", encoding="utf-8-sig", dtype=str
     )
@@ -93,6 +91,16 @@ def load_csv_from_github():
 
     if "Painelistas" not in df.columns:
       df["Painelistas"] = ""
+
+    # Garante a existência da coluna APRESENTAÇÕES (boolean/checkbox)
+    if "APRESENTAÇÕES" not in df.columns:
+      df["APRESENTAÇÕES"] = False
+    else:
+      df["APRESENTAÇÕES"] = df["APRESENTAÇÕES"].apply(
+          lambda x: True
+          if str(x).strip().lower() in ["true", "1", "sim", "ok"]
+          else False
+      )
 
     df["Tema"] = df["Tema"].apply(
         lambda x: "🔓 HORÁRIO VAGO"
@@ -108,7 +116,6 @@ def load_csv_from_github():
     return pd.DataFrame()
 
 
-# Funções Auxiliares para Agrupamento e Ordenação
 def extract_time_val(time_str):
   if not time_str:
     return 9999
@@ -120,7 +127,6 @@ def extract_time_val(time_str):
 
 
 def merge_consecutive_events(df):
-  """Consolida horários subsequentes para eventos idênticos na mesma data e espaço."""
   if df.empty:
     return df
 
@@ -147,17 +153,13 @@ def merge_consecutive_events(df):
             str(current_event.get("Secretaria")).strip().lower()
             == str(row.get("Secretaria")).strip().lower()
         )
-        same_resp = (
-            str(current_event.get("Responsável")).strip().lower()
-            == str(row.get("Responsável")).strip().lower()
-        )
         same_pain = (
             str(current_event.get("Painelistas")).strip().lower()
             == str(row.get("Painelistas")).strip().lower()
         )
         not_vago = row.get("Tema") != "🔓 HORÁRIO VAGO"
 
-        if same_theme and same_sec and same_resp and same_pain and not_vago:
+        if same_theme and same_sec and same_pain and not_vago:
           current_event["Hora_Fim"] = str(row["Horário"]).strip()
         else:
           if (
@@ -198,7 +200,6 @@ def merge_consecutive_events(df):
   return res_df.drop(columns=cols_to_drop)
 
 
-# 3. Commit de Alterações para o GitHub (salva em Grade Expointer.txt)
 def commit_changes_to_github(updated_df, change_log_notes=""):
   if not GITHUB_TOKEN:
     st.error("❌ GITHUB_TOKEN não configurado no Secrets do Streamlit Cloud.")
@@ -344,16 +345,15 @@ def generate_pdf_report(df_export, doc_title_info):
       Paragraph("Horário", cell_header_style),
       Paragraph("Espaço / Auditório", cell_header_style),
       Paragraph("Atividade / Tema", cell_header_style),
-      Paragraph("Organização / Responsável", cell_header_style),
+      Paragraph("Secretaria / Entidade", cell_header_style),
       Paragraph("Painelista(s)", cell_header_style),
   ]]
 
   for _, row in df_export.iterrows():
-    resp_str = f" ({row['Responsável']})" if row["Responsável"] else ""
-    org_resp = (
-        f"{row['Secretaria']}{resp_str}"
-        if row["Secretaria"]
-        else row["Responsável"]
+    sec_str = (
+        str(row["Secretaria"]).strip()
+        if pd.notna(row["Secretaria"]) and str(row["Secretaria"]).strip()
+        else "-"
     )
     pain_str = (
         str(row["Painelistas"]).strip()
@@ -367,7 +367,7 @@ def generate_pdf_report(df_export, doc_title_info):
         Paragraph(row["Horário"], cell_time_style),
         Paragraph(row["Espaço"], cell_meta_style),
         Paragraph(row["Tema"], cell_title_style),
-        Paragraph(org_resp if org_resp else "-", cell_meta_style),
+        Paragraph(sec_str, cell_meta_style),
         Paragraph(pain_str, cell_meta_style),
     ])
 
@@ -533,7 +533,7 @@ with st.container():
   col_busca, col_dias = st.columns([2, 2])
   with col_busca:
     busca = st.text_input(
-        "🔎 Palavra-chave:", "", placeholder="Digite tema, responsável, painelista..."
+        "🔎 Palavra-chave:", "", placeholder="Digite tema ou painelista..."
     )
   with col_dias:
     dias_sel = st.multiselect(
@@ -566,7 +566,6 @@ if busca:
   df_filtered = df_filtered[
       df_filtered["Tema"].astype(str).str.lower().str.contains(t)
       | df_filtered["Espaço"].astype(str).str.lower().str.contains(t)
-      | df_filtered["Responsável"].astype(str).str.lower().str.contains(t)
       | df_filtered["Painelistas"].astype(str).str.lower().str.contains(t)
   ]
 if dias_sel:
@@ -668,14 +667,20 @@ with tab_calendar:
                 if pd.notna(ev["Secretaria"])
                 else ""
             )
-            resp_val = (
-                str(ev["Responsável"]).strip()
-                if pd.notna(ev["Responsável"])
-                else ""
-            )
             pain_val = (
                 str(ev["Painelistas"]).strip()
                 if pd.notna(ev.get("Painelistas"))
+                else ""
+            )
+
+            # Badge discreto indicando se a apresentação está OK (na visão restrita/de controle)
+            pres_ok = ev.get("APRESENTAÇÕES", False)
+            pres_badge = (
+                '<span style="background-color:#16a34a; color:#ffffff;'
+                ' font-size:0.68rem; font-weight:800; padding:2px 6px;'
+                ' border-radius:4px; margin-left:6px;">📊 Apresentação'
+                " OK</span>"
+                if pres_ok
                 else ""
             )
 
@@ -683,12 +688,6 @@ with tab_calendar:
                 f'<div style="color:#334155; font-size:0.75rem;'
                 f' font-weight:600; margin-top:4px;">🏢 {sec_val}</div>'
                 if sec_val and sec_val.lower() not in ["nan", "none", ""]
-                else ""
-            )
-            resp_display = (
-                f'<div style="color:#475569; font-size:0.75rem;'
-                f' font-weight:500;">👤 {resp_val}</div>'
-                if resp_val and resp_val.lower() not in ["nan", "none", ""]
                 else ""
             )
             pain_display = (
@@ -701,11 +700,10 @@ with tab_calendar:
             st.markdown(
                 f"""
                 <div class="cal-event-box">
-                    <span>⏰ {ev['Horário']}</span>
+                    <span>⏰ {ev['Horário']} {pres_badge}</span>
                     <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">{ev['Tema']}</div>
                     <div style="color:#0369a1; font-weight:700; font-size:0.8rem;">📍 {ev['Espaço']}</div>
                     {sec_display}
-                    {resp_display}
                     {pain_display}
                 </div>
                 """,
@@ -749,8 +747,8 @@ with tab_edit:
 
   if senha == ADMIN_PASSWORD:
     st.success(
-        "🔓 Acesso liberado! Utilize os filtros abaixo para localizar e editar"
-        " rapidamente qualquer dia ou espaço."
+        "🔓 Acesso liberado! Marque a caixa 'APRESENTAÇÕES' dos eventos cujos"
+        " arquivos já foram recebidos e validados."
     )
 
     col_f1, col_f2 = st.columns(2)
@@ -771,7 +769,7 @@ with tab_edit:
 
     notes = st.text_input(
         "Motivo / Descrição da Alteração (Auditoria):",
-        placeholder="Ex: Inclusão do painel SEDUC no dia 31/08",
+        placeholder="Ex: Confirmação do recebimento da apresentação da SEDUC",
     )
 
     edited_subset = st.data_editor(
@@ -790,9 +788,14 @@ with tab_edit:
                 "Atividade / Tema", required=True
             ),
             "Secretaria": st.column_config.TextColumn("Secretaria / Entidade"),
-            "Responsável": st.column_config.TextColumn("Responsável"),
+            "Responsável": st.column_config.TextColumn("Responsável (Interno)"),
             "Painelistas": st.column_config.TextColumn(
                 "Painelistas / Palestrantes"
+            ),
+            "APRESENTAÇÕES": st.column_config.CheckboxColumn(
+                "Apresentação OK?",
+                help="Marque se a apresentação do evento já foi recebida e conferida",
+                default=False,
             ),
         },
         key="editor_github",
