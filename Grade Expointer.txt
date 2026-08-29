@@ -1,4 +1,4 @@
-Espaço;Data;Horário;Tema;Secretaria;Responsável;Painelistas;APRESENTAÇÕES
+Espaço;Data;Horário;Tema;Secretaria;Responsável;Painelistas;APRESENTAÇÕES;CONTATO
 Auditório ADMINISTRAÇÃO;Sábado 29/08;09:00;🔓 HORÁRIO VAGO;;;
 Auditório ADMINISTRAÇÃO;Sábado 29/08;10:00;🔓 HORÁRIO VAGO;;;
 Auditório ADMINISTRAÇÃO;Sábado 29/08;11:00;🔓 HORÁRIO VAGO;;;
