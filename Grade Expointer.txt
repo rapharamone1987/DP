@@ -639,26 +639,6 @@ Bancada ESPAÇO GOV;Terça 01/09;15:00;🔓 HORÁRIO VAGO;;;;False;
 Bancada ESPAÇO GOV;Terça 01/09;16:00;🔓 HORÁRIO VAGO;;;;False;
 Bancada ESPAÇO GOV;Terça 01/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Bancada ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Quarta 02/09;09:00;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;False;51992996032
-Arena ESPAÇO GOV;Quarta 02/09;09:30;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;False;51992996032
-Arena ESPAÇO GOV;Quarta 02/09;10:00;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;False;54 99953-0353
-Arena ESPAÇO GOV;Quarta 02/09;10:30;O que realmente gera valor em um Imovel Rural?;SPGG/DEAPE;Rolnei Viceinte Coradini;Vinicius Deprá(Sub Sec, de Patrimonio)Rolnei Vicente Coradini(Especialista em Infraestrutura)Marina Zanchin(Diretora DEAPE);True;51982404482
-Arena ESPAÇO GOV;Quarta 02/09;11:00;Economia Criativa: A Importancia dos dados na construção de Politicas Publica;SEDAC;Juliana Sehn;Juliana Sehn(Coordenadora RS Criativo/SEDAC)Tomás Pinheiro( Diretor Departamento de Economia e Estatistica/SPGG);False;51984458985
-Arena ESPAÇO GOV;Quarta 02/09;11:30;Planos de Desenvolvimento Regional da Industria Cultural e Criativa-Diagnostico Inicial;SEDAC;Juliana Sehn;Juliana Sehn(Coordenadora RS Criativo/SEDAC)Cristiano Max ( Professor da Pucrs e Coordenador do projeto na Pucrs);False;51984458985
-Arena ESPAÇO GOV;Quarta 02/09;12:00;Serviços Publicos do Futuro:Como atender melhor uma Sociedade em Transformação;SERG/AGERGS;Bruno Pancot;Marcelo Spilki (Conselheiro Presidente da AGERGS)Pedro Capeluppi (Secretario da Reconstrução Gaucha)Joel Goldrnfum ( Secretario Executivo do Comite Cientifico de Adaptação e Resiliencia Climatica);False;54996235253
-Arena ESPAÇO GOV;Quarta 02/09;12:30;Serviços Publicos do Futuro:Como atender melhor uma Sociedade em Transformação;SERG/AGERGS;Bruno Pancot;Marcelo Spilki (Conselheiro Presidente da AGERGS)Pedro Capeluppi (Secretario da Reconstrução Gaucha)Joel Goldrnfum ( Secretario Executivo do Comite Cientifico de Adaptação e Resiliencia Climatica);False;54996235253
-Arena ESPAÇO GOV;Quarta 02/09;13:00;Expofeira Três de Maio;Pref. Tres de Maio;Janis Gabinete;Prefeito Marcos Corso;False;
-Arena ESPAÇO GOV;Quarta 02/09;13:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Quarta 02/09;14:00;Modelos de Atendimentos ao Cidadão e Canais de Prestação de Serviços Publicos no RS;SPGG/DIRGE/SUAD;Sonia Sacconi;Danielle Calazans(Secretaria) Sonia Saconi 9diretora Geral SPGG),Liege Dresch(Subsecretaria de Administração)Nielson Carramillo(Subsecretario de TIC);False;61998300109
-Arena ESPAÇO GOV;Quarta 02/09;14:30;O Papel da Consolidação dos limites Municipais enquanto Ferramenta de Planejamento S;PGG/SUPLAN/DEPLAN;(Luciana Dal Forno Gianluppi);Dionisio Sangoi,(Chefe de Divisão)Fernando de Morais(Geografo),Guilherme Risco(Geografo) ,Tiago do Rosario(Geografo0;True;
-Arena ESPAÇO GOV;Quarta 02/09;15:00;Regularização Fundiária e Habitação: Instrumentos de Desenvolvimento Humano e Social;SEHAB;Maria Emilia;Sec.Bruno Silveira,Diretora Daiane Malabarba.Diretora Adjunta Paula silva;False;maria-portella@sehab.rs.gov.br | 519999199958
-Arena ESPAÇO GOV;Quarta 02/09;15:30;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;False;54 99953-0353
-Arena ESPAÇO GOV;Quarta 02/09;16:00;Asssinaturas e Lançamentos: Cursos Hídricos e Segurança de Barragens;SEMA;Luana Winter;;False;51992996032
-Arena ESPAÇO GOV;Quarta 02/09;16:30;Asssinaturas e Lançamentos: Cursos Hídricos e Segurança de Barragens;SEMA;Luana Winter;;False;51992996032
-Arena ESPAÇO GOV;Quarta 02/09;17:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Quarta 02/09;17:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Quarta 02/09;18:30;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Domingo 30/08;09:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Domingo 30/08;10:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Domingo 30/08;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -813,3 +793,23 @@ Auditório ESPAÇO GOV;Terça 01/09;15:00;Entrega do Selo Ambiental;IRGA;Denise 
 Auditório ESPAÇO GOV;Terça 01/09;16:00;Ações e resultados do Projeto Reflora: UFRGS/UFSM/PUCRS/UNISC/Embrapii/UFV/CMPC/SEMA;SEAPI/ DDPA;Jackson Freitas;;True;51981039727
 Auditório ESPAÇO GOV;Terça 01/09;17:00;🔓 HORÁRIO VAGO;;;;True;51991472323
 Auditório ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Quarta 02/09;09:00;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;True;51992996032
+Arena ESPAÇO GOV;Quarta 02/09;09:30;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;True;51992996032
+Arena ESPAÇO GOV;Quarta 02/09;10:00;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;False;54 99953-0353
+Arena ESPAÇO GOV;Quarta 02/09;10:30;O que realmente gera valor em um Imovel Rural?;SPGG/DEAPE;Rolnei Viceinte Coradini;Vinicius Deprá(Sub Sec, de Patrimonio)Rolnei Vicente Coradini(Especialista em Infraestrutura)Marina Zanchin(Diretora DEAPE);True;51982404482
+Arena ESPAÇO GOV;Quarta 02/09;11:00;Economia Criativa: A Importancia dos dados na construção de Politicas Publica;SEDAC;Juliana Sehn;Juliana Sehn(Coordenadora RS Criativo/SEDAC)Tomás Pinheiro( Diretor Departamento de Economia e Estatistica/SPGG);False;51984458985
+Arena ESPAÇO GOV;Quarta 02/09;11:30;Planos de Desenvolvimento Regional da Industria Cultural e Criativa-Diagnostico Inicial;SEDAC;Juliana Sehn;Juliana Sehn(Coordenadora RS Criativo/SEDAC)Cristiano Max ( Professor da Pucrs e Coordenador do projeto na Pucrs);False;51984458985
+Arena ESPAÇO GOV;Quarta 02/09;12:00;Serviços Publicos do Futuro:Como atender melhor uma Sociedade em Transformação;SERG/AGERGS;Bruno Pancot;Marcelo Spilki (Conselheiro Presidente da AGERGS)Pedro Capeluppi (Secretario da Reconstrução Gaucha)Joel Goldrnfum ( Secretario Executivo do Comite Cientifico de Adaptação e Resiliencia Climatica);False;54996235253
+Arena ESPAÇO GOV;Quarta 02/09;12:30;Serviços Publicos do Futuro:Como atender melhor uma Sociedade em Transformação;SERG/AGERGS;Bruno Pancot;Marcelo Spilki (Conselheiro Presidente da AGERGS)Pedro Capeluppi (Secretario da Reconstrução Gaucha)Joel Goldrnfum ( Secretario Executivo do Comite Cientifico de Adaptação e Resiliencia Climatica);False;54996235253
+Arena ESPAÇO GOV;Quarta 02/09;13:00;Expofeira Três de Maio;Pref. Tres de Maio;Janis Gabinete;Prefeito Marcos Corso;False;
+Arena ESPAÇO GOV;Quarta 02/09;13:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Quarta 02/09;14:00;Modelos de Atendimentos ao Cidadão e Canais de Prestação de Serviços Publicos no RS;SPGG/DIRGE/SUAD;Sonia Sacconi;Danielle Calazans(Secretaria) Sonia Saconi 9diretora Geral SPGG),Liege Dresch(Subsecretaria de Administração)Nielson Carramillo(Subsecretario de TIC);False;61998300109
+Arena ESPAÇO GOV;Quarta 02/09;14:30;O Papel da Consolidação dos limites Municipais enquanto Ferramenta de Planejamento S;PGG/SUPLAN/DEPLAN;(Luciana Dal Forno Gianluppi);Dionisio Sangoi,(Chefe de Divisão)Fernando de Morais(Geografo),Guilherme Risco(Geografo) ,Tiago do Rosario(Geografo0;True;
+Arena ESPAÇO GOV;Quarta 02/09;15:00;Regularização Fundiária e Habitação: Instrumentos de Desenvolvimento Humano e Social;SEHAB;Maria Emilia;Sec.Bruno Silveira,Diretora Daiane Malabarba.Diretora Adjunta Paula silva;False;maria-portella@sehab.rs.gov.br | 519999199958
+Arena ESPAÇO GOV;Quarta 02/09;15:30;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;False;54 99953-0353
+Arena ESPAÇO GOV;Quarta 02/09;16:00;Asssinaturas e Lançamentos: Cursos Hídricos e Segurança de Barragens;SEMA;Luana Winter;;True;51992996032
+Arena ESPAÇO GOV;Quarta 02/09;16:30;Asssinaturas e Lançamentos: Cursos Hídricos e Segurança de Barragens;SEMA;Luana Winter;;True;51992996032
+Arena ESPAÇO GOV;Quarta 02/09;17:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Quarta 02/09;17:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Quarta 02/09;18:30;🔓 HORÁRIO VAGO;;;;False;
