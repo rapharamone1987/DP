@@ -808,9 +808,9 @@ Arena ESPAÇO GOV;Terça 01/09;14:00;Compras Publicas e sua relação com Cadeia
 Arena ESPAÇO GOV;Terça 01/09;14:30;Soluções Digitais e Integração entre Estado e Municípios;SPGG/DGD/STI;Nielson Luis de Paula Carramilo;Danielle Calazans( Secretaria da SPGG),Nielson Carramilo ( Subsecretario de TIC);False;991440416
 Arena ESPAÇO GOV;Terça 01/09;15:00;Feira Digital Sabor Gaúcho: Conectando Agroindústrias a Novos Mercados;SDR;Guilherme Granez;;True;(55) 991855432
 Arena ESPAÇO GOV;Terça 01/09;15:30;Apresentação para escolas: Expointer Carbono Neutro por CRVR;SEMA;Luana winter;;True;51992996032
-Arena ESPAÇO GOV;Terça 01/09;16:00;Apresentação para escolas: Expointer Carbono Neutro por CRVR;SEMA;Luana winter;;False;51992996032
+Arena ESPAÇO GOV;Terça 01/09;16:00;Apresentação para escolas: Expointer Carbono Neutro por CRVR;SEMA;Luana winter;;True;51992996032
 Arena ESPAÇO GOV;Terça 01/09;16:30;Troca de Saberes: Rota dos Butiazais e Escolas Desafio do Butiá;SEMA;Luana winter;;True;51992996032
-Arena ESPAÇO GOV;Terça 01/09;17:00;Troca de Saberes: Rota dos Butiazais e Escolas Desafio do Butiá;SEMA;Luana winter;;False;51992996032
+Arena ESPAÇO GOV;Terça 01/09;17:00;Troca de Saberes: Rota dos Butiazais e Escolas Desafio do Butiá;SEMA;Luana winter;;True;51992996032
 Arena ESPAÇO GOV;Terça 01/09;17:30;Histórico de atuação em derivas de 2,4D e herbicidas hormonais no Estado: Estratégias de Mitigação de danos e resultados;SEAPI/DDV;Ricardo Felicetti;;False;5132886295
 Arena ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Terça 01/09;18:30;🔓 HORÁRIO VAGO;;;;False;
