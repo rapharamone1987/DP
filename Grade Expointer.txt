@@ -806,7 +806,7 @@ Fabrício Forest - Diretor de Atração de Investimentos e Promoção Comercial 
 Arena ESPAÇO GOV;Terça 01/09;13:30;Mercosul–União Europeia: oportunidades para a indústria gaúcha;Invest;Tulius Tsangaropulos;;False;51989926830
 Arena ESPAÇO GOV;Terça 01/09;14:00;Compras Publicas e sua relação com Cadeias Produtivas do Agronegócio no RS;SPGG/SUBSEC/CELIC;Paulo Lunardi;Paulo Lunardi(Subsecretario da CELIC),kethy Bazo(Subsecretaria da CELIC);True;51996272927
 Arena ESPAÇO GOV;Terça 01/09;14:30;Soluções Digitais e Integração entre Estado e Municípios;SPGG/DGD/STI;Nielson Luis de Paula Carramilo;Danielle Calazans( Secretaria da SPGG),Nielson Carramilo ( Subsecretario de TIC);False;991440416
-Arena ESPAÇO GOV;Terça 01/09;15:00;Feira Digital Sabor Gaúcho: Conectando Agroindústrias a Novos Mercados;SDR;Guilherme Granez;;False;(55) 991855432
+Arena ESPAÇO GOV;Terça 01/09;15:00;Feira Digital Sabor Gaúcho: Conectando Agroindústrias a Novos Mercados;SDR;Guilherme Granez;;True;(55) 991855432
 Arena ESPAÇO GOV;Terça 01/09;15:30;Apresentação para escolas: Expointer Carbono Neutro por CRVR;SEMA;Luana winter;;False;51992996032
 Arena ESPAÇO GOV;Terça 01/09;16:00;Apresentação para escolas: Expointer Carbono Neutro por CRVR;SEMA;Luana winter;;False;51992996032
 Arena ESPAÇO GOV;Terça 01/09;16:30;Troca de Saberes: Rota dos Butiazais e Escolas Desafio do Butiá;SEMA;Luana winter;;False;51992996032
