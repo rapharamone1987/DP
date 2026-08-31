@@ -804,7 +804,7 @@ Arena ESPAÇO GOV;Quarta 02/09;12:30;Serviços Publicos do Futuro:Como atender m
 Arena ESPAÇO GOV;Quarta 02/09;13:00;Expofeira Três de Maio;Pref. Tres de Maio;Janis Gabinete;Prefeito Marcos Corso;False;
 Arena ESPAÇO GOV;Quarta 02/09;13:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;14:00;Modelos de Atendimentos ao Cidadão e Canais de Prestação de Serviços Publicos no RS;SPGG/DIRGE/SUAD;Sonia Sacconi;Danielle Calazans(Secretaria) Sonia Saconi 9diretora Geral SPGG),Liege Dresch(Subsecretaria de Administração)Nielson Carramillo(Subsecretario de TIC);False;61998300109
-Arena ESPAÇO GOV;Quarta 02/09;14:30;O Papel da Consolidação dos limites Municipais enquanto Ferramenta de Planejamento S;PGG/SUPLAN/DEPLAN;(Luciana Dal Forno Gianluppi);Dionisio Sangoi,(Chefe de Divisão)Fernando de Morais(Geografo),Guilherme Risco(Geografo) ,Tiago do Rosario(Geografo0;True;
+Arena ESPAÇO GOV;Quarta 02/09;14:30;O Papel da Consolidação dos limites Municipais enquanto Ferramenta de Planejamento S;PGG/SUPLAN/DEPLAN;(Luciana Dal Forno Gianluppi);Dionisio Sangoi,(Chefe de Divisão)Fernando de Morais(Geografo),Guilherme Cabreira (Geografo) ,Tiago do Rosario(Geografo0;True;
 Arena ESPAÇO GOV;Quarta 02/09;15:00;Regularização Fundiária e Habitação: Instrumentos de Desenvolvimento Humano e Social;SEHAB;Maria Emilia;Sec.Bruno Silveira,Diretora Daiane Malabarba.Diretora Adjunta Paula silva;False;maria-portella@sehab.rs.gov.br | 519999199958
 Arena ESPAÇO GOV;Quarta 02/09;15:30;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;False;54 99953-0353
 Arena ESPAÇO GOV;Quarta 02/09;16:00;Asssinaturas e Lançamentos: Cursos Hídricos e Segurança de Barragens;SEMA;Luana Winter;;True;51992996032
