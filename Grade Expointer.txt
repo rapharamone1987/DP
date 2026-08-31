@@ -639,16 +639,6 @@ Bancada ESPAÇO GOV;Terça 01/09;15:00;🔓 HORÁRIO VAGO;;;;False;
 Bancada ESPAÇO GOV;Terça 01/09;16:00;🔓 HORÁRIO VAGO;;;;False;
 Bancada ESPAÇO GOV;Terça 01/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Bancada ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Quarta 02/09;09:00;Prevenção das Intoxicações no Campo;SES SEVS;Vanda Garibotti;Vanda Garibotti(Biologa Sanitarista) Julia Costa ( Veterinaria)Giovanna Tereza Oliveira( Biologa) Ramon Pinotti( Biologo);False;51999775853
-Auditório ESPAÇO GOV;Quarta 02/09;16:00;RS e China: oportunidades para as proteínas animais e a atuação da Invest RS na Ásia s/ parceira com ABPA e ABIEC;Invest;Tulius Tsangaropulos;;False;51989926830
-Auditório ESPAÇO GOV;Quarta 02/09;11:00;Serviços e funcionalidades da GurIA para usuários AGRO;SPGG/EDP/DG;Fernando Bartelle;Danielle Calazans(Secretaria SPGG)Nielson Luis de Paula Carramilo(Sub Secretario TI)Fernando Bartelle.(Diretora Geral EDP0 Marcelo Conterato(Subsecretario de TIC);False;51979969991
-Auditório ESPAÇO GOV;Quarta 02/09;12:00;Futuro do Campo - Diagnóstico da Juventude Rural no RS;SDR;Guilherme Geanez;;False;(55) 991855432
-Auditório ESPAÇO GOV;Quarta 02/09;13:00;Panorama e Perspectivas do Mercado de Carbono no Setor Agropecuário;SEAPI;Jackson Freitas;;False;51981039727
-Auditório ESPAÇO GOV;Quarta 02/09;14:00;Erva-Mate do Alto Taquari: Ciência,Cooperação e Desenvolvimento Territorial;SEAPI;Jackson Freitas;;False;51981039727
-Auditório ESPAÇO GOV;Quarta 02/09;15:00;Monitoramento Climático e Hidrológico na prevenção de riscos;SPGG/DSTR/PROCERGS;Luciana Hann Menezes;Marcelo Conterato (Diretor de sistemas Transacionais da Procergs) E Vanessa Trindade  (Coordenadora de Comunicação  da SEMA);False;51993114520
-Auditório ESPAÇO GOV;Quarta 02/09;10:00;Reunião com comitê científico;SICT;Cristina;;False;51989926830
-Auditório ESPAÇO GOV;Quarta 02/09;17:00;Entrega de Licenças Ambientais e Assinatura de Termos de Cooperação do Bioma Mata Atlântica;SEMA;Luana Winter;;False;51992996032
-Auditório ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;09:00;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;False;51992996032
 Arena ESPAÇO GOV;Quarta 02/09;09:30;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;False;51992996032
 Arena ESPAÇO GOV;Quarta 02/09;10:00;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;False;54 99953-0353
@@ -814,3 +804,13 @@ Auditório ESPAÇO GOV;Terça 01/09;16:00;Ações e resultados do Projeto Reflor
 Auditório ESPAÇO GOV;Terça 01/09;17:00;Capacidade Territorial para Inovação e o Desenvolvimento;SICT;Rogerio Assis Brasil;"Mariela Portz - Secretária Adjunta SICT RS | Caroline Bücker -Diretora de Estratégia e Inteligência da Invest RS | Representante 
 Sedec RS";True;51991472323
 Auditório ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Quarta 02/09;09:00;Prevenção das Intoxicações no Campo;SES/CEVS;Vanda Garibotti;Vanda Garibotti(Biologa Sanitarista) Julia Costa ( Veterinaria)Giovanna Tereza Oliveira( Biologa) Ramon Pinotti( Biologo);False;51999775853
+Auditório ESPAÇO GOV;Quarta 02/09;16:00;RS e China: oportunidades para as proteínas animais e a atuação da Invest RS na Ásia s/ parceira com ABPA e ABIEC;Invest;Tulius Tsangaropulos;;False;51989926830
+Auditório ESPAÇO GOV;Quarta 02/09;11:00;Serviços e funcionalidades da GurIA para usuários AGRO;SPGG/EDP/DG;Fernando Bartelle;Danielle Calazans(Secretaria SPGG)Nielson Luis de Paula Carramilo(Sub Secretario TI)Fernando Bartelle.(Diretora Geral EDP0 Marcelo Conterato(Subsecretario de TIC);False;51979969991
+Auditório ESPAÇO GOV;Quarta 02/09;12:00;Futuro do Campo - Diagnóstico da Juventude Rural no RS;SDR;Guilherme Geanez;;False;(55) 991855432
+Auditório ESPAÇO GOV;Quarta 02/09;13:00;Panorama e Perspectivas do Mercado de Carbono no Setor Agropecuário;SEAPI;Jackson Freitas;;False;51981039727
+Auditório ESPAÇO GOV;Quarta 02/09;14:00;Erva-Mate do Alto Taquari: Ciência,Cooperação e Desenvolvimento Territorial;SEAPI;Jackson Freitas;;False;51981039727
+Auditório ESPAÇO GOV;Quarta 02/09;15:00;Monitoramento Climático e Hidrológico na prevenção de riscos;SPGG/DSTR/PROCERGS;Luciana Hann Menezes;Marcelo Conterato (Diretor de sistemas Transacionais da Procergs) E Vanessa Trindade  (Coordenadora de Comunicação  da SEMA);False;51993114520
+Auditório ESPAÇO GOV;Quarta 02/09;10:00;Reunião com comitê científico;SICT;Cristina;;False;51989926830
+Auditório ESPAÇO GOV;Quarta 02/09;17:00;Entrega de Licenças Ambientais e Assinatura de Termos de Cooperação do Bioma Mata Atlântica;SEMA;Luana Winter;;False;51992996032
+Auditório ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
