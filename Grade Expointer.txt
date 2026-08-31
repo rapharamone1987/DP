@@ -779,12 +779,23 @@ Arena ESPAÇO GOV;Sábado 29/08;17:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 29/08;17:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 29/08;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 29/08;18:30;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Terça 01/09;09:00;Painel do Agronegócio do Rio Grande do Sul - 2026;SPGG/DEE/SUPLAN ;Sergio Leusin Junior;Danielle Calazans(Secretaria SPGG)Alessandro Martins(Sub Secretario Adjunto da SUPLAN) TomasPinheiro Fioro( Diretor DEE);False;51991295878
+Auditório ESPAÇO GOV;Terça 01/09;10:00;RS Cyber Shied: Segurança Cibernética na Administração Pública Estadual;SPGG/PROCERGS/DSTI;Nielson Luis de Paula Carramilo);Danielle Calazans(Secretaria SPGG)Nielson Carramilo(Subsecretrio de TIC)Karem Lopes( Diretora de negocios/PROCERGS);False;991440416
+Auditório ESPAÇO GOV;Terça 01/09;11:00;Apresentação da Radiografia da Agropecuária Gaúcha 2026 (RAG);DGSP/Seapi;Eduardo Geyer;;False;51984040800
+Auditório ESPAÇO GOV;Terça 01/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Terça 01/09;13:00;Integração Lavoura-Pecuária (ILP) - Tecnologia, gestão e resultados na prática;SEAPI;Jackson Freitas;Paulo Carvalho,Pedro Albuquerque, Jackon Brilhante;False;51981039727
+Auditório ESPAÇO GOV;Terça 01/09;14:00;Entrega do Selo Ambiental;IRGA;Denise Cabral;;False;51981263234
+Auditório ESPAÇO GOV;Terça 01/09;15:00;Entrega do Selo Ambiental;IRGA;Denise Cabral;;False;51981263234
+Auditório ESPAÇO GOV;Terça 01/09;16:00;Ações e resultados do Projeto Reflora: UFRGS/UFSM/PUCRS/UNISC/Embrapii/UFV/CMPC/SEMA;SEAPI/ DDPA;Jackson Freitas;;True;51981039727
+Auditório ESPAÇO GOV;Terça 01/09;17:00;Capacidade Territorial para Inovação e o Desenvolvimento;SICT;Rogerio Assis Brasil;"Mariela Portz - Secretária Adjunta SICT RS | Caroline Bücker -Diretora de Estratégia e Inteligência da Invest RS | Representante 
+Sedec RS";True;51991472323
+Auditório ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Terça 01/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Terça 01/09;09:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Terça 01/09;10:00;EIXO 1- Credito e Financiamento: BADESUL (Todos os Programas Agro+ Empresarial) BRDE( BRDE Agronegocio Empresarial/Convenios/Maquinas e Equipamentos);SEDEC;Tais Teixeira;;False;51986878194
-Arena ESPAÇO GOV;Terça 01/09;10:30;EIXO 1- Credito e Financiamento: BADESUL (Todos os Programas Agro+ Empresarial) BRDE( BRDE Agronegocio Empresarial/Convenios/Maquinas e Equipamentos);SEDEC;Tais Teixeira;;False;51986878194
-Arena ESPAÇO GOV;Terça 01/09;11:00;EIXO 1- Credito e Financiamento: BADESUL (Todos os Programas Agro+ Empresarial) BRDE( BRDE Agronegocio Empresarial/Convenios/Maquinas e Equipamentos);SEDEC;Tais Teixeira;;False;51986878194
-Arena ESPAÇO GOV;Terça 01/09;11:30;Eixo 4 - Apresentação da FUNDOPEM-Desenvolvimento Industrial;SEDEC;Tais Teixeira;;False;51986878194
+Arena ESPAÇO GOV;Terça 01/09;10:00;EIXO 1- Credito e Financiamento: BADESUL (Todos os Programas Agro+ Empresarial) BRDE( BRDE Agronegocio Empresarial/Convenios/Maquinas e Equipamentos);SEDEC;Tais Teixeira;;True;51986878194
+Arena ESPAÇO GOV;Terça 01/09;10:30;EIXO 1- Credito e Financiamento: BADESUL (Todos os Programas Agro+ Empresarial) BRDE( BRDE Agronegocio Empresarial/Convenios/Maquinas e Equipamentos);SEDEC;Tais Teixeira;;True;51986878194
+Arena ESPAÇO GOV;Terça 01/09;11:00;EIXO 1- Credito e Financiamento: BADESUL (Todos os Programas Agro+ Empresarial) BRDE( BRDE Agronegocio Empresarial/Convenios/Maquinas e Equipamentos);SEDEC;Tais Teixeira;;True;51986878194
+Arena ESPAÇO GOV;Terça 01/09;11:30;Eixo 4 - Apresentação da FUNDOPEM-Desenvolvimento Industrial;SEDEC;Tais Teixeira;;True;51986878194
 Arena ESPAÇO GOV;Terça 01/09;12:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Terça 01/09;12:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Terça 01/09;13:00;Do campo à bioenergia: construindo a economia do futuro no RS;SEAPI/EMBRAPA TRIGO/SSGL/Refinaria Riograndense/Invest RS;Cassiane;"Márcio Madalena - Secretário de Agricultura, Pecuária, Produção Sustentável e Irrigação.
@@ -803,14 +814,3 @@ Arena ESPAÇO GOV;Terça 01/09;17:00;Troca de Saberes: Rota dos Butiazais e Esco
 Arena ESPAÇO GOV;Terça 01/09;17:30;Histórico de atuação em derivas de 2,4D e herbicidas hormonais no Estado: Estratégias de Mitigação de danos e resultados;SEAPI/DDV;Ricardo Felicetti;;False;5132886295
 Arena ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Terça 01/09;18:30;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Terça 01/09;09:00;Painel do Agronegócio do Rio Grande do Sul - 2026;SPGG/DEE/SUPLAN ;Sergio Leusin Junior;Danielle Calazans(Secretaria SPGG)Alessandro Martins(Sub Secretario Adjunto da SUPLAN) TomasPinheiro Fioro( Diretor DEE);False;51991295878
-Auditório ESPAÇO GOV;Terça 01/09;10:00;RS Cyber Shied: Segurança Cibernética na Administração Pública Estadual;SPGG/PROCERGS/DSTI;Nielson Luis de Paula Carramilo);Danielle Calazans(Secretaria SPGG)Nielson Carramilo(Subsecretrio de TIC)Karem Lopes( Diretora de negocios/PROCERGS);False;991440416
-Auditório ESPAÇO GOV;Terça 01/09;11:00;Apresentação da Radiografia da Agropecuária Gaúcha 2026 (RAG);DGSP/Seapi;Eduardo Geyer;;False;51984040800
-Auditório ESPAÇO GOV;Terça 01/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Terça 01/09;13:00;Integração Lavoura-Pecuária (ILP) - Tecnologia, gestão e resultados na prática;SEAPI;Jackson Freitas;Paulo Carvalho,Pedro Albuquerque, Jackon Brilhante;False;51981039727
-Auditório ESPAÇO GOV;Terça 01/09;14:00;Entrega do Selo Ambiental;IRGA;Denise Cabral;;False;51981263234
-Auditório ESPAÇO GOV;Terça 01/09;15:00;Entrega do Selo Ambiental;IRGA;Denise Cabral;;False;51981263234
-Auditório ESPAÇO GOV;Terça 01/09;16:00;Ações e resultados do Projeto Reflora: UFRGS/UFSM/PUCRS/UNISC/Embrapii/UFV/CMPC/SEMA;SEAPI/ DDPA;Jackson Freitas;;True;51981039727
-Auditório ESPAÇO GOV;Terça 01/09;17:00;Capacidade Territorial para Inovação e o Desenvolvimento;SICT;Rogerio Assis Brasil;"Mariela Portz - Secretária Adjunta SICT RS | Caroline Bücker -Diretora de Estratégia e Inteligência da Invest RS | Representante 
-Sedec RS";True;51991472323
-Auditório ESPAÇO GOV;Terça 01/09;18:00;🔓 HORÁRIO VAGO;;;;False;
