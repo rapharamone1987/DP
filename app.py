@@ -43,13 +43,30 @@ if "texto_pdf" not in st.session_state:
 key = st.secrets.get("GROQ_API_KEY", "")
 client = Groq(api_key=key) if key else None
 
-# LISTA DE MODELOS COM FALLBACK AUTOMÁTICO (Evita erro 404 se um nome mudar na Groq)
-MODELOS_DISPONIVEIS = [
-    "llama-3.1-8b-instant",
-    "llama3-70b-8192",
-    "llama3-8b-8192",
-    "mixtral-8x7b-32768",
-]
+
+def obter_modelos_ativos():
+    """Busca dinamicamente na API da Groq os modelos de texto ativos e suportados"""
+    modelos_prioritarios = [
+        "llama-3.3-70b-specdec",
+        "llama-3.2-11b-vision-instruct",
+        "llama-3.2-3b-preview",
+        "llama-3.2-1b-preview",
+    ]
+    if not client:
+        return modelos_prioritarios
+    try:
+        lista_models = client.models.list()
+        disponiveis = [m.id for m in lista_models.data if hasattr(m, "id")]
+        ativos = [m for m in modelos_prioritarios if m in disponiveis]
+        if not ativos:
+            ativos = [
+                m
+                for m in disponiveis
+                if "whisper" not in m and "safetensors" not in m
+            ]
+        return ativos if ativos else modelos_prioritarios
+    except Exception:
+        return modelos_prioritarios
 
 
 # ==========================================
@@ -80,11 +97,15 @@ def extrair_dados_ia(texto_entrada):
     )
 
     if not client:
-        st.error("❌ A chave GROQ_API_KEY não foi configurada nos secrets do Streamlit.")
+        st.error(
+            "❌ A chave GROQ_API_KEY não foi configurada nos secrets do Streamlit."
+        )
         return None
 
+    modelos = obter_modelos_ativos()
     ultimo_erro = None
-    for modelo in MODELOS_DISPONIVEIS:
+
+    for modelo in modelos:
         try:
             res = client.chat.completions.create(
                 model=modelo,
@@ -101,15 +122,21 @@ def extrair_dados_ia(texto_entrada):
                 return data
         except Exception as e:
             ultimo_erro = e
-            # Trata erros de modelo inexistente (404) ou descontinuado (400)
-            err_str = str(e)
-            if "404" in err_str or "400" in err_str or "model_decommissioned" in err_str or "model_not_found" in err_str:
+            err_str = str(e).lower()
+            if (
+                "404" in err_str
+                or "400" in err_str
+                or "decommissioned" in err_str
+                or "not_found" in err_str
+            ):
                 continue
             else:
                 st.error(f"Erro de comunicação com a IA ({modelo}): {e}")
                 return None
 
-    st.error(f"❌ Nenhum dos modelos ativos respondeu com sucesso. Último erro: {ultimo_erro}")
+    st.error(
+        f"❌ Nenhum dos modelos ativos respondeu com sucesso. Último erro: {ultimo_erro}"
+    )
     return None
 
 
@@ -118,7 +145,8 @@ def perguntar_ia(pergunta, contexto):
         return "Nenhum documento disponível ou chave de API ausente."
 
     prompt = f"Responda de forma curta baseada no documento: {pergunta}\n\nDocumento:\n{contexto[:10000]}"
-    for modelo in MODELOS_DISPONIVEIS:
+    modelos = obter_modelos_ativos()
+    for modelo in modelos:
         try:
             res = client.chat.completions.create(
                 model=modelo,
@@ -222,8 +250,7 @@ if not st.session_state.items_lista:
             with st.spinner("IA extraindo dados do documento..."):
                 texto = ""
                 pdf_file.seek(0)
-                
-                # Leitura em memória via BytesIO
+
                 try:
                     with pdfplumber.open(io.BytesIO(pdf_file.read())) as pdf:
                         for pg in pdf.pages[:6]:
@@ -234,7 +261,9 @@ if not st.session_state.items_lista:
                     st.error(f"Erro ao abrir arquivo PDF: {err_pdf}")
 
                 if not texto.strip():
-                    st.error("⚠️ Não foi possível extrair texto deste PDF. Verifique se o arquivo não é uma imagem digitalizada sem OCR.")
+                    st.error(
+                        "⚠️ Não foi possível extrair texto deste PDF. Verifique se o arquivo não é uma imagem digitalizada sem OCR."
+                    )
                 else:
                     st.session_state.texto_pdf = texto
                     res = extrair_dados_ia(texto)
