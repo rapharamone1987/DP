@@ -795,7 +795,7 @@ Auditório ESPAÇO GOV;Quinta 03/09;17:00;Setor Vitivinícola: Estratégias de P
 Auditório ESPAÇO GOV;Quinta 03/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;09:00;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;True;51992996032
 Arena ESPAÇO GOV;Quarta 02/09;09:30;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;True;51992996032
-Arena ESPAÇO GOV;Quarta 02/09;10:00;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;False;54 99953-0353
+Arena ESPAÇO GOV;Quarta 02/09;10:00;;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;10:30;O que realmente gera valor em um Imovel Rural?;SPGG/DEAPE;Rolnei Viceinte Coradini;Vinicius Deprá(Sub Sec, de Patrimonio)Rolnei Vicente Coradini(Especialista em Infraestrutura)Marina Zanchin(Diretora DEAPE);True;51982404482
 Arena ESPAÇO GOV;Quarta 02/09;11:00;Economia Criativa: A Importancia dos dados na construção de Politicas Publica;SEDAC;Juliana Sehn;Juliana Sehn(Coordenadora RS Criativo/SEDAC)Tomás Pinheiro( Diretor Departamento de Economia e Estatistica/SPGG);True;51984458985
 Arena ESPAÇO GOV;Quarta 02/09;11:30;Planos de Desenvolvimento Regional da Industria Cultural e Criativa-Diagnostico Inicial;SEDAC;Juliana Sehn;Juliana Sehn(Coordenadora RS Criativo/SEDAC)Cristiano Max ( Professor da Pucrs e Coordenador do projeto na Pucrs);True;51984458985
