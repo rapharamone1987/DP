@@ -196,7 +196,7 @@ elif st.session_state.items_lista:
                 t1, t2 = st.tabs(["📸 Câmera", "📁 Galeria"])
                 with t1:
                     if st.session_state.camera_ativa == uid:
-                        f = st.camera_input("Foto", key=f"cam_{uid}", facing_mode="environment")
+                        f = st.camera_input("Foto", key=f"cam_{uid}")
                         if f: st.session_state.registros_media[uid] = f; st.session_state.camera_ativa = None; st.rerun()
                     elif st.button("Abrir Câmera", key=f"btn_c_{uid}"): st.session_state.camera_ativa = uid; st.rerun()
                 with t2:
