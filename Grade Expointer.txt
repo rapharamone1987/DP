@@ -783,6 +783,16 @@ Auditório ESPAÇO GOV;Quarta 02/09;15:00;Monitoramento Climático e Hidrológic
 Auditório ESPAÇO GOV;Quarta 02/09;11:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Quarta 02/09;17:00;Entrega de Licenças Ambientais e Assinatura de Termos de Cooperação do Bioma Mata Atlântica;SEMA;Luana Winter;;True;51992996032
 Auditório ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Quinta 03/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Quinta 03/09;10:00;Irrigação e Gestão de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
+Auditório ESPAÇO GOV;Quinta 03/09;11:00;Irrigação e Gestao de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
+Auditório ESPAÇO GOV;Quinta 03/09;12:00;Infraestrutura e Logistica para Sustentação do Agro: O Papel Estratégico das Ferrovias;SELT;Bruna Peralta;Clovis Magalhaes (Secretario) Rodrigo Sousa Costa ( Presidente Federasul)Claudio Amoretti bier( Presidente fiergs) Beto Martins( Representante do Gov de SC);False;51989103810
+Auditório ESPAÇO GOV;Quinta 03/09;13:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
+Auditório ESPAÇO GOV;Quinta 03/09;14:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
+Auditório ESPAÇO GOV;Quinta 03/09;15:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
+Auditório ESPAÇO GOV;Quinta 03/09;16:00;Censo das Agroindústrias do Programa Estadual de Agroindústria Familiar Peaf;SDR;Guilherme;;False;
+Auditório ESPAÇO GOV;Quinta 03/09;17:00;Setor Vitivinícola: Estratégias de Proteção Setorial frente ao Acordo Mercosul - União Européia;Seapi e Consevitis;Cristina Carniel;;False;54 99953-0353
+Auditório ESPAÇO GOV;Quinta 03/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;09:00;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;True;51992996032
 Arena ESPAÇO GOV;Quarta 02/09;09:30;Agrominerais e Transição para uma Agroindústria de Baixo Carbono;SEMA;Luana winter;;True;51992996032
 Arena ESPAÇO GOV;Quarta 02/09;10:00;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;False;54 99953-0353
@@ -796,20 +806,10 @@ Arena ESPAÇO GOV;Quarta 02/09;13:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;14:00;Modelos de Atendimentos ao Cidadão e Canais de Prestação de Serviços Publicos no RS;SPGG/DIRGE/SUAD;Sonia Sacconi;Danielle Calazans(Secretaria) Sonia Saconi 9diretora Geral SPGG),Liege Dresch(Subsecretaria de Administração)Nielson Carramillo(Subsecretario de TIC);True;61998300109
 Arena ESPAÇO GOV;Quarta 02/09;14:30;O Papel da Consolidação dos limites Municipais enquanto Ferramenta de Planejamento S;PGG/SUPLAN/DEPLAN;(Luciana Dal Forno Gianluppi);Dionisio Sangoi,(Chefe de Divisão)Fernando de Morais(Geografo),Guilherme Cabreira (Geografo) ,Tiago do Rosario(Geografo0;True;
 Arena ESPAÇO GOV;Quarta 02/09;15:00;Regularização Fundiária e Habitação: Instrumentos de Desenvolvimento Humano e Social;SEHAB;Maria Emilia;Sec.Bruno Silveira,Diretora Daiane Malabarba.Diretora Adjunta Paula silva;False;maria-portella@sehab.rs.gov.br | 519999199958
-Arena ESPAÇO GOV;Quarta 02/09;15:30;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;False;54 99953-0353
+Arena ESPAÇO GOV;Quarta 02/09;15:30;Consevitis/Seapi;CONSEVITIS/SEAPI;Cristina Carniel;;True;54 99953-0353
 Arena ESPAÇO GOV;Quarta 02/09;16:00;Asssinaturas e Lançamentos: Cursos Hídricos e Segurança de Barragens;SEMA;Luana Winter;;True;51992996032
 Arena ESPAÇO GOV;Quarta 02/09;16:30;Asssinaturas e Lançamentos: Cursos Hídricos e Segurança de Barragens;SEMA;Luana Winter;;True;51992996032
 Arena ESPAÇO GOV;Quarta 02/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;17:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;18:30;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Quinta 03/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Quinta 03/09;10:00;Irrigação e Gestão de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
-Auditório ESPAÇO GOV;Quinta 03/09;11:00;Irrigação e Gestao de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
-Auditório ESPAÇO GOV;Quinta 03/09;12:00;Infraestrutura e Logistica para Sustentação do Agro: O Papel Estratégico das Ferrovias;SELT;Bruna Peralta;Clovis Magalhaes (Secretario) Rodrigo Sousa Costa ( Presidente Federasul)Claudio Amoretti bier( Presidente fiergs) Beto Martins( Representante do Gov de SC);False;51989103810
-Auditório ESPAÇO GOV;Quinta 03/09;13:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
-Auditório ESPAÇO GOV;Quinta 03/09;14:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
-Auditório ESPAÇO GOV;Quinta 03/09;15:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
-Auditório ESPAÇO GOV;Quinta 03/09;16:00;Censo das Agroindústrias do Programa Estadual de Agroindústria Familiar Peaf;SDR;Guilherme;;False;
-Auditório ESPAÇO GOV;Quinta 03/09;17:00;Setor Vitivinícola: Estratégias de Proteção Setorial frente ao Acordo Mercosul - União Européia;Seapi e Consevitis;Cristina Carniel;;False;54 99953-0353
-Auditório ESPAÇO GOV;Quinta 03/09;18:00;🔓 HORÁRIO VAGO;;;;False;
