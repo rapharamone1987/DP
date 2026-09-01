@@ -83,7 +83,6 @@ def extrair_dados_ia(texto_entrada):
         st.error("❌ A chave GROQ_API_KEY não foi configurada nos secrets do Streamlit.")
         return None
 
-    # Tenta cada modelo da lista em ordem até obter resposta
     ultimo_erro = None
     for modelo in MODELOS_DISPONIVEIS:
         try:
@@ -102,14 +101,15 @@ def extrair_dados_ia(texto_entrada):
                 return data
         except Exception as e:
             ultimo_erro = e
-            # Se der erro 404 de modelo não encontrado, passa para o próximo modelo silenciosamente
-            if "404" in str(e) or "model_not_found" in str(e):
+            # Trata erros de modelo inexistente (404) ou descontinuado (400)
+            err_str = str(e)
+            if "404" in err_str or "400" in err_str or "model_decommissioned" in err_str or "model_not_found" in err_str:
                 continue
             else:
                 st.error(f"Erro de comunicação com a IA ({modelo}): {e}")
                 return None
 
-    st.error(f"❌ Nenhum dos modelos da Groq respondeu com sucesso. Último erro: {ultimo_erro}")
+    st.error(f"❌ Nenhum dos modelos ativos respondeu com sucesso. Último erro: {ultimo_erro}")
     return None
 
 
