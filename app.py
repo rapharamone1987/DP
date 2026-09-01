@@ -42,7 +42,7 @@ if "texto_pdf" not in st.session_state:
 # CONFIGURAÇÃO DA IA (GROQ)
 key = st.secrets.get("GROQ_API_KEY", "")
 client = Groq(api_key=key) if key else None
-MODELO_ID = "llama-3.1-8b-instant"
+MODELO_ID = "llama-3.3-70b-versatile"
 
 
 # ==========================================
