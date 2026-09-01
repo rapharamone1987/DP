@@ -42,7 +42,15 @@ if "texto_pdf" not in st.session_state:
 # CONFIGURAÇÃO DA IA (GROQ)
 key = st.secrets.get("GROQ_API_KEY", "")
 client = Groq(api_key=key) if key else None
-MODELO_ID = "llama-3.1-8b-instant"
+
+# LISTA DE MODELOS COM FALLBACK AUTOMÁTICO (Evita erro 404 se um nome mudar na Groq)
+MODELOS_DISPONIVEIS = [
+    "llama-3.1-8b-instant",
+    "llama3-70b-8192",
+    "llama3-8b-8192",
+    "mixtral-8x7b-32768",
+]
+
 
 # ==========================================
 # 2. FUNÇÕES DE APOIO
@@ -70,10 +78,17 @@ def extrair_dados_ia(texto_entrada):
         "Extraia apenas o que o fiscal pode tocar ou medir. Responda APENAS JSON: "
         '{"fornecedor": "nome", "edital": "número", "objeto": "descrição", "checklist": ["item 1", "item 2"]}'
     )
-    if client:
+
+    if not client:
+        st.error("❌ A chave GROQ_API_KEY não foi configurada nos secrets do Streamlit.")
+        return None
+
+    # Tenta cada modelo da lista em ordem até obter resposta
+    ultimo_erro = None
+    for modelo in MODELOS_DISPONIVEIS:
         try:
             res = client.chat.completions.create(
-                model=MODELO_ID,
+                model=modelo,
                 messages=[
                     {
                         "role": "user",
@@ -82,26 +97,38 @@ def extrair_dados_ia(texto_entrada):
                 ],
                 temperature=0.1,
             )
-            return limpar_json_ia(res.choices[0].message.content)
+            data = limpar_json_ia(res.choices[0].message.content)
+            if data:
+                return data
         except Exception as e:
-            st.error(f"Erro ao comunicar com a IA: {e}")
-            return None
+            ultimo_erro = e
+            # Se der erro 404 de modelo não encontrado, passa para o próximo modelo silenciosamente
+            if "404" in str(e) or "model_not_found" in str(e):
+                continue
+            else:
+                st.error(f"Erro de comunicação com a IA ({modelo}): {e}")
+                return None
+
+    st.error(f"❌ Nenhum dos modelos da Groq respondeu com sucesso. Último erro: {ultimo_erro}")
     return None
 
 
 def perguntar_ia(pergunta, contexto):
-    if client and contexto:
+    if not client or not contexto:
+        return "Nenhum documento disponível ou chave de API ausente."
+
+    prompt = f"Responda de forma curta baseada no documento: {pergunta}\n\nDocumento:\n{contexto[:10000]}"
+    for modelo in MODELOS_DISPONIVEIS:
         try:
-            prompt = f"Responda de forma curta baseada no documento: {pergunta}\n\nDocumento:\n{contexto[:10000]}"
             res = client.chat.completions.create(
-                model=MODELO_ID,
+                model=modelo,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0,
             )
             return res.choices[0].message.content
-        except Exception as e:
-            return f"Erro na consulta: {e}"
-    return "Nenhum documento disponível ou chave de API não configurada."
+        except Exception:
+            continue
+    return "Não foi possível obter resposta da IA."
 
 
 def processar_imagem_pdf(st_image):
@@ -192,19 +219,22 @@ if not st.session_state.items_lista:
     with tabs[0]:
         pdf_file = st.file_uploader("Upload PDF", type="pdf")
         if pdf_file and st.button("🔍 ANALISAR DOCUMENTO"):
-            with st.spinner("IA (70B) extraindo dados..."):
+            with st.spinner("IA extraindo dados do documento..."):
                 texto = ""
                 pdf_file.seek(0)
                 
                 # Leitura em memória via BytesIO
-                with pdfplumber.open(io.BytesIO(pdf_file.read())) as pdf:
-                    for pg in pdf.pages[:6]:
-                        ext = pg.extract_text()
-                        if ext:
-                            texto += ext + "\n"
-                
+                try:
+                    with pdfplumber.open(io.BytesIO(pdf_file.read())) as pdf:
+                        for pg in pdf.pages[:6]:
+                            ext = pg.extract_text()
+                            if ext:
+                                texto += ext + "\n"
+                except Exception as err_pdf:
+                    st.error(f"Erro ao abrir arquivo PDF: {err_pdf}")
+
                 if not texto.strip():
-                    st.error("⚠️ Não foi possível extrair texto do PDF. Verifique se o arquivo não é uma imagem digitalizada sem camada de texto (OCR).")
+                    st.error("⚠️ Não foi possível extrair texto deste PDF. Verifique se o arquivo não é uma imagem digitalizada sem OCR.")
                 else:
                     st.session_state.texto_pdf = texto
                     res = extrair_dados_ia(texto)
@@ -217,8 +247,6 @@ if not st.session_state.items_lista:
                             for i, txt in enumerate(res.get("checklist", []))
                         ]
                         st.rerun()
-                    else:
-                        st.warning("⚠️ O documento foi lido, mas a IA não identificou os requisitos no formato esperado.")
 
     with tabs[1]:
         txt_col = st.text_area("Cole as especificações aqui:")
