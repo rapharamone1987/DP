@@ -803,7 +803,7 @@ Jorge Lemainski - Chefe Geral - Embrapa Trigo.
 Flávio Mingorance de Souza - Head de Biorrefino da Refinaria Riograndense.
 Fabrício Forest - Diretor de Atração de Investimentos e Promoção Comercial · Invest RS";True;
 Arena ESPAÇO GOV;Terça 01/09;13:30;Mercosul–União Europeia: oportunidades para a indústria gaúcha;Invest;Tulius Tsangaropulos;;False;51989926830
-Arena ESPAÇO GOV;Terça 01/09;14:00;Compras Publicas e sua relação com Cadeias Produtivas do Agronegócio no RS;SPGG/SUBSEC/CELIC;Paulo Lunardi;kethy Hellen Bazo (Subsecretária  Adjunta da CELIC);True;51996272927
+Arena ESPAÇO GOV;Terça 01/09;14:00;Compras Publicas e sua relação com Cadeias Produtivas do Agronegócio no RS;SPGG/SUBSEC/CELIC;Paulo Lunardi;kethy Helen Bazo (Subsecretária  Adjunta da CELIC) - Roberto Coelho Caierão (Coordenador da Assessoria de Controle Interno e Governaça de Licitações;True;51996272927
 Arena ESPAÇO GOV;Terça 01/09;14:30;Soluções Digitais e Integração entre Estado e Municípios;SPGG/DGD/STI;Nielson Luis de Paula Carramilo;Danielle Calazans( Secretaria da SPGG),Nielson Carramilo ( Subsecretario de TIC);True;991440416
 Arena ESPAÇO GOV;Terça 01/09;15:00;Feira Digital Sabor Gaúcho: Conectando Agroindústrias a Novos Mercados;SDR;Guilherme Granez;;True;(55) 991855432
 Arena ESPAÇO GOV;Terça 01/09;15:30;Apresentação para escolas: Expointer Carbono Neutro por CRVR;SEMA;Luana winter;;True;51992996032
