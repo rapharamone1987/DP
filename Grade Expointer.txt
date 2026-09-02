@@ -519,16 +519,6 @@ Auditório ESPAÇO GOV;Segunda 31/08;15:00;Trilha do Agro - SOUTH SUMMIT BRAZIL;
 Auditório ESPAÇO GOV;Segunda 31/08;16:00;Trilha do Agro - SOUTH SUMMIT BRAZIL;;;;False;
 Auditório ESPAÇO GOV;Segunda 31/08;17:00;Trilha do Agro - SOUTH SUMMIT BRAZIL;;;;False;
 Auditório ESPAÇO GOV;Segunda 31/08;18:00;Trilha do Agro - SOUTH SUMMIT BRAZIL;;;;False;
-Auditório ESPAÇO GOV;Sexta 04/09;09:00;DESFILE CAMPEÃS;;;;False;
-Auditório ESPAÇO GOV;Sexta 04/09;10:00;DESFILE CAMPEÃS;;;;False;
-Auditório ESPAÇO GOV;Sexta 04/09;11:00;DESFILE CAMPEÃS;;;;False;
-Auditório ESPAÇO GOV;Sexta 04/09;12:00;DESFILE CAMPEÃS;;;;False;
-Auditório ESPAÇO GOV;Sexta 04/09;13:00;Do Campo aos Territórios: Agricultura Familiar e Pontos Populares na Promoção da Segurança Alimentar;SEDES;Vanusa Rosa;Alex Martins Moraes (Analista Antropólogo SEDES/DSA);False;51991515739
-Auditório ESPAÇO GOV;Sexta 04/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sexta 04/09;15:00;Bioenergias: Hidrogênio Verde, Biodiesel, Etanol e Metanol Verde;SEMA;Luana Winter;;False;51992996032
-Auditório ESPAÇO GOV;Sexta 04/09;16:00;Combustíveis de Baixo Carbono: Biogás, Biometano e Gás Natural;SEMA;Luana Winter;;False;51992996032
-Auditório ESPAÇO GOV;Sexta 04/09;17:00;Agricultura Regenerativa: produitvidade, competitividade e resiliência para o agro gaúcho;Syngenta/SEMA;Luana Winter;;False;51992996032
-Auditório ESPAÇO GOV;Sexta 04/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -813,3 +803,13 @@ Auditório ESPAÇO GOV;Quarta 02/09;15:00;Monitoramento Climático e Hidrológic
 Auditório ESPAÇO GOV;Quarta 02/09;11:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Quarta 02/09;17:00;Entrega de Licenças Ambientais e Assinatura de Termos de Cooperação do Bioma Mata Atlântica;SEMA;Luana Winter;;True;51992996032
 Auditório ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sexta 04/09;09:00;DESFILE CAMPEÃS;;;;False;
+Auditório ESPAÇO GOV;Sexta 04/09;10:00;DESFILE CAMPEÃS;;;;False;
+Auditório ESPAÇO GOV;Sexta 04/09;11:00;DESFILE CAMPEÃS;;;;False;
+Auditório ESPAÇO GOV;Sexta 04/09;12:00;DESFILE CAMPEÃS;;;;False;
+Auditório ESPAÇO GOV;Sexta 04/09;13:00;Do Campo aos Territórios: Agricultura Familiar e Pontos Populares na Promoção da Segurança Alimentar;SEDES;Vanusa Rosa;Alex Martins Moraes (Analista Antropólogo SEDES/DSA);False;51991515739
+Auditório ESPAÇO GOV;Sexta 04/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sexta 04/09;15:00;Bioenergias: Hidrogênio Verde, Biodiesel, Etanol e Metanol Verde;SEMA;Luana Winter;;True;51992996032
+Auditório ESPAÇO GOV;Sexta 04/09;16:00;Combustíveis de Baixo Carbono: Biogás, Biometano e Gás Natural;SEMA;Luana Winter;;True;51992996032
+Auditório ESPAÇO GOV;Sexta 04/09;17:00;Agricultura Regenerativa: produitvidade, competitividade e resiliência para o agro gaúcho;Syngenta/SEMA;Luana Winter;;True;51992996032
+Auditório ESPAÇO GOV;Sexta 04/09;18:00;🔓 HORÁRIO VAGO;;;;False;
