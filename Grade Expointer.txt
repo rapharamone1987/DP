@@ -806,10 +806,10 @@ Auditório ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Quinta 03/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Quinta 03/09;10:00;Irrigação e Gestão de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
 Auditório ESPAÇO GOV;Quinta 03/09;11:00;Irrigação e Gestao de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
-Auditório ESPAÇO GOV;Quinta 03/09;12:00;;;;;False;
+Auditório ESPAÇO GOV;Quinta 03/09;12:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Quinta 03/09;13:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
 Auditório ESPAÇO GOV;Quinta 03/09;14:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
 Auditório ESPAÇO GOV;Quinta 03/09;15:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
-Auditório ESPAÇO GOV;Quinta 03/09;16:00;Censo das Agroindústrias do Programa Estadual de Agroindústria Familiar Peaf;SDR;Guilherme;;False;
+Auditório ESPAÇO GOV;Quinta 03/09;16:00;Censo das Agroindústrias do Programa Estadual de Agroindústria Familiar Peaf;SDR;Guilherme;;True;
 Auditório ESPAÇO GOV;Quinta 03/09;17:00;Setor Vitivinícola: Estratégias de Proteção Setorial frente ao Acordo Mercosul - União Européia;Seapi e Consevitis;Cristina Carniel;;True;54 99953-0353
 Auditório ESPAÇO GOV;Quinta 03/09;18:00;🔓 HORÁRIO VAGO;;;;False;
