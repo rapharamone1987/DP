@@ -763,16 +763,6 @@ Arena ESPAÇO GOV;Quarta 02/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;17:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Quarta 02/09;18:30;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Quinta 03/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Quinta 03/09;10:00;Irrigação e Gestão de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
-Auditório ESPAÇO GOV;Quinta 03/09;11:00;Irrigação e Gestao de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
-Auditório ESPAÇO GOV;Quinta 03/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Quinta 03/09;13:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
-Auditório ESPAÇO GOV;Quinta 03/09;14:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
-Auditório ESPAÇO GOV;Quinta 03/09;15:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
-Auditório ESPAÇO GOV;Quinta 03/09;16:00;Censo das Agroindústrias do Programa Estadual de Agroindústria Familiar Peaf;SDR;Guilherme;;True;
-Auditório ESPAÇO GOV;Quinta 03/09;17:00;Setor Vitivinícola: Estratégias de Proteção Setorial frente ao Acordo Mercosul - União Européia;Seapi e Consevitis;Cristina Carniel;;True;54 99953-0353
-Auditório ESPAÇO GOV;Quinta 03/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Quarta 02/09;09:00;Prevenção das Intoxicações no Campo;SES/CEVS;Vanda Garibotti;Vanda Garibotti(Biologa Sanitarista) Julia Costa ( Veterinaria)Giovanna Tereza Oliveira( Biologa) Ramon Pinotti( Biologo);True;51999775853
 Auditório ESPAÇO GOV;Quarta 02/09;16:00;RS e China: oportunidades para as proteínas animais e a atuação da Invest RS na Ásia s/ parceira com ABPA e ABIEC;Invest;Tulius Tsangaropulos;;True;51989926830
 Auditório ESPAÇO GOV;Quarta 02/09;10:00;Serviços e funcionalidades da GurIA para usuários AGRO;SPGG/EDP/DG;Fernando Bartelle;Danielle Calazans(Secretaria SPGG)Nielson Luis de Paula Carramilo(Sub Secretario TI)Fernando Bartelle.(Diretora Geral EDP0 Marcelo Conterato(Subsecretario de TIC);True;51979969991
@@ -813,3 +803,13 @@ Arena ESPAÇO GOV;Sexta 04/09;17:00;Centro Agro;;;;False;
 Arena ESPAÇO GOV;Sexta 04/09;17:30;Centro Agro;;;;False;
 Arena ESPAÇO GOV;Sexta 04/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sexta 04/09;18:30;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Quinta 03/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Quinta 03/09;10:00;Irrigação e Gestão de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
+Auditório ESPAÇO GOV;Quinta 03/09;11:00;Irrigação e Gestão de Recursos Hidricos / Sub Secretaria de Irrigação;SEAPI;Davi Teixeira;;False;51999566677
+Auditório ESPAÇO GOV;Quinta 03/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Quinta 03/09;13:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
+Auditório ESPAÇO GOV;Quinta 03/09;14:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
+Auditório ESPAÇO GOV;Quinta 03/09;15:00;Fórum Gaúcho de Mudanças Climáticas;SEMA;Luana Winter;;True;51992996032
+Auditório ESPAÇO GOV;Quinta 03/09;16:00;Censo das Agroindústrias do Programa Estadual de Agroindústria Familiar Peaf;SDR;Guilherme;;True;
+Auditório ESPAÇO GOV;Quinta 03/09;17:00;Setor Vitivinícola: Estratégias de Proteção Setorial frente ao Acordo Mercosul - União Européia;Seapi e Consevitis;Cristina Carniel;;True;54 99953-0353
+Auditório ESPAÇO GOV;Quinta 03/09;18:00;🔓 HORÁRIO VAGO;;;;False;
