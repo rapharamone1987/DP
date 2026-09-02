@@ -802,7 +802,7 @@ Arena ESPAÇO GOV;Quinta 03/09;11:30;Centro Agro;SICT;Nadiele Pires;;False;11 97
 Arena ESPAÇO GOV;Quinta 03/09;12:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
 Arena ESPAÇO GOV;Quinta 03/09;12:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
 Arena ESPAÇO GOV;Quinta 03/09;13:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
-Arena ESPAÇO GOV;Quinta 03/09;13:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;13:30;Lançamento do Edital de Chamamento de Apoio à Manutenção e Operação de Sistemas Antigranizo;;Cassiane;Governador Eduardo Leite | Secretário-chefe da Casa Civil, Ranolfo Vieira Júnior  |  Secretário da Agricultura, Pecuária, Produção Suatentável e Irrigação, Márcio Madalena;False;
 Arena ESPAÇO GOV;Quinta 03/09;14:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
 Arena ESPAÇO GOV;Quinta 03/09;14:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
 Arena ESPAÇO GOV;Quinta 03/09;15:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
