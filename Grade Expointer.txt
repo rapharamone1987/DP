@@ -89,26 +89,6 @@ Arena ESPAÇO GOV;Segunda 31/08;17:00;Trilha do Agro - SOUTH SUMMIT BRAZIL;;;;Fa
 Arena ESPAÇO GOV;Segunda 31/08;17:30;Trilha do Agro - SOUTH SUMMIT BRAZIL;;;;False;
 Arena ESPAÇO GOV;Segunda 31/08;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Segunda 31/08;18:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;09:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
-Arena ESPAÇO GOV;Quinta 03/09;09:30;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;10:00;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;10:30;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;11:00;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;11:30;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;12:00;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;12:30;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;13:00;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;13:30;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;14:00;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;14:30;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;15:00;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;15:30;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;16:00;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;16:30;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;17:00;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;17:30;Centro Agro;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Quinta 03/09;18:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Domingo 06/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Domingo 06/09;09:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Domingo 06/09;10:00;🔓 HORÁRIO VAGO;;;;False;
@@ -813,3 +793,23 @@ Auditório ESPAÇO GOV;Quinta 03/09;15:00;Fórum Gaúcho de Mudanças Climática
 Auditório ESPAÇO GOV;Quinta 03/09;16:00;Censo das Agroindústrias do Programa Estadual de Agroindústria Familiar Peaf;SDR;Guilherme;;True;
 Auditório ESPAÇO GOV;Quinta 03/09;17:00;Setor Vitivinícola: Estratégias de Proteção Setorial frente ao Acordo Mercosul - União Européia;Seapi e Consevitis;Cristina Carniel;;True;54 99953-0353
 Auditório ESPAÇO GOV;Quinta 03/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Quinta 03/09;09:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;09:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;10:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;10:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;11:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;11:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;12:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;12:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;13:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;13:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;14:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;14:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;15:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;15:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;16:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;16:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;17:00;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;17:30;Centro Agro;SICT;Nadiele Pires;;False;11 97702-4693
+Arena ESPAÇO GOV;Quinta 03/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Quinta 03/09;18:30;🔓 HORÁRIO VAGO;;;;False;
