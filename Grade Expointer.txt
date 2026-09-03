@@ -49,16 +49,6 @@ Auditório ADMINISTRAÇÃO;Sexta 04/09;15:00;Ciclo de Palestras e Debates - Comi
 Auditório ADMINISTRAÇÃO;Sexta 04/09;16:00;Ciclo de Palestras e Debates - Comissão de Agriculltura e Reforma Agraria -CRRA - do Senado Federal ( Gabinete Luis carlos Heinze);Senado Federal;Lucas Sena;;False;55-999052284
 Auditório ADMINISTRAÇÃO;Sexta 04/09;17:00;Ciclo de Palestras e Debates - Comissão de Agriculltura e Reforma Agraria -CRRA - do Senado Federal ( Gabinete Luis carlos Heinze);Senado Federal;Lucas Sena;;False;55-999052284
 Auditório ADMINISTRAÇÃO;Sexta 04/09;18:00;Ciclo de Palestras e Debates - Comissão de Agriculltura e Reforma Agraria -CRRA - do Senado Federal ( Gabinete Luis carlos Heinze);Senado Federal;Lucas Sena;;False;55-999052284
-Auditório ADMINISTRAÇÃO;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ADMINISTRAÇÃO;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Domingo 06/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Domingo 06/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Domingo 06/09;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -149,16 +139,6 @@ Bancada ESPAÇO GOV;Sexta 04/09;15:00;Orientação de Solicitação Digital de M
 Bancada ESPAÇO GOV;Sexta 04/09;16:00;Orientação de Solicitação Digital de Medicamentos a;Populaçao(Farmacia Digital);;;False;
 Bancada ESPAÇO GOV;Sexta 04/09;17:00;Orientação de Solicitação Digital de Medicamentos a;Populaçao(Farmacia Digital);;;False;
 Bancada ESPAÇO GOV;Sexta 04/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Bancada ESPAÇO GOV;Sábado 05/09;09:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Sábado 05/09;10:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Sábado 05/09;11:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Sábado 05/09;12:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Sábado 05/09;13:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Sábado 05/09;14:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Sábado 05/09;15:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Sábado 05/09;16:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Sábado 05/09;17:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
-Bancada ESPAÇO GOV;Sábado 05/09;18:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
 Bancada ESPAÇO GOV;Domingo 06/09;09:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
 Bancada ESPAÇO GOV;Domingo 06/09;10:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
 Bancada ESPAÇO GOV;Domingo 06/09;11:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
@@ -219,16 +199,6 @@ Sala de reunião 1 ESPAÇO GOV;Sexta 04/09;15:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 1 ESPAÇO GOV;Sexta 04/09;16:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 1 ESPAÇO GOV;Sexta 04/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 1 ESPAÇO GOV;Sexta 04/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 1 ESPAÇO GOV;Domingo 06/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 1 ESPAÇO GOV;Domingo 06/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 1 ESPAÇO GOV;Domingo 06/09;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -269,16 +239,6 @@ Sala de reunião 2 ESPAÇO GOV;Sexta 04/09;15:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 2 ESPAÇO GOV;Sexta 04/09;16:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 2 ESPAÇO GOV;Sexta 04/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 2 ESPAÇO GOV;Sexta 04/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 2 ESPAÇO GOV;Domingo 06/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 2 ESPAÇO GOV;Domingo 06/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 2 ESPAÇO GOV;Domingo 06/09;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -339,16 +299,6 @@ Sala de reunião 3 ESPAÇO GOV;Sexta 04/09;15:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 3 ESPAÇO GOV;Sexta 04/09;16:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 3 ESPAÇO GOV;Sexta 04/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 3 ESPAÇO GOV;Sexta 04/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
-Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 3 ESPAÇO GOV;Domingo 06/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 3 ESPAÇO GOV;Domingo 06/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 Sala de reunião 3 ESPAÇO GOV;Domingo 06/09;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -409,16 +359,6 @@ ESTANDE SEAPI E SEMA;Sexta 04/09;15:00;🔓 HORÁRIO VAGO;;;;False;
 ESTANDE SEAPI E SEMA;Sexta 04/09;16:00;🔓 HORÁRIO VAGO;;;;False;
 ESTANDE SEAPI E SEMA;Sexta 04/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 ESTANDE SEAPI E SEMA;Sexta 04/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
-ESTANDE SEAPI E SEMA;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 ESTANDE SEAPI E SEMA;Domingo 06/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 ESTANDE SEAPI E SEMA;Domingo 06/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 ESTANDE SEAPI E SEMA;Domingo 06/09;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -479,16 +419,6 @@ Auditório ESPAÇO GOV;Segunda 31/08;15:00;Trilha do Agro - SOUTH SUMMIT BRAZIL;
 Auditório ESPAÇO GOV;Segunda 31/08;16:00;Trilha do Agro - SOUTH SUMMIT BRAZIL;;;;False;
 Auditório ESPAÇO GOV;Segunda 31/08;17:00;Trilha do Agro - SOUTH SUMMIT BRAZIL;;;;False;
 Auditório ESPAÇO GOV;Segunda 31/08;18:00;Trilha do Agro - SOUTH SUMMIT BRAZIL;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;17:00;(Pre) Lançamento do Projeto AGROSUMMIT da UFPEL;UFPEL/AGRONOMIA;Pablo Martins;Ursula Rosa da Silva(REITORA)Felipe Hermann (Coordenador de Extensão) Mauricio de Oliveira( Diretor da Faculdade de Agronomia)Vinicius Farias ( Superintendente de Inovação);False;5331160967
-Auditório ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 06/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 06/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 06/09;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -499,26 +429,6 @@ Auditório ESPAÇO GOV;Domingo 06/09;15:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 06/09;16:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 06/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ESPAÇO GOV;Domingo 06/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;09:30;Apresentação da Expointer Carbono Neutro por CRVR e entrega do Selo ONU à Fenasoja;SEMA;Luana Winter;;False;51992996032
-Arena ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;10:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;11:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;12:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;13:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;14:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;15:00;Lançamento da Plataforma de Mapeamento Automático de Pasto Apícola Mais Abelhas Apicultura e Consultoria;Ambiental ltda;Betina Blochtein;Betina Blochtein,Charles Fernando dos Santos e Gabrielli Cecchin;False;51999598524
-Arena ESPAÇO GOV;Sábado 05/09;15:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;16:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;17:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;18:30;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Terça 01/09;09:00;Apresentação dos Projetos Pedagógicos e Científicos desenvolvidos nas Escolas Estaduais;SEDUC;Claudia Feijo;-;False;51981621989
 Auditório ADMINISTRAÇÃO;Terça 01/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 Auditório ADMINISTRAÇÃO;Terça 01/09;11:00;🔓 HORÁRIO VAGO;;;;False;
@@ -813,3 +723,93 @@ Auditório ESPAÇO GOV;Sexta 04/09;15:00;Bioenergias: Hidrogênio Verde, Biodies
 Auditório ESPAÇO GOV;Sexta 04/09;16:00;Combustíveis de Baixo Carbono: Biogás, Biometano e Gás Natural;SEMA;Luana Winter;;True;51992996032
 Auditório ESPAÇO GOV;Sexta 04/09;17:00;Agricultura Regenerativa: produitvidade, competitividade e resiliência para o agro gaúcho;Syngenta/SEMA;Luana Winter;;True;51992996032
 Auditório ESPAÇO GOV;Sexta 04/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ADMINISTRAÇÃO;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Bancada ESPAÇO GOV;Sábado 05/09;09:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Bancada ESPAÇO GOV;Sábado 05/09;10:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Bancada ESPAÇO GOV;Sábado 05/09;11:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Bancada ESPAÇO GOV;Sábado 05/09;12:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Bancada ESPAÇO GOV;Sábado 05/09;13:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Bancada ESPAÇO GOV;Sábado 05/09;14:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Bancada ESPAÇO GOV;Sábado 05/09;15:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Bancada ESPAÇO GOV;Sábado 05/09;16:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Bancada ESPAÇO GOV;Sábado 05/09;17:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Bancada ESPAÇO GOV;Sábado 05/09;18:00;Exposição de Materiais de Divulgação da Defesa Civil;Defesa Civil;Tenente Sabrina Ribas;;False;51993774053
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 1 ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 2 ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
+Sala de reunião 3 ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
+ESTANDE SEAPI E SEMA;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;17:00;(Pre) Lançamento do Projeto AGROSUMMIT da UFPEL;UFPEL/AGRONOMIA;Pablo Martins;Ursula Rosa da Silva(REITORA)Felipe Hermann (Coordenador de Extensão) Mauricio de Oliveira( Diretor da Faculdade de Agronomia)Vinicius Farias ( Superintendente de Inovação);False;5331160967
+Auditório ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;09:30;Apresentação da Expointer Carbono Neutro por CRVR e entrega do Selo ONU à Fenasoja;SEMA;Luana Winter;;False;51992996032
+Arena ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;10:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;11:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;12:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;13:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;14:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;15:00;Lançamento da Plataforma de Mapeamento Automático de Pasto Apícola Mais Abelhas Apicultura e Consultoria;Ambiental ltda;Betina Blochtein;Betina Blochtein,Charles Fernando dos Santos e Gabrielli Cecchin;False;51999598524
+Arena ESPAÇO GOV;Sábado 05/09;15:30;Lançamento da Plataforma de Mapeamento Automático de Pasto Apícola Mais Abelhas Apicultura e Consultoria;Ambiental ltda;Betina Blochtein;Betina Blochtein,Charles Fernando dos Santos e Gabrielli Cecchin;False;51999598524
+Arena ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;16:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;17:30;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;18:30;🔓 HORÁRIO VAGO;;;;False;
