@@ -805,8 +805,8 @@ Arena ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;13:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;14:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;15:00;Lançamento da Plataforma de Mapeamento Automático de Pasto Apícola Mais Abelhas Apicultura e Consultoria;Ambiental ltda;Betina Blochtein;Betina Blochtein,Charles Fernando dos Santos e Gabrielli Cecchin;False;51999598524
-Arena ESPAÇO GOV;Sábado 05/09;15:30;Lançamento da Plataforma de Mapeamento Automático de Pasto Apícola Mais Abelhas Apicultura e Consultoria;Ambiental ltda;Betina Blochtein;Betina Blochtein,Charles Fernando dos Santos e Gabrielli Cecchin;False;51999598524
+Arena ESPAÇO GOV;Sábado 05/09;15:00;Lançamento da Plataforma de Mapeamento Automático de Pasto Apícola Mais Abelhas Apicultura e Consultoria;Ambiental ltda;Betina Blochtein;Betina Blochtein,Charles Fernando dos Santos e Gabrielli Cecchin;True;51999598524
+Arena ESPAÇO GOV;Sábado 05/09;15:30;Lançamento da Plataforma de Mapeamento Automático de Pasto Apícola Mais Abelhas Apicultura e Consultoria;Ambiental ltda;Betina Blochtein;Betina Blochtein,Charles Fernando dos Santos e Gabrielli Cecchin;True;51999598524
 Arena ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;16:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
