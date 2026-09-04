@@ -783,16 +783,6 @@ ESTANDE SEAPI E SEMA;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
 ESTANDE SEAPI E SEMA;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
 ESTANDE SEAPI E SEMA;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 ESTANDE SEAPI E SEMA;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
-Auditório ESPAÇO GOV;Sábado 05/09;17:00;(Pre) Lançamento do Projeto AGROSUMMIT da UFPEL;UFPEL/AGRONOMIA;Pablo Martins;Ursula Rosa da Silva(REITORA)Felipe Hermann (Coordenador de Extensão) Mauricio de Oliveira( Diretor da Faculdade de Agronomia)Vinicius Farias ( Superintendente de Inovação);False;5331160967
-Auditório ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;09:30;Apresentação da Expointer Carbono Neutro por CRVR e entrega do Selo ONU à Fenasoja;SEMA;Luana Winter;;False;51992996032
 Arena ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
@@ -813,3 +803,13 @@ Arena ESPAÇO GOV;Sábado 05/09;17:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;17:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;18:30;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;13:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;14:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;15:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;16:00;🔓 HORÁRIO VAGO;;;;False;
+Auditório ESPAÇO GOV;Sábado 05/09;17:00;Lançamento do Projeto AGROSUMMIT da UFPEL;UFPEL/AGRONOMIA;Pablo Martins;Ursula Rosa da Silva(REITORA)Felipe Hermann (Coordenador de Extensão) Mauricio de Oliveira( Diretor da Faculdade de Agronomia)Vinicius Farias ( Superintendente de Inovação);True;5331160967
+Auditório ESPAÇO GOV;Sábado 05/09;18:00;🔓 HORÁRIO VAGO;;;;False;
