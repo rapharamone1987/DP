@@ -797,7 +797,7 @@ Arena ESPAÇO GOV;Sábado 05/09;09:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;09:30;Apresentação da Expointer Carbono Neutro por CRVR e entrega do Selo ONU à Fenasoja;SEMA;Luana Winter;;False;51992996032
 Arena ESPAÇO GOV;Sábado 05/09;10:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;10:30;🔓 HORÁRIO VAGO;;;;False;
-Arena ESPAÇO GOV;Sábado 05/09;11:00;🔓 HORÁRIO VAGO;;;;False;
+Arena ESPAÇO GOV;Sábado 05/09;11:00;Imersão ao Paralelo 31 - Pampa Gaúcho;SETUR;Cris Silva;Jonas Morais - Diretor de Turismo de Candiota;True;
 Arena ESPAÇO GOV;Sábado 05/09;11:30;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;12:00;🔓 HORÁRIO VAGO;;;;False;
 Arena ESPAÇO GOV;Sábado 05/09;12:30;🔓 HORÁRIO VAGO;;;;False;
