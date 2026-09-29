@@ -13,7 +13,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 # ----------------------------------------------------
-# 1. CONFIGURAÇÃO DA PÁGINA & PALETA VERDE INTEGRAL
+# 1. CONFIGURAÇÃO DA PÁGINA & CSS ADAPTATIVO (COLOR-MIX)
 # ----------------------------------------------------
 st.set_page_config(
     page_title="Sistema Integrado de Consulta Patrimonial - SEAPI/RS",
@@ -21,57 +21,27 @@ st.set_page_config(
     layout="wide"
 )
 
-# Injeção de CSS responsivo com atmosfera de verdes institucionais
+# Estilização adaptativa via color-mix combinando tons institucionais da SEAPI
 st.markdown("""
 <style>
-    /* ====================================================
-       1. MODO CLARO: Tons de Verde Sálvia / Menta Suave
-       ==================================================== */
-    :root {
-        --seapi-bg: #EDF4EE;
-        --seapi-sidebar-bg: #E3EDE5;
-        --seapi-card-bg: #F7FAF8;
-        --seapi-card-border: #C8DDCB;
-        --seapi-text-main: #0E2414;
-        --seapi-text-sub: #2E5336;
-        --seapi-primary-green: #1E4D2B;
-        --seapi-accent-green: #2B7A41;
-        --seapi-kpi-val: #144020;
-    }
-
-    /* ====================================================
-       2. MODO ESCURO: Tons de Verde Musgo Profundo / Noturno
-       ==================================================== */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --seapi-bg: #09170D;
-            --seapi-sidebar-bg: #061009;
-            --seapi-card-bg: #102617;
-            --seapi-card-border: #1E4429;
-            --seapi-text-main: #E3EFE5;
-            --seapi-text-sub: #9EBEA5;
-            --seapi-primary-green: #2E7D32;
-            --seapi-accent-green: #4CAF50;
-            --seapi-kpi-val: #66BB6A;
-        }
-    }
-
-    /* Fundo integral da aplicação */
+    /* ==========================================================
+       CSS ADAPTATIVO NATIVO:
+       Usa a cor de fundo do tema ativo misturada com verde SEAPI
+       ========================================================== */
+    
+    /* Fundo da aplicação: tonalidade de verde sobre o fundo atual */
     .stApp {
-        background-color: var(--seapi-bg) !important;
-        color: var(--seapi-text-main) !important;
+        background-color: color-mix(in srgb, #1E4D2B 7%, var(--background-color)) !important;
+        color: var(--text-color) !important;
     }
 
-    /* Barra lateral adaptada */
+    /* Barra lateral com verde ligeiramente mais acentuado */
     [data-testid="stSidebar"] {
-        background-color: var(--seapi-sidebar-bg) !important;
-        border-right: 1px solid var(--seapi-card-border) !important;
-    }
-    [data-testid="stSidebar"] * {
-        color: var(--seapi-text-main) !important;
+        background-color: color-mix(in srgb, #1E4D2B 14%, var(--secondary-background-color)) !important;
+        border-right: 1px solid color-mix(in srgb, #1E4D2B 25%, var(--border-color, #CCCCCC)) !important;
     }
 
-    /* Banner Institucional Superior */
+    /* Banner Superior Institucional (Verde executivo elegante) */
     .header-box {
         background: linear-gradient(135deg, #1A4726 0%, #0F2B17 100%);
         color: #FFFFFF !important;
@@ -94,58 +64,56 @@ st.markdown("""
         font-size: 13px;
     }
 
-    /* Cards de Métricas / KPIs */
+    /* Cards de Métricas / KPIs que se adaptam perfeitamente */
     .metric-card {
-        background-color: var(--seapi-card-bg) !important;
-        color: var(--seapi-text-main) !important;
+        background-color: color-mix(in srgb, #1E4D2B 10%, var(--secondary-background-color)) !important;
+        color: var(--text-color) !important;
         border-radius: 10px;
         padding: 13px 17px;
-        border-left: 5px solid var(--seapi-accent-green) !important;
-        border-top: 1px solid var(--seapi-card-border) !important;
-        border-right: 1px solid var(--seapi-card-border) !important;
-        border-bottom: 1px solid var(--seapi-card-border) !important;
+        border-left: 5px solid #2E7D32 !important;
+        border-top: 1px solid color-mix(in srgb, #1E4D2B 20%, var(--border-color, #CCCCCC)) !important;
+        border-right: 1px solid color-mix(in srgb, #1E4D2B 20%, var(--border-color, #CCCCCC)) !important;
+        border-bottom: 1px solid color-mix(in srgb, #1E4D2B 20%, var(--border-color, #CCCCCC)) !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         margin-bottom: 10px;
     }
     .metric-card .title {
         font-size: 11px;
         font-weight: 600;
-        color: var(--seapi-text-sub) !important;
+        color: var(--text-color) !important;
+        opacity: 0.8;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
     .metric-card .value {
         font-size: 21px;
         font-weight: 700;
-        color: var(--seapi-kpi-val) !important;
+        color: color-mix(in srgb, #2E7D32 75%, var(--text-color)) !important;
         margin-top: 2px;
     }
     .metric-card .subtitle {
         font-size: 10.5px;
-        color: var(--seapi-text-sub) !important;
-        opacity: 0.85;
+        color: var(--text-color) !important;
+        opacity: 0.7;
         margin-top: 2px;
     }
 
-    /* Ajuste para Abas e Botões harmonizarem com os tons de verde */
+    /* Abas */
     .stTabs [data-baseweb="tab-list"] {
         gap: 10px;
-        border-bottom: 1px solid var(--seapi-card-border);
-    }
-    .stTabs [data-baseweb="tab"] {
-        color: var(--seapi-text-sub) !important;
+        border-bottom: 1px solid color-mix(in srgb, #1E4D2B 20%, var(--border-color, #CCCCCC));
     }
     .stTabs [aria-selected="true"] {
-        color: var(--seapi-kpi-val) !important;
+        color: color-mix(in srgb, #2E7D32 80%, var(--text-color)) !important;
         font-weight: bold;
-        border-bottom: 3px solid var(--seapi-accent-green) !important;
+        border-bottom: 3px solid #2E7D32 !important;
     }
 
     /* Tabelas e Dataframes */
     [data-testid="stDataFrame"] {
-        background-color: var(--seapi-card-bg) !important;
+        background-color: color-mix(in srgb, #1E4D2B 8%, var(--secondary-background-color)) !important;
         border-radius: 8px;
-        border: 1px solid var(--seapi-card-border);
+        border: 1px solid color-mix(in srgb, #1E4D2B 20%, var(--border-color, #CCCCCC));
     }
 </style>
 """, unsafe_allow_html=True)
@@ -526,7 +494,7 @@ with col_k1:
     <div class="metric-card">
         <div class="title">Quantidade de Bens Filtrados</div>
         <div class="value">{qtd_total:,}</div>
-        <div class="subtitle">Representa <b>{pct_bens_total:.2f}%</b> do acervo total geral</div>
+        <div class="subtitle">Representa <b>{pct_bens_total:.2f}%</b> do acervo geral do Estado</div>
     </div>
     """.replace(",", "."), unsafe_allow_html=True)
 
