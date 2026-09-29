@@ -288,4 +288,4 @@ with tab_ficha:
                 st.write(f"**Responsável / Titular:** {dado['Responsavel']}")
                 st.write(f"**Valor Contábil:** R$ {dado['Valor_Contabil']:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
         else:
-            st.error(f"Nenhum registro encontrado com o tombamento '{tombamento_ficha}'.")tuais.")
+            st.error(f"Nenhum registro encontrado com o tombamento '{tombamento_ficha}'.")
