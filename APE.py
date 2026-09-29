@@ -13,7 +13,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 # ----------------------------------------------------
-# 1. CONFIGURAÇÃO DA PÁGINA & CSS ADAPTATIVO (LIGHT/DARK)
+# 1. CONFIGURAÇÃO DA PÁGINA & PALETA VERDE INTEGRAL
 # ----------------------------------------------------
 st.set_page_config(
     page_title="Sistema Integrado de Consulta Patrimonial - SEAPI/RS",
@@ -21,69 +21,131 @@ st.set_page_config(
     layout="wide"
 )
 
-# Estilização que respeita o modo Claro e Escuro sem conflito de legibilidade
+# Injeção de CSS responsivo com atmosfera de verdes institucionais
 st.markdown("""
 <style>
-    /* Cabeçalho Institucional Verde SEAPI com contraste garantido */
+    /* ====================================================
+       1. MODO CLARO: Tons de Verde Sálvia / Menta Suave
+       ==================================================== */
+    :root {
+        --seapi-bg: #EDF4EE;
+        --seapi-sidebar-bg: #E3EDE5;
+        --seapi-card-bg: #F7FAF8;
+        --seapi-card-border: #C8DDCB;
+        --seapi-text-main: #0E2414;
+        --seapi-text-sub: #2E5336;
+        --seapi-primary-green: #1E4D2B;
+        --seapi-accent-green: #2B7A41;
+        --seapi-kpi-val: #144020;
+    }
+
+    /* ====================================================
+       2. MODO ESCURO: Tons de Verde Musgo Profundo / Noturno
+       ==================================================== */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --seapi-bg: #09170D;
+            --seapi-sidebar-bg: #061009;
+            --seapi-card-bg: #102617;
+            --seapi-card-border: #1E4429;
+            --seapi-text-main: #E3EFE5;
+            --seapi-text-sub: #9EBEA5;
+            --seapi-primary-green: #2E7D32;
+            --seapi-accent-green: #4CAF50;
+            --seapi-kpi-val: #66BB6A;
+        }
+    }
+
+    /* Fundo integral da aplicação */
+    .stApp {
+        background-color: var(--seapi-bg) !important;
+        color: var(--seapi-text-main) !important;
+    }
+
+    /* Barra lateral adaptada */
+    [data-testid="stSidebar"] {
+        background-color: var(--seapi-sidebar-bg) !important;
+        border-right: 1px solid var(--seapi-card-border) !important;
+    }
+    [data-testid="stSidebar"] * {
+        color: var(--seapi-text-main) !important;
+    }
+
+    /* Banner Institucional Superior */
     .header-box {
-        background: linear-gradient(135deg, #1E4D2B 0%, #112E1A 100%);
+        background: linear-gradient(135deg, #1A4726 0%, #0F2B17 100%);
         color: #FFFFFF !important;
         padding: 22px 28px;
         border-radius: 12px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 22px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+        border: 1px solid #2D6B3E;
     }
     .header-box h1 {
         color: #FFFFFF !important;
         margin: 0;
         font-size: 24px;
         font-weight: 700;
+        letter-spacing: -0.3px;
     }
     .header-box p {
-        color: #DCE8DD !important;
+        color: #CBE3CE !important;
         margin: 5px 0 0 0;
         font-size: 13px;
     }
 
-    /* Cards de Indicadores com suporte a tema Claro e Escuro */
+    /* Cards de Métricas / KPIs */
     .metric-card {
-        background-color: var(--secondary-background-color);
-        color: var(--text-color);
+        background-color: var(--seapi-card-bg) !important;
+        color: var(--seapi-text-main) !important;
         border-radius: 10px;
-        padding: 14px 18px;
-        border-left: 5px solid #2E7D32;
-        border-top: 1px solid var(--border-color, rgba(128,128,128,0.2));
-        border-right: 1px solid var(--border-color, rgba(128,128,128,0.2));
-        border-bottom: 1px solid var(--border-color, rgba(128,128,128,0.2));
+        padding: 13px 17px;
+        border-left: 5px solid var(--seapi-accent-green) !important;
+        border-top: 1px solid var(--seapi-card-border) !important;
+        border-right: 1px solid var(--seapi-card-border) !important;
+        border-bottom: 1px solid var(--seapi-card-border) !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         margin-bottom: 10px;
-        transition: transform 0.1s ease-in-out;
     }
     .metric-card .title {
         font-size: 11px;
         font-weight: 600;
-        color: var(--text-color);
-        opacity: 0.75;
+        color: var(--seapi-text-sub) !important;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
     .metric-card .value {
-        font-size: 22px;
+        font-size: 21px;
         font-weight: 700;
-        color: #2E7D32;
-        margin-top: 3px;
+        color: var(--seapi-kpi-val) !important;
+        margin-top: 2px;
     }
     .metric-card .subtitle {
-        font-size: 11px;
-        color: var(--text-color);
-        opacity: 0.65;
+        font-size: 10.5px;
+        color: var(--seapi-text-sub) !important;
+        opacity: 0.85;
         margin-top: 2px;
     }
 
-    /* Ajuste de espaçamento nas abas */
+    /* Ajuste para Abas e Botões harmonizarem com os tons de verde */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 12px;
+        gap: 10px;
+        border-bottom: 1px solid var(--seapi-card-border);
+    }
+    .stTabs [data-baseweb="tab"] {
+        color: var(--seapi-text-sub) !important;
+    }
+    .stTabs [aria-selected="true"] {
+        color: var(--seapi-kpi-val) !important;
+        font-weight: bold;
+        border-bottom: 3px solid var(--seapi-accent-green) !important;
+    }
+
+    /* Tabelas e Dataframes */
+    [data-testid="stDataFrame"] {
+        background-color: var(--seapi-card-bg) !important;
+        border-radius: 8px;
+        border: 1px solid var(--seapi-card-border);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -188,7 +250,7 @@ def classificar_bem_patrimonial(descricao: str):
     return "Outros / Diversos", "Outros", "Não Especificado"
 
 def calcular_idade_anos(data_str):
-    """Extrai ano de incorporação e calcula a idade do bem em anos."""
+    """Extrai ano de incorporação e calcula a idade em anos."""
     if not data_str or str(data_str).strip() in ["nan", "None", ""]:
         return np.nan
     ano_match = re.search(r"(19\d{2}|20\d{2})", str(data_str))
@@ -333,7 +395,6 @@ def carregar_dados_sistema():
     df_total["Tipo_Bem"] = [c[1] for c in classificacoes]
     df_total["Subtipo"] = [c[2] for c in classificacoes]
 
-    # Cálculos de Idade e Faixa Etária
     df_total["Idade_Anos"] = df_total["Data_Incorp"].apply(calcular_idade_anos)
     df_total["Faixa_Etaria"] = df_total["Idade_Anos"].apply(classificar_faixa_etaria)
 
@@ -349,12 +410,11 @@ with st.spinner("Conectando ao Google Sheets e consolidando acervo patrimonial..
         st.error(f"Erro ao carregar dados da planilha: {e}")
         st.stop()
 
-# Totais Gerais para Cálculo de Representatividade
 TOTAL_BENS_GERAL = len(df)
 TOTAL_VALOR_GERAL = df["Valor_Contabil"].sum()
 
 # ----------------------------------------------------
-# 5. HEADER INSTITUCIONAL
+# 5. HEADER INSTITUCIONAL SEAPI
 # ----------------------------------------------------
 st.markdown("""
 <div class="header-box">
@@ -466,7 +526,7 @@ with col_k1:
     <div class="metric-card">
         <div class="title">Quantidade de Bens Filtrados</div>
         <div class="value">{qtd_total:,}</div>
-        <div class="subtitle">Representa <b>{pct_bens_total:.2f}%</b> do acervo geral do Estado</div>
+        <div class="subtitle">Representa <b>{pct_bens_total:.2f}%</b> do acervo total geral</div>
     </div>
     """.replace(",", "."), unsafe_allow_html=True)
 
@@ -508,7 +568,7 @@ with col_k5:
         <div class="value" style="font-size: 15px; margin-top: 5px;">
             <span style="color:#2E7D32;"><b>Uso:</b> {qtd_em_uso:,}</span> | 
             <span style="color:#4CAF50;"><b>Ced.:</b> {qtd_cedidos:,}</span> | 
-            <span style="color:#D32F2F;"><b>Não Loc.:</b> {qtd_nao_loc:,}</span>
+            <span style="color:#E53935;"><b>Não Loc.:</b> {qtd_nao_loc:,}</span>
         </div>
         <div class="subtitle">Distribuição por situação operacional</div>
     </div>
@@ -517,9 +577,9 @@ with col_k5:
 with col_k6:
     filtros_ativos = bool(termo_busca or bases_selecionadas or deptos_selecionados or unidades_selecionadas or familias_selecionadas or tipos_selecionados or subtipos_selecionados or faixas_selecionadas or status_selecionados)
     st.markdown(f"""
-    <div class="metric-card" style="border-left-color: {'#1976D2' if filtros_ativos else '#757575'};">
+    <div class="metric-card" style="border-left-color: {'#1976D2' if filtros_ativos else '#689F38'};">
         <div class="title">Escopo dos Filtros</div>
-        <div class="value" style="color: {'#1976D2' if filtros_ativos else '#757575'}; font-size: 16px; margin-top: 4px;">
+        <div class="value" style="color: {'#1976D2' if filtros_ativos else '#689F38'}; font-size: 16px; margin-top: 4px;">
             {'🔵 Filtros Personalizados' if filtros_ativos else '⚪ Base Integral (Sem Restrição)'}
         </div>
         <div class="subtitle">{f'{qtd_total:,} de {TOTAL_BENS_GERAL:,} bens totais'.replace(',', '.')}</div>
@@ -542,7 +602,7 @@ def gerar_grafico_donut_status(df_dados, para_pdf=False):
         labels=None,
         colors=cores,
         startangle=90,
-        wedgeprops=dict(width=0.45, edgecolor='white' if para_pdf else '#222222', linewidth=1.2)
+        wedgeprops=dict(width=0.45, edgecolor='white' if para_pdf else '#1A3322', linewidth=1.2)
     )
     
     ax.legend(
@@ -572,13 +632,13 @@ def gerar_grafico_faixa_etaria(df_dados, para_pdf=False):
     barras = ax.bar(faixa_counts.index, faixa_counts.values, color="#2E693D", width=0.55)
     for bar in barras:
         h = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, h + (max(faixa_counts.values)*0.02), f"{int(h):,}".replace(",", "."), ha='center', va='bottom', fontsize=6.5, fontweight='bold', color="#13331C" if para_pdf else "#81C784")
+        ax.text(bar.get_x() + bar.get_width()/2, h + (max(faixa_counts.values)*0.02), f"{int(h):,}".replace(",", "."), ha='center', va='bottom', fontsize=6.5, fontweight='bold', color="#13331C" if para_pdf else "#2E7D32")
     
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_color('#888888')
     ax.spines['bottom'].set_color('#888888')
-    ax.tick_params(axis='both', which='both', labelsize=6, colors="#333333" if para_pdf else "#CCCCCC")
+    ax.tick_params(axis='both', which='both', labelsize=6, colors="#333333" if para_pdf else "#555555")
     plt.xticks(rotation=15, ha='right')
     ax.set_title("Distribuição por Faixa Etária (Ciclo de Vida)", fontsize=9, fontweight="bold", color="#1E4D2B" if para_pdf else "#2E7D32", pad=6)
     plt.tight_layout()
@@ -592,16 +652,16 @@ def gerar_grafico_faixa_etaria(df_dados, para_pdf=False):
 def gerar_grafico_barras_categorias(df_dados, para_pdf=False):
     cat_counts = df_dados["Tipo_Bem"].value_counts().head(8).sort_values(ascending=True)
     fig, ax = plt.subplots(figsize=(3.8, 2.7), dpi=200)
-    barras = ax.barh(cat_counts.index, cat_counts.values, color="#1E4D2B" if para_pdf else "#388E3C", height=0.55)
+    barras = ax.barh(cat_counts.index, cat_counts.values, color="#1E4D2B" if para_pdf else "#2E7D32", height=0.55)
     for bar in barras:
         w = bar.get_width()
-        ax.text(w + (max(cat_counts.values) * 0.02), bar.get_y() + bar.get_height()/2, f"{int(w):,}".replace(",", "."), va='center', ha='left', fontsize=6.5, fontweight='bold', color="#13331C" if para_pdf else "#81C784")
+        ax.text(w + (max(cat_counts.values) * 0.02), bar.get_y() + bar.get_height()/2, f"{int(w):,}".replace(",", "."), va='center', ha='left', fontsize=6.5, fontweight='bold', color="#13331C" if para_pdf else "#2E7D32")
     
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_color('#888888')
     ax.spines['bottom'].set_color('#888888')
-    ax.tick_params(axis='both', which='both', labelsize=6.5, colors="#333333" if para_pdf else "#CCCCCC")
+    ax.tick_params(axis='both', which='both', labelsize=6.5, colors="#333333" if para_pdf else "#555555")
     ax.set_title("Top Tipos de Bens Filtrados", fontsize=9, fontweight="bold", color="#1E4D2B" if para_pdf else "#2E7D32", pad=6)
     plt.tight_layout()
     
@@ -612,7 +672,7 @@ def gerar_grafico_barras_categorias(df_dados, para_pdf=False):
     return buf
 
 # ----------------------------------------------------
-# 11. GERAÇÃO DO RELATÓRIO PDF EXECUTIVO (COM TODOS OS GRÁFICOS E KPIs)
+# 11. GERAÇÃO DO RELATÓRIO PDF EXECUTIVO
 # ----------------------------------------------------
 def gerar_dashboard_pdf_oficial(df_dados, filtros_desc):
     buffer = io.BytesIO()
@@ -677,7 +737,7 @@ def gerar_dashboard_pdf_oficial(df_dados, filtros_desc):
     elementos.append(t_kpi)
     elementos.append(Spacer(1, 8))
 
-    # 3. Bloco de Gráficos Superiores com fundo branco para PDF
+    # 3. Bloco de Gráficos Superiores
     buf_donut = gerar_grafico_donut_status(df_dados, para_pdf=True)
     buf_idade = gerar_grafico_faixa_etaria(df_dados, para_pdf=True)
     buf_cat = gerar_grafico_barras_categorias(df_dados, para_pdf=True)
@@ -696,7 +756,7 @@ def gerar_dashboard_pdf_oficial(df_dados, filtros_desc):
     elementos.append(linha_graficos)
     elementos.append(Spacer(1, 6))
 
-    # 4. Matriz Cruzada: Distribuição por Faixa Etária e Tipo de Bem
+    # 4. Matriz Cruzada: Faixa Etária vs. Tipo de Bem
     elementos.append(Paragraph("Distribuição Cruzada: Faixa Etária (Ciclo de Vida) vs. Tipo de Bem", secao_style))
     top_tipos = df_dados["Tipo_Bem"].value_counts().head(6).index.tolist()
     df_cruz = df_dados[df_dados["Tipo_Bem"].isin(top_tipos)]
@@ -741,7 +801,7 @@ tab_dash, tab_cruzada, tab_itens, tab_pdf, tab_ficha = st.tabs([
     "🔍 Ficha Individual do Bem"
 ])
 
-# ABA 1: DASHBOARD (Corrigido para st.image com buffer)
+# ABA 1: DASHBOARD
 with tab_dash:
     if qtd_total > 0:
         c1, c2, c3 = st.columns([1, 1.2, 1])
@@ -767,7 +827,7 @@ with tab_dash:
     else:
         st.info("Nenhum registro encontrado para alimentar o painel executivo.")
 
-# ABA 2: ANÁLISE CRUZADA (IDADE X TIPO DE BEM)
+# ABA 2: ANÁLISE CRUZADA
 with tab_cruzada:
     st.subheader("Matriz Cruzada: Faixa Etária vs. Tipo de Bem")
     if qtd_total > 0:
