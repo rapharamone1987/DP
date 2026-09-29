@@ -1,28 +1,3 @@
-Para elevar o visual ao padrão executivo da SEAPI e habilitar a exportação do relatório/dashboard em **PDF** com base nos filtros ativos, implementamos duas melhorias centrais:
-
-1.  **Design Institucional Verde SEAPI (`#1E4D2B`) com Cards Executivos**:
-      - Inserção de CSS personalizado (`st.markdown`) com cards estilizados, tipografia corporativa e bordas sutis idênticas às das abas `Dashboard` e `Dashboard_Analitico`.
-      - Organização em abas: **Painel Executivo / Dashboard**, **Resultados da Pesquisa**, **Ficha Individual** e **Exportação PDF**.
-2.  **Gerador de Relatório PDF Dinâmico com `reportlab`**:
-      - Compila automaticamente os KPIs filtrados, tabelas de distribuição por departamento, por status e por tipo de bem, além do resumo dos itens.
-      - O PDF é gerado em memória e disponibilizado diretamente com `st.download_button`.
-
------
-
-### Instalação dos Pacotes Necessários
-
-No seu terminal ou no arquivo `requirements.txt` do Streamlit Cloud, certifique-se de ter:
-
-``` bash
-pip install streamlit pandas reportlab
-
-```
-
------
-
-### Código Completo Atualizado (`APE.py`)
-
-``` python
 import streamlit as st
 import pandas as pd
 import re
@@ -747,5 +722,3 @@ with tab_ficha:
                 st.write(f"**Valor Contábil:** R$ {item['Valor_Contabil']:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
         else:
             st.error(f"Nenhum registro localizado para o tombamento '{tomb_busca}'.")
-
-```
