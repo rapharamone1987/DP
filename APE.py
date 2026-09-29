@@ -13,7 +13,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 # ----------------------------------------------------
-# 1. CONFIGURAÇÃO DA PÁGINA & CSS INSTITUCIONAL
+# 1. CONFIGURAÇÃO DA PÁGINA & CSS ADAPTATIVO (LIGHT/DARK)
 # ----------------------------------------------------
 st.set_page_config(
     page_title="Sistema Integrado de Consulta Patrimonial - SEAPI/RS",
@@ -21,20 +21,18 @@ st.set_page_config(
     layout="wide"
 )
 
+# Estilização que respeita o modo Claro e Escuro sem conflito de legibilidade
 st.markdown("""
 <style>
-    :root {
-        --seapi-green: #1E4D2B;
-        --seapi-dark: #13331C;
-        --seapi-light: #F4F8F4;
-    }
+    /* Cabeçalho Institucional Verde SEAPI com contraste garantido */
     .header-box {
-        background: linear-gradient(135deg, #1E4D2B 0%, #13331C 100%);
-        color: white;
+        background: linear-gradient(135deg, #1E4D2B 0%, #112E1A 100%);
+        color: #FFFFFF !important;
         padding: 22px 28px;
-        border-radius: 10px;
+        border-radius: 12px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .header-box h1 {
         color: #FFFFFF !important;
@@ -43,38 +41,49 @@ st.markdown("""
         font-weight: 700;
     }
     .header-box p {
-        color: #DCE8DD;
+        color: #DCE8DD !important;
         margin: 5px 0 0 0;
         font-size: 13px;
     }
+
+    /* Cards de Indicadores com suporte a tema Claro e Escuro */
     .metric-card {
-        background-color: #FFFFFF;
-        border-radius: 8px;
-        padding: 12px 16px;
-        border-left: 5px solid #1E4D2B;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-        border-top: 1px solid #EBEBEB;
-        border-right: 1px solid #EBEBEB;
-        border-bottom: 1px solid #EBEBEB;
+        background-color: var(--secondary-background-color);
+        color: var(--text-color);
+        border-radius: 10px;
+        padding: 14px 18px;
+        border-left: 5px solid #2E7D32;
+        border-top: 1px solid var(--border-color, rgba(128,128,128,0.2));
+        border-right: 1px solid var(--border-color, rgba(128,128,128,0.2));
+        border-bottom: 1px solid var(--border-color, rgba(128,128,128,0.2));
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         margin-bottom: 10px;
+        transition: transform 0.1s ease-in-out;
     }
     .metric-card .title {
         font-size: 11px;
         font-weight: 600;
-        color: #666666;
+        color: var(--text-color);
+        opacity: 0.75;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
     .metric-card .value {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 700;
-        color: #1E4D2B;
-        margin-top: 2px;
+        color: #2E7D32;
+        margin-top: 3px;
     }
     .metric-card .subtitle {
-        font-size: 10.5px;
-        color: #888888;
+        font-size: 11px;
+        color: var(--text-color);
+        opacity: 0.65;
         margin-top: 2px;
+    }
+
+    /* Ajuste de espaçamento nas abas */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 12px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -100,6 +109,7 @@ def classificar_bem_patrimonial(descricao: str):
     """Classifica a descrição em (Macro_Familia, Tipo_Bem, Subtipo)."""
     desc = str(descricao).upper().strip()
 
+    # CADEIRAS E ASSENTOS
     if re.search(r"\b(CADEIRA|POLTRONA|LONGARINA|BANQUETA|BANCO)\b", desc):
         familia = "Mobiliário em Geral"
         tipo = "Cadeiras"
@@ -116,6 +126,7 @@ def classificar_bem_patrimonial(descricao: str):
             subtipo = "Não Especificado"
         return familia, tipo, subtipo
 
+    # ARMÁRIOS E ARQUIVOS
     if re.search(r"\b(ARMARIO|ARMÁRIO|ARQUIVO|ROUPEIRO)\b", desc):
         familia = "Mobiliário em Geral"
         tipo = "Armários"
@@ -131,6 +142,7 @@ def classificar_bem_patrimonial(descricao: str):
             subtipo = "Não Especificado"
         return familia, tipo, subtipo
 
+    # MESAS
     if re.search(r"\b(MESA|ESTACAO DE TRABALHO|ESTAÇÃO DE TRABALHO|ESCRIVANINHA)\b", desc):
         familia = "Mobiliário em Geral"
         tipo = "Mesas"
@@ -144,6 +156,7 @@ def classificar_bem_patrimonial(descricao: str):
             subtipo = "Não Especificado"
         return familia, tipo, subtipo
 
+    # INFORMÁTICA
     if re.search(r"\b(NOTEBOOK|LAPTOP)\b", desc):
         return "Informática & TI", "Notebooks", "Notebook"
     if re.search(r"\b(MICROCOMPUTADOR|COMPUTADOR|DESKTOP|CPU|SERVIDOR)\b", desc):
@@ -157,6 +170,7 @@ def classificar_bem_patrimonial(descricao: str):
     if re.search(r"\b(NOBREAK|NO-BREAK|ESTABILIZADOR|TECLADO|MOUSE|PERIFERICO)\b", desc):
         return "Informática & TI", "Periféricos", "Não Especificado"
 
+    # VEÍCULOS & MÁQUINAS
     if re.search(r"\b(CAMINHONETE|CAMIONETE|PICKUP|CAMINHAO|CAMINHÃO)\b", desc):
         subtipo = "Caminhão" if "CAMINH" in desc else "Caminhonete"
         return "Veículos & Transporte", "Veículos", subtipo
@@ -165,6 +179,7 @@ def classificar_bem_patrimonial(descricao: str):
     if re.search(r"\b(TRATOR|RETROESCAVADEIRA|COLHEITADEIRA|PULVERIZADOR|SEMEADORA)\b", desc):
         return "Maquinário & Equip. Agrícolas", "Máquina Agrícola", "Pesada / Implemento"
 
+    # CLIMATIZAÇÃO
     if re.search(r"\b(CONDICIONADOR DE AR|AR CONDICIONADO|SPLIT|VENTILADOR)\b", desc):
         return "Climatização & Eletro", "Climatização", "Climatizador / Split"
     if re.search(r"\b(REFRIGERADOR|GELADEIRA|FREEZER|BEBEDOURO|MICRO-ONDAS|CAFETEIRA)\b", desc):
@@ -436,11 +451,9 @@ qtd_total = len(df_filtrado)
 valor_total = df_filtrado["Valor_Contabil"].sum()
 ticket_medio = (valor_total / qtd_total) if qtd_total > 0 else 0.0
 
-# Idade Média (ignorando NaN)
 idades_validas = df_filtrado["Idade_Anos"].dropna()
 idade_media = idades_validas.mean() if not idades_validas.empty else 0.0
 
-# Percentuais em relação ao acervo geral total
 pct_bens_total = (qtd_total / TOTAL_BENS_GERAL * 100) if TOTAL_BENS_GERAL > 0 else 0.0
 pct_valor_total = (valor_total / TOTAL_VALOR_GERAL * 100) if TOTAL_VALOR_GERAL > 0 else 0.0
 
@@ -453,7 +466,7 @@ with col_k1:
     <div class="metric-card">
         <div class="title">Quantidade de Bens Filtrados</div>
         <div class="value">{qtd_total:,}</div>
-        <div class="subtitle">Representa <b>{pct_bens_total:.2f}%</b> do acervo total geral</div>
+        <div class="subtitle">Representa <b>{pct_bens_total:.2f}%</b> do acervo geral do Estado</div>
     </div>
     """.replace(",", "."), unsafe_allow_html=True)
 
@@ -493,9 +506,9 @@ with col_k5:
     <div class="metric-card">
         <div class="title">Alocação Ativa</div>
         <div class="value" style="font-size: 15px; margin-top: 5px;">
-            <span style="color:#1E4D2B;"><b>Uso:</b> {qtd_em_uso:,}</span> | 
-            <span style="color:#2E693D;"><b>Ced.:</b> {qtd_cedidos:,}</span> | 
-            <span style="color:#C62828;"><b>Não Loc.:</b> {qtd_nao_loc:,}</span>
+            <span style="color:#2E7D32;"><b>Uso:</b> {qtd_em_uso:,}</span> | 
+            <span style="color:#4CAF50;"><b>Ced.:</b> {qtd_cedidos:,}</span> | 
+            <span style="color:#D32F2F;"><b>Não Loc.:</b> {qtd_nao_loc:,}</span>
         </div>
         <div class="subtitle">Distribuição por situação operacional</div>
     </div>
@@ -504,9 +517,9 @@ with col_k5:
 with col_k6:
     filtros_ativos = bool(termo_busca or bases_selecionadas or deptos_selecionados or unidades_selecionadas or familias_selecionadas or tipos_selecionados or subtipos_selecionados or faixas_selecionadas or status_selecionados)
     st.markdown(f"""
-    <div class="metric-card" style="border-left-color: {'#2A75D3' if filtros_ativos else '#666666'};">
+    <div class="metric-card" style="border-left-color: {'#1976D2' if filtros_ativos else '#757575'};">
         <div class="title">Escopo dos Filtros</div>
-        <div class="value" style="color: {'#2A75D3' if filtros_ativos else '#666666'}; font-size: 16px; margin-top: 4px;">
+        <div class="value" style="color: {'#1976D2' if filtros_ativos else '#757575'}; font-size: 16px; margin-top: 4px;">
             {'🔵 Filtros Personalizados' if filtros_ativos else '⚪ Base Integral (Sem Restrição)'}
         </div>
         <div class="subtitle">{f'{qtd_total:,} de {TOTAL_BENS_GERAL:,} bens totais'.replace(',', '.')}</div>
@@ -518,22 +531,39 @@ st.write("")
 # ----------------------------------------------------
 # 10. FUNÇÕES DE RENDERIZAÇÃO DE GRÁFICOS (MATPLOTLIB)
 # ----------------------------------------------------
-def gerar_grafico_donut_status(df_dados):
+def gerar_grafico_donut_status(df_dados, para_pdf=False):
     status_counts = df_dados["Status"].value_counts()
     fig, ax = plt.subplots(figsize=(3.4, 2.7), dpi=200)
     color_map = {"Em Uso Direto": "#1E4D2B", "Bens Cedidos": "#4CAF50", "Bens Não Localizados": "#C62828"}
     cores = [color_map.get(s, "#888888") for s in status_counts.index]
-    wedges, _ = ax.pie(status_counts.values, labels=None, colors=cores, startangle=90, wedgeprops=dict(width=0.45, edgecolor='white', linewidth=1.5))
-    ax.legend(wedges, [f"{s} ({v:,})".replace(",", ".") for s, v in zip(status_counts.index, status_counts.values)], loc="center", bbox_to_anchor=(0.5, -0.15), fontsize=6.5, frameon=False)
-    ax.set_title("Distribuição por Alocação Ativa", fontsize=9, fontweight="bold", color="#1E4D2B", pad=6)
+    
+    wedges, _ = ax.pie(
+        status_counts.values,
+        labels=None,
+        colors=cores,
+        startangle=90,
+        wedgeprops=dict(width=0.45, edgecolor='white' if para_pdf else '#222222', linewidth=1.2)
+    )
+    
+    ax.legend(
+        wedges,
+        [f"{s} ({v:,})".replace(",", ".") for s, v in zip(status_counts.index, status_counts.values)],
+        loc="center",
+        bbox_to_anchor=(0.5, -0.15),
+        fontsize=6.5,
+        frameon=False
+    )
+    
+    ax.set_title("Distribuição por Alocação Ativa", fontsize=9, fontweight="bold", color="#1E4D2B" if para_pdf else "#2E7D32", pad=6)
     plt.tight_layout()
+    
     buf = io.BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight', dpi=200)
+    plt.savefig(buf, format='png', bbox_inches='tight', dpi=200, transparent=not para_pdf)
     plt.close(fig)
     buf.seek(0)
     return buf
 
-def gerar_grafico_faixa_etaria(df_dados):
+def gerar_grafico_faixa_etaria(df_dados, para_pdf=False):
     ordem = ["0 a 2 anos (Novos)", "3 a 5 anos (Intermediários)", "6 a 10 anos (Amortizados)", "Mais de 10 anos (Históricos)", "Não Informado"]
     faixa_counts = df_dados["Faixa_Etaria"].value_counts().reindex(ordem).fillna(0)
     faixa_counts = faixa_counts[faixa_counts > 0]
@@ -542,37 +572,41 @@ def gerar_grafico_faixa_etaria(df_dados):
     barras = ax.bar(faixa_counts.index, faixa_counts.values, color="#2E693D", width=0.55)
     for bar in barras:
         h = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, h + (max(faixa_counts.values)*0.02), f"{int(h):,}".replace(",", "."), ha='center', va='bottom', fontsize=6.5, fontweight='bold', color="#13331C")
+        ax.text(bar.get_x() + bar.get_width()/2, h + (max(faixa_counts.values)*0.02), f"{int(h):,}".replace(",", "."), ha='center', va='bottom', fontsize=6.5, fontweight='bold', color="#13331C" if para_pdf else "#81C784")
+    
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_color('#CCCCCC')
-    ax.spines['bottom'].set_color('#CCCCCC')
-    ax.tick_params(axis='both', which='both', labelsize=6)
+    ax.spines['left'].set_color('#888888')
+    ax.spines['bottom'].set_color('#888888')
+    ax.tick_params(axis='both', which='both', labelsize=6, colors="#333333" if para_pdf else "#CCCCCC")
     plt.xticks(rotation=15, ha='right')
-    ax.set_title("Distribuição por Faixa Etária (Ciclo de Vida)", fontsize=9, fontweight="bold", color="#1E4D2B", pad=6)
+    ax.set_title("Distribuição por Faixa Etária (Ciclo de Vida)", fontsize=9, fontweight="bold", color="#1E4D2B" if para_pdf else "#2E7D32", pad=6)
     plt.tight_layout()
+    
     buf = io.BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight', dpi=200)
+    plt.savefig(buf, format='png', bbox_inches='tight', dpi=200, transparent=not para_pdf)
     plt.close(fig)
     buf.seek(0)
     return buf
 
-def gerar_grafico_barras_categorias(df_dados):
+def gerar_grafico_barras_categorias(df_dados, para_pdf=False):
     cat_counts = df_dados["Tipo_Bem"].value_counts().head(8).sort_values(ascending=True)
     fig, ax = plt.subplots(figsize=(3.8, 2.7), dpi=200)
-    barras = ax.barh(cat_counts.index, cat_counts.values, color="#1E4D2B", height=0.55)
+    barras = ax.barh(cat_counts.index, cat_counts.values, color="#1E4D2B" if para_pdf else "#388E3C", height=0.55)
     for bar in barras:
         w = bar.get_width()
-        ax.text(w + (max(cat_counts.values) * 0.02), bar.get_y() + bar.get_height()/2, f"{int(w):,}".replace(",", "."), va='center', ha='left', fontsize=6.5, fontweight='bold', color="#13331C")
+        ax.text(w + (max(cat_counts.values) * 0.02), bar.get_y() + bar.get_height()/2, f"{int(w):,}".replace(",", "."), va='center', ha='left', fontsize=6.5, fontweight='bold', color="#13331C" if para_pdf else "#81C784")
+    
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_color('#CCCCCC')
-    ax.spines['bottom'].set_color('#CCCCCC')
-    ax.tick_params(axis='both', which='both', labelsize=6.5)
-    ax.set_title("Top Tipos de Bens Filtrados", fontsize=9, fontweight="bold", color="#1E4D2B", pad=6)
+    ax.spines['left'].set_color('#888888')
+    ax.spines['bottom'].set_color('#888888')
+    ax.tick_params(axis='both', which='both', labelsize=6.5, colors="#333333" if para_pdf else "#CCCCCC")
+    ax.set_title("Top Tipos de Bens Filtrados", fontsize=9, fontweight="bold", color="#1E4D2B" if para_pdf else "#2E7D32", pad=6)
     plt.tight_layout()
+    
     buf = io.BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight', dpi=200)
+    plt.savefig(buf, format='png', bbox_inches='tight', dpi=200, transparent=not para_pdf)
     plt.close(fig)
     buf.seek(0)
     return buf
@@ -643,10 +677,10 @@ def gerar_dashboard_pdf_oficial(df_dados, filtros_desc):
     elementos.append(t_kpi)
     elementos.append(Spacer(1, 8))
 
-    # 3. Bloco de Gráficos Superiores: Donut Alocação + Barras Idade + Barras Tipo
-    buf_donut = gerar_grafico_donut_status(df_dados)
-    buf_idade = gerar_grafico_faixa_etaria(df_dados)
-    buf_cat = gerar_grafico_barras_categorias(df_dados)
+    # 3. Bloco de Gráficos Superiores com fundo branco para PDF
+    buf_donut = gerar_grafico_donut_status(df_dados, para_pdf=True)
+    buf_idade = gerar_grafico_faixa_etaria(df_dados, para_pdf=True)
+    buf_cat = gerar_grafico_barras_categorias(df_dados, para_pdf=True)
 
     img_donut = Image(buf_donut, width=230, height=150)
     img_idade = Image(buf_idade, width=280, height=150)
@@ -685,7 +719,7 @@ def gerar_dashboard_pdf_oficial(df_dados, filtros_desc):
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#2E693D')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 6.5),
+        ('FONTSIZE', (0,0), (-1,0), 6.5),
         ('ALIGN', (1,0), (-1,-1), 'CENTER'),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#CCCCCC')),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#F9FBF9')])
@@ -707,21 +741,21 @@ tab_dash, tab_cruzada, tab_itens, tab_pdf, tab_ficha = st.tabs([
     "🔍 Ficha Individual do Bem"
 ])
 
-# ABA 1: DASHBOARD
+# ABA 1: DASHBOARD (Corrigido para st.image com buffer)
 with tab_dash:
     if qtd_total > 0:
         c1, c2, c3 = st.columns([1, 1.2, 1])
         with c1:
             st.subheader("Alocação Ativa")
-            st.pyplot(plt.figure(gerar_grafico_donut_status(df_filtrado)))
+            st.image(gerar_grafico_donut_status(df_filtrado, para_pdf=False), use_container_width=True)
 
         with c2:
             st.subheader("Ciclo de Vida (Faixa Etária)")
-            st.pyplot(plt.figure(gerar_grafico_faixa_etaria(df_filtrado)))
+            st.image(gerar_grafico_faixa_etaria(df_filtrado, para_pdf=False), use_container_width=True)
 
         with c3:
             st.subheader("Top Tipos de Bens")
-            st.pyplot(plt.figure(gerar_grafico_barras_categorias(df_filtrado)))
+            st.image(gerar_grafico_barras_categorias(df_filtrado, para_pdf=False), use_container_width=True)
 
         st.divider()
         st.subheader("Distribuição por Departamento Oficial")
@@ -737,19 +771,10 @@ with tab_dash:
 with tab_cruzada:
     st.subheader("Matriz Cruzada: Faixa Etária vs. Tipo de Bem")
     if qtd_total > 0:
-        crosstab_tela = pd.crosstab(
-            df_filtrado["Tipo_Bem"],
-            df_filtrado["Faixa_Etaria"],
-            values=df_filtrado["Valor_Contabil"],
-            aggfunc=["count", "sum"]
-        ).fillna(0)
-
-        # Visualização de Contagem
         st.write("##### Quantidade de Bens por Faixa de Idade")
         df_count = pd.crosstab(df_filtrado["Tipo_Bem"], df_filtrado["Faixa_Etaria"], margins=True, margins_name="Total")
         st.dataframe(df_count, use_container_width=True)
 
-        # Gráfico Empilhado
         st.write("##### Distribuição Visual Proporcional")
         crosstab_plot = pd.crosstab(df_filtrado["Tipo_Bem"], df_filtrado["Faixa_Etaria"])
         top_plot = crosstab_plot.loc[df_filtrado["Tipo_Bem"].value_counts().head(8).index]
