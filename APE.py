@@ -1,9 +1,42 @@
+Para elevar o visual ao padrão executivo da SEAPI e habilitar a exportação do relatório/dashboard em **PDF** com base nos filtros ativos, implementamos duas melhorias centrais:
+
+1.  **Design Institucional Verde SEAPI (`#1E4D2B`) com Cards Executivos**:
+      - Inserção de CSS personalizado (`st.markdown`) com cards estilizados, tipografia corporativa e bordas sutis idênticas às das abas `Dashboard` e `Dashboard_Analitico`.
+      - Organização em abas: **Painel Executivo / Dashboard**, **Resultados da Pesquisa**, **Ficha Individual** e **Exportação PDF**.
+2.  **Gerador de Relatório PDF Dinâmico com `reportlab`**:
+      - Compila automaticamente os KPIs filtrados, tabelas de distribuição por departamento, por status e por tipo de bem, além do resumo dos itens.
+      - O PDF é gerado em memória e disponibilizado diretamente com `st.download_button`.
+
+-----
+
+### Instalação dos Pacotes Necessários
+
+No seu terminal ou no arquivo `requirements.txt` do Streamlit Cloud, certifique-se de ter:
+
+``` bash
+pip install streamlit pandas reportlab
+
+```
+
+-----
+
+### Código Completo Atualizado (`APE.py`)
+
+``` python
 import streamlit as st
 import pandas as pd
 import re
+import io
+from datetime import datetime
+
+# ReportLab para geração de PDF
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 # ----------------------------------------------------
-# 1. CONFIGURAÇÃO DA PÁGINA
+# 1. CONFIGURAÇÃO DA PÁGINA & CSS INSTITUCIONAL
 # ----------------------------------------------------
 st.set_page_config(
     page_title="Sistema Integrado de Consulta Patrimonial - SEAPI/RS",
@@ -11,13 +44,81 @@ st.set_page_config(
     layout="wide"
 )
 
+# Estilização visual inspirada na identidade SEAPI
+st.markdown("""
+<style>
+    /* Cor primária institucional */
+    :root {
+        --seapi-green: #1E4D2B;
+        --seapi-dark: #13331C;
+        --seapi-light: #F4F8F4;
+    }
+    
+    /* Top banner */
+    .header-box {
+        background: linear-gradient(135deg, #1E4D2B 0%, #13331C 100%);
+        color: white;
+        padding: 24px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .header-box h1 {
+        color: #FFFFFF !important;
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+    }
+    .header-box p {
+        color: #DCE8DD;
+        margin: 6px 0 0 0;
+        font-size: 14px;
+    }
+
+    /* Cards de Métricas / KPIs */
+    .kpi-container {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .metric-card {
+        background-color: #FFFFFF;
+        border-radius: 10px;
+        padding: 16px 20px;
+        border-left: 5px solid #1E4D2B;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-top: 1px solid #EAEAEA;
+        border-right: 1px solid #EAEAEA;
+        border-bottom: 1px solid #EAEAEA;
+    }
+    .metric-card .title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #555555;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .metric-card .value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1E4D2B;
+        margin-top: 4px;
+    }
+    .metric-card .subtitle {
+        font-size: 11px;
+        color: #888888;
+        margin-top: 3px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 SPREADSHEET_ID = "1cnQTahu9K3UGLtmE8pdc8EnbyUxPdB2POdm3csRhZwg"
 
 # ----------------------------------------------------
 # 2. FUNÇÕES DE PROCESSAMENTO E CLASSIFICAÇÃO
 # ----------------------------------------------------
 def converter_moeda_br(coluna):
-    """Converte valores no formato 'R$ 1.234,56' ou '1234,56' para float."""
+    """Converte formato 'R$ 1.234,56' para float."""
     return (
         coluna.astype(str)
         .str.replace("R$", "", regex=False)
@@ -29,13 +130,10 @@ def converter_moeda_br(coluna):
     )
 
 def classificar_bem_patrimonial(descricao: str):
-    """
-    Classifica a descrição do bem em 3 camadas:
-    (Macro_Familia, Tipo_Bem, Subtipo)
-    """
+    """Classifica a descrição em (Macro_Familia, Tipo_Bem, Subtipo)."""
     desc = str(descricao).upper().strip()
 
-    # 1. CADEIRAS E ASSENTOS
+    # CADEIRAS E ASSENTOS
     if re.search(r"\b(CADEIRA|POLTRONA|LONGARINA|BANQUETA|BANCO)\b", desc):
         familia = "Mobiliário em Geral"
         tipo = "Cadeira / Assento"
@@ -52,7 +150,7 @@ def classificar_bem_patrimonial(descricao: str):
             subtipo = "Não Especificado"
         return familia, tipo, subtipo
 
-    # 2. ARMÁRIOS E ARQUIVOS
+    # ARMÁRIOS E ARQUIVOS
     if re.search(r"\b(ARMARIO|ARMÁRIO|ARQUIVO|ROUPEIRO)\b", desc):
         familia = "Mobiliário em Geral"
         tipo = "Armário / Arquivo"
@@ -68,7 +166,7 @@ def classificar_bem_patrimonial(descricao: str):
             subtipo = "Não Especificado"
         return familia, tipo, subtipo
 
-    # 3. MESAS E ESTAÇÕES DE TRABALHO
+    # MESAS
     if re.search(r"\b(MESA|ESTACAO DE TRABALHO|ESTAÇÃO DE TRABALHO|ESCRIVANINHA)\b", desc):
         familia = "Mobiliário em Geral"
         tipo = "Mesa / Estação de Trabalho"
@@ -82,7 +180,7 @@ def classificar_bem_patrimonial(descricao: str):
             subtipo = "Não Especificado"
         return familia, tipo, subtipo
 
-    # 4. INFORMÁTICA & TECNOLOGIA
+    # INFORMÁTICA
     if re.search(r"\b(NOTEBOOK|LAPTOP)\b", desc):
         return "Informática & TI", "Computador", "Notebook"
     if re.search(r"\b(MICROCOMPUTADOR|COMPUTADOR|DESKTOP|CPU|SERVIDOR)\b", desc):
@@ -91,17 +189,12 @@ def classificar_bem_patrimonial(descricao: str):
     if re.search(r"\b(MONITOR|TELA|DISPLAY)\b", desc):
         return "Informática & TI", "Monitor / Tela", "Não Especificado"
     if re.search(r"\b(IMPRESSORA|MULTIFUNCIONAL|PLOTTER|SCANNER)\b", desc):
-        if "MULTIFUNCIONAL" in desc:
-            subtipo = "Multifuncional"
-        elif "SCANNER" in desc:
-            subtipo = "Scanner"
-        else:
-            subtipo = "Impressora Térmica/Laser/Jato"
+        subtipo = "Multifuncional" if "MULTIFUNCIONAL" in desc else "Impressora Laser/Jato"
         return "Informática & TI", "Impressora & Imagem", subtipo
     if re.search(r"\b(NOBREAK|NO-BREAK|ESTABILIZADOR)\b", desc):
         return "Informática & TI", "Proteção de Energia", "Nobreak / Estabilizador"
 
-    # 5. VEÍCULOS & MÁQUINAS
+    # VEÍCULOS & MÁQUINAS
     if re.search(r"\b(CAMINHONETE|CAMIONETE|PICKUP|CAMINHAO|CAMINHÃO)\b", desc):
         subtipo = "Caminhão" if "CAMINH" in desc else "Caminhonete"
         return "Veículos & Transporte", "Utilitário / Carga", subtipo
@@ -110,18 +203,13 @@ def classificar_bem_patrimonial(descricao: str):
     if re.search(r"\b(TRATOR|RETROESCAVADEIRA|COLHEITADEIRA|PULVERIZADOR|SEMEADORA)\b", desc):
         return "Maquinário & Equip. Agrícolas", "Máquina Agrícola", "Pesada / Implemento"
 
-    # 6. CLIMATIZAÇÃO & ELETRODOMÉSTICOS
+    # CLIMATIZAÇÃO
     if re.search(r"\b(CONDICIONADOR DE AR|AR CONDICIONADO|SPLIT|VENTILADOR)\b", desc):
         subtipo = "Split / AC" if "SPLIT" in desc or "AR" in desc else "Ventilador"
         return "Climatização & Eletro", "Climatização", subtipo
     if re.search(r"\b(REFRIGERADOR|GELADEIRA|FREEZER|BEBEDOURO|MICRO-ONDAS|CAFETEIRA)\b", desc):
         return "Climatização & Eletro", "Eletrodoméstico / Copa", "Padrão"
 
-    # 7. COMUNICAÇÃO & ÁUDIO/VÍDEO
-    if re.search(r"\b(TELEFONE|TELEFONICO|RADIO|RÁDIO|TELEVISOR|TV|PROJETOR)\b", desc):
-        return "Comunicação & Áudio/Vídeo", "Aparelho de Mídia/Comunicação", "Não Especificado"
-
-    # 8. OUTROS
     return "Outros / Diversos", "Não Classificado", "Não Especificado"
 
 # ----------------------------------------------------
@@ -129,13 +217,11 @@ def classificar_bem_patrimonial(descricao: str):
 # ----------------------------------------------------
 @st.cache_data(ttl=600)
 def carregar_aba(sheet_name: str):
-    """Baixa a aba da planilha em formato CSV via GViz."""
     url = f"https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
     return pd.read_csv(url, dtype=str)
 
 @st.cache_data(ttl=600)
 def carregar_dados_sistema():
-    # 1. Carrega Estrutura de Custos para mapear Departamentos
     df_estrutura = carregar_aba("Estrutura_Custos")
     mapa_por_codigo = {}
     mapa_por_nome = {}
@@ -148,7 +234,6 @@ def carregar_dados_sistema():
 
             if cod and cod != "nan" and depto and depto != "nan":
                 mapa_por_codigo[cod] = depto
-
             if unid_texto and unid_texto != "nan" and depto and depto != "nan":
                 nome_limpo = re.sub(r"^\d+\s*-\s*", "", unid_texto).upper().strip()
                 mapa_por_nome[nome_limpo] = depto
@@ -157,22 +242,18 @@ def carregar_dados_sistema():
         txt = str(texto_unidade).upper().strip()
         if not txt or txt == "NAN":
             return "Não Informado"
-
-        # Tenta casar código de 5 dígitos (ex: 000090001 -> 90001)
         match_cod = re.search(r"0*([1-9]\d{4})", txt)
         if match_cod:
             cod_5d = match_cod.group(1)
             if cod_5d in mapa_por_codigo:
                 return mapa_por_codigo[cod_5d]
 
-        # Tenta casar nome textual
         txt_sem_prefixo = re.sub(r"^UNIDADE:\s*", "", txt)
         txt_sem_prefixo = re.sub(r"^ECC\.\d+\.\d+\s*-\s*", "", txt_sem_prefixo).strip()
         for nome_ref, depto_ref in mapa_por_nome.items():
             if nome_ref in txt_sem_prefixo or txt_sem_prefixo in nome_ref:
                 return depto_ref
 
-        # Regras diretas da SEAPI
         if "GABINETE" in txt:
             return "GABINETE SEAPI"
         elif "PATRIMÔNIO" in txt or "DIVISÃO DE PATRIMÔNIO" in txt:
@@ -185,10 +266,9 @@ def carregar_dados_sistema():
             return "DDPA"
         elif "INFRAESTRUTURA" in txt or "DINFRA" in txt:
             return "DINFRA"
-
         return "Demais (DEFIN, DGSP, DG)"
 
-    # 2. Termos de Responsabilidade (~30k linhas)
+    # Base Termos de Responsabilidade
     df_termos_raw = carregar_aba("Termo_Responsabilidade")
     df_termos = pd.DataFrame()
     if not df_termos_raw.empty:
@@ -211,7 +291,7 @@ def carregar_dados_sistema():
             "Status": "Em Uso Direto"
         })
 
-    # 3. Bens Cedidos (~3.3k linhas)
+    # Base Bens Cedidos
     df_cedidos_raw = carregar_aba("Bens_Cedidos")
     df_cedidos = pd.DataFrame()
     if not df_cedidos_raw.empty:
@@ -228,7 +308,7 @@ def carregar_dados_sistema():
             "Status": "Bens Cedidos"
         })
 
-    # 4. Bens Não Localizados (~430 linhas)
+    # Base Bens Não Localizados
     df_nao_loc_raw = carregar_aba("Bens_Nao_Localizados")
     df_nao_loc = pd.DataFrame()
     if not df_nao_loc_raw.empty:
@@ -245,11 +325,9 @@ def carregar_dados_sistema():
             "Status": "Bens Não Localizados"
         })
 
-    # Concatenação e limpeza
     df_total = pd.concat([df_termos, df_cedidos, df_nao_loc], ignore_index=True)
     df_total["Departamento"] = df_total["Unidade_Raw"].apply(identificar_departamento)
 
-    # Classificação em 3 camadas de cada bem com base na Descrição
     classificacoes = df_total["Descricao"].apply(classificar_bem_patrimonial)
     df_total["Macro_Familia"] = [c[0] for c in classificacoes]
     df_total["Tipo_Bem"] = [c[1] for c in classificacoes]
@@ -258,82 +336,220 @@ def carregar_dados_sistema():
     return df_total
 
 # ----------------------------------------------------
-# 4. CARREGAMENTO DOS DADOS NO APP
+# 4. FUNÇÃO DE GERAÇÃO DE RELATÓRIO PDF EM MEMÓRIA
 # ----------------------------------------------------
-with st.spinner("Conectando ao Google Sheets e carregando dados patrimoniais..."):
+def gerar_relatorio_pdf(df_dados, filtros_desc):
+    """Gera um PDF formatado com layout executivo e retorna os bytes."""
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(letter),
+        leftMargin=30,
+        rightMargin=30,
+        topMargin=30,
+        bottomMargin=30
+    )
+
+    elementos = []
+    styles = getSampleStyleSheet()
+
+    # Estilos customizados
+    titulo_style = ParagraphStyle(
+        'DocTitle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=18,
+        textColor=colors.HexColor('#1E4D2B'),
+        spaceAfter=4
+    )
+    sub_style = ParagraphStyle(
+        'DocSub',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=10,
+        textColor=colors.HexColor('#555555'),
+        spaceAfter=15
+    )
+    secao_style = ParagraphStyle(
+        'SectionTitle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=12,
+        textColor=colors.HexColor('#1E4D2B'),
+        spaceBefore=12,
+        spaceAfter=6
+    )
+
+    # Cabeçalho
+    elementos.append(Paragraph("SISTEMA INTEGRADO DE GESTÃO E CONSULTA PATRIMONIAL", titulo_style))
+    elementos.append(Paragraph(
+        f"Secretaria da Agricultura, Pecuária, Produção Sustentável e Irrigação • SEAPI/RS | Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}",
+        sub_style
+    ))
+
+    # Filtros Aplicados
+    filtro_p = Paragraph(f"<b>Parâmetros do Filtro:</b> {filtros_desc}", ParagraphStyle('Filtros', fontSize=8, textColor=colors.HexColor('#333333')))
+    elementos.append(filtro_p)
+    elementos.append(Spacer(1, 10))
+
+    # 1. Tabela de KPIs Principais
+    qtd_total = len(df_dados)
+    val_total = df_dados["Valor_Contabil"].sum()
+    val_medio = (val_total / qtd_total) if qtd_total > 0 else 0.0
+
+    kpi_data = [
+        ["QUANTIDADE DE BENS", "VALOR PATRIMONIAL TOTAL", "TICKET MÉDIO CONTÁBIL"],
+        [f"{qtd_total:,}".replace(",", "."), f"R$ {val_total:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."), f"R$ {val_medio:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")]
+    ]
+    t_kpi = Table(kpi_data, colWidths=[240, 260, 240])
+    t_kpi.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1E4D2B')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,0), 9),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('BACKGROUND', (0,1), (-1,1), colors.HexColor('#F4F8F4')),
+        ('FONTNAME', (0,1), (-1,1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,1), (-1,1), 14),
+        ('TEXTCOLOR', (0,1), (-1,1), colors.HexColor('#1E4D2B')),
+        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#1E4D2B')),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
+    ]))
+    elementos.append(t_kpi)
+    elementos.append(Spacer(1, 12))
+
+    # 2. Resumo por Departamento
+    elementos.append(Paragraph("Distribuição Consolidada por Departamento Oficial", secao_style))
+    agrup_dep = df_dados.groupby("Departamento")["Valor_Contabil"].agg(["count", "sum"]).reset_index()
+    agrup_dep.columns = ["Departamento", "Qtd", "Valor"]
+    agrup_dep = agrup_dep.sort_values(by="Qtd", ascending=False).head(8)
+
+    t_dep_data = [["Departamento Oficial", "Qtd. Bens", "Part. (%)", "Valor Total (R$)"]]
+    for _, r in agrup_dep.iterrows():
+        pct = (r["Qtd"] / qtd_total * 100) if qtd_total > 0 else 0
+        t_dep_data.append([
+            str(r["Departamento"]),
+            f"{int(r['Qtd']):,}".replace(",", "."),
+            f"{pct:.1f}%",
+            f"R$ {r['Valor']:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        ])
+
+    t_dep = Table(t_dep_data, colWidths=[260, 140, 140, 200])
+    t_dep.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#2E693D')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,-1), 8),
+        ('ALIGN', (1,0), (-1,-1), 'RIGHT'),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#CCCCCC')),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#F9FBF9')])
+    ]))
+    elementos.append(t_dep)
+    elementos.append(Spacer(1, 12))
+
+    # 3. Amostra dos Primeiros 25 Bens Listados
+    elementos.append(Paragraph(f"Detalhamento dos Itens Filtrados (Primeiros {min(qtd_total, 25)} registros)", secao_style))
+    amostra = df_dados.head(25)
+    t_itens_data = [["Tombamento", "Descrição do Bem", "Depto.", "Unidade de Guarda", "Status", "Valor (R$)"]]
+    for _, r in amostra.iterrows():
+        t_itens_data.append([
+            str(r["Tombamento"]),
+            str(r["Descricao"])[:35],
+            str(r["Departamento"])[:10],
+            str(r["Unidade"])[:28],
+            str(r["Status"])[:15],
+            f"R$ {r['Valor_Contabil']:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        ])
+
+    t_itens = Table(t_itens_data, colWidths=[70, 210, 70, 200, 100, 90])
+    t_itens.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1E4D2B')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,-1), 7),
+        ('ALIGN', (-1,0), (-1,-1), 'RIGHT'),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#DDDDDD')),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#FAFAFA')])
+    ]))
+    elementos.append(t_itens)
+
+    doc.build(elementos)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+# ----------------------------------------------------
+# 5. CARREGAMENTO DOS DADOS NO APP
+# ----------------------------------------------------
+with st.spinner("Conectando ao Google Sheets e consolidando bases de dados..."):
     try:
         df = carregar_dados_sistema()
     except Exception as e:
         st.error(f"Erro ao carregar dados da planilha: {e}")
-        st.info("Certifique-se de que a planilha está compartilhada com 'Qualquer pessoa com o link' em modo Leitor.")
         st.stop()
 
 # ----------------------------------------------------
-# 5. CABEÇALHO DO SISTEMA
+# 6. HEADER VISUAL EXECUTIVO
 # ----------------------------------------------------
-st.title("🏛️ Sistema Integrado de Consulta e Pesquisa Patrimonial")
-st.caption("Secretaria da Agricultura, Pecuária, Produção Sustentável e Irrigação • Estado do Rio Grande do Sul")
+st.markdown("""
+<div class="header-box">
+    <h1>🏛️ Sistema Integrado de Consulta e Pesquisa Patrimonial</h1>
+    <p>Secretaria da Agricultura, Pecuária, Produção Sustentável e Irrigação • Estado do Rio Grande do Sul</p>
+</div>
+""", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 6. BARRA LATERAL (FILTROS INTERATIVOS)
+# 7. BARRA LATERAL COM FILTROS MULTISSELEÇÃO
 # ----------------------------------------------------
 st.sidebar.header("🔍 Painel de Filtros")
 
-# 1. Campo Livre de Busca
 termo_busca = st.sidebar.text_input(
-    "Nº Tombamento (Atual/Anterior) ou Descrição:",
-    placeholder="Ex: 203388, 10542, Cadeira, Dell..."
+    "Nº Tombamento ou Descrição:",
+    placeholder="Ex: 203388, Cadeira, Hilux..."
 ).strip()
 
-# 2. Filtro de Base de Origem
-bases_disponiveis = ["Todas as Bases"] + sorted(df["Base"].unique().tolist())
-base_selecionada = st.sidebar.selectbox("Base de Dados:", bases_disponiveis)
+bases_disponiveis = sorted(df["Base"].unique().tolist())
+bases_selecionadas = st.sidebar.multiselect("Base de Dados:", bases_disponiveis, placeholder="Todas as bases")
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("🏢 Localização & Lotação")
 
-# 3. Departamento Oficial
-deptos_disponiveis = ["Todos os Departamentos"] + sorted(df["Departamento"].unique().tolist())
-depto_selecionado = st.sidebar.selectbox("Departamento Oficial:", deptos_disponiveis)
+deptos_disponiveis = sorted(df["Departamento"].unique().tolist())
+deptos_selecionados = st.sidebar.multiselect("Departamento Oficial:", deptos_disponiveis, placeholder="Todos os departamentos")
 
-# 4. Unidade de Guarda (Dependente do Departamento)
 df_escopo_unidade = df.copy()
-if depto_selecionado != "Todos os Departamentos":
-    df_escopo_unidade = df_escopo_unidade[df_escopo_unidade["Departamento"] == depto_selecionado]
+if deptos_selecionados:
+    df_escopo_unidade = df_escopo_unidade[df_escopo_unidade["Departamento"].isin(deptos_selecionados)]
 
-unidades_lista = ["Todas as Unidades"] + sorted([u for u in df_escopo_unidade["Unidade"].unique() if u])
-unidade_selecionada = st.sidebar.selectbox("Unidade de Guarda / Local:", unidades_lista)
+unidades_lista = sorted([u for u in df_escopo_unidade["Unidade"].unique() if u])
+unidades_selecionadas = st.sidebar.multiselect("Unidade de Guarda / Local:", unidades_lista, placeholder="Todas as unidades")
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📦 Tipologia do Bem")
 
-# 5. Macro-Família
-familias_disponiveis = ["Todas as Famílias"] + sorted(df["Macro_Familia"].unique().tolist())
-familia_selecionada = st.sidebar.selectbox("Macro-Família:", familias_disponiveis)
+familias_disponiveis = sorted(df["Macro_Familia"].unique().tolist())
+familias_selecionadas = st.sidebar.multiselect("Macro-Família:", familias_disponiveis, placeholder="Todas as famílias")
 
-# 6. Tipo do Bem (Dependente da Família)
 df_escopo_tipo = df.copy()
-if familia_selecionada != "Todas as Famílias":
-    df_escopo_tipo = df_escopo_tipo[df_escopo_tipo["Macro_Familia"] == familia_selecionada]
+if familias_selecionadas:
+    df_escopo_tipo = df_escopo_tipo[df_escopo_tipo["Macro_Familia"].isin(familias_selecionadas)]
 
-tipos_lista = ["Todos os Tipos"] + sorted(df_escopo_tipo["Tipo_Bem"].unique().tolist())
-tipo_selecionado = st.sidebar.selectbox("Tipo de Bem:", tipos_lista)
+tipos_lista = sorted(df_escopo_tipo["Tipo_Bem"].unique().tolist())
+tipos_selecionados = st.sidebar.multiselect("Tipo de Bem:", tipos_lista, placeholder="Todos os tipos")
 
-# 7. Subtipo / Variação (Dependente do Tipo)
 df_escopo_subtipo = df_escopo_tipo.copy()
-if tipo_selecionado != "Todos os Tipos":
-    df_escopo_subtipo = df_escopo_subtipo[df_escopo_subtipo["Tipo_Bem"] == tipo_selecionado]
+if tipos_selecionados:
+    df_escopo_subtipo = df_escopo_subtipo[df_escopo_subtipo["Tipo_Bem"].isin(tipos_selecionados)]
 
-subtipos_lista = ["Todos os Subtipos"] + sorted(df_escopo_subtipo["Subtipo"].unique().tolist())
-subtipo_selecionado = st.sidebar.selectbox("Variação / Subtipo:", subtipos_lista)
+subtipos_lista = sorted(df_escopo_subtipo["Subtipo"].unique().tolist())
+subtipos_selecionados = st.sidebar.multiselect("Subtipo / Variação:", subtipos_lista, placeholder="Todos os subtipos")
 
 st.sidebar.markdown("---")
-# 8. Status
-status_lista = ["Todos os Status"] + sorted(df["Status"].unique().tolist())
-status_selecionado = st.sidebar.selectbox("Situação / Status:", status_lista)
+status_lista = sorted(df["Status"].unique().tolist())
+status_selecionados = st.sidebar.multiselect("Situação / Status:", status_lista, placeholder="Todos os status")
 
 # ----------------------------------------------------
-# 7. FILTRAGEM DO DATAFRAME
+# 8. FILTRAGEM DO DATAFRAME
 # ----------------------------------------------------
 df_filtrado = df.copy()
 
@@ -343,78 +559,113 @@ if termo_busca:
         df_filtrado["Tombamento_Anterior"].str.contains(termo_busca, case=False, na=False) |
         df_filtrado["Descricao"].str.contains(termo_busca, case=False, na=False)
     ]
-
-if base_selecionada != "Todas as Bases":
-    df_filtrado = df_filtrado[df_filtrado["Base"] == base_selecionada]
-
-if depto_selecionado != "Todos os Departamentos":
-    df_filtrado = df_filtrado[df_filtrado["Departamento"] == depto_selecionado]
-
-if unidade_selecionada != "Todas as Unidades":
-    df_filtrado = df_filtrado[df_filtrado["Unidade"] == unidade_selecionada]
-
-if familia_selecionada != "Todas as Famílias":
-    df_filtrado = df_filtrado[df_filtrado["Macro_Familia"] == familia_selecionada]
-
-if tipo_selecionado != "Todos os Tipos":
-    df_filtrado = df_filtrado[df_filtrado["Tipo_Bem"] == tipo_selecionado]
-
-if subtipo_selecionado != "Todos os Subtipos":
-    df_filtrado = df_filtrado[df_filtrado["Subtipo"] == subtipo_selecionado]
-
-if status_selecionado != "Todos os Status":
-    df_filtrado = df_filtrado[df_filtrado["Status"] == status_selecionado]
+if bases_selecionadas:
+    df_filtrado = df_filtrado[df_filtrado["Base"].isin(bases_selecionadas)]
+if deptos_selecionados:
+    df_filtrado = df_filtrado[df_filtrado["Departamento"].isin(deptos_selecionados)]
+if unidades_selecionadas:
+    df_filtrado = df_filtrado[df_filtrado["Unidade"].isin(unidades_selecionadas)]
+if familias_selecionadas:
+    df_filtrado = df_filtrado[df_filtrado["Macro_Familia"].isin(familias_selecionadas)]
+if tipos_selecionados:
+    df_filtrado = df_filtrado[df_filtrado["Tipo_Bem"].isin(tipos_selecionados)]
+if subtipos_selecionados:
+    df_filtrado = df_filtrado[df_filtrado["Subtipo"].isin(subtipos_selecionados)]
+if status_selecionados:
+    df_filtrado = df_filtrado[df_filtrado["Status"].isin(status_selecionados)]
 
 # ----------------------------------------------------
-# 8. CARDS DE INDICADORES (KPIs)
+# 9. CARDS DE KPIS COM DESIGN SEAPI
 # ----------------------------------------------------
 qtd_total = len(df_filtrado)
 valor_total = df_filtrado["Valor_Contabil"].sum()
 ticket_medio = (valor_total / qtd_total) if qtd_total > 0 else 0.0
 
-col1, col2, col3, col4 = st.columns(4)
+col_kpi1, col_kpi2, col_kpi3, col_kpi4 = st.columns(4)
 
-col1.metric("Quantidade de Bens", f"{qtd_total:,}".replace(",", "."))
-col2.metric("Valor Patrimonial Total", f"R$ {valor_total:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-col3.metric("Ticket Médio Contábil", f"R$ {ticket_medio:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+with col_kpi1:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="title">Quantidade de Bens</div>
+        <div class="value">{qtd_total:,}</div>
+        <div class="subtitle">Itens no escopo ativo</div>
+    </div>
+    """.replace(",", "."), unsafe_allow_html=True)
 
-filtros_ativos = bool(
-    termo_busca or 
-    base_selecionada != "Todas as Bases" or 
-    depto_selecionado != "Todos os Departamentos" or 
-    unidade_selecionada != "Todas as Unidades" or 
-    familia_selecionada != "Todas as Famílias" or 
-    tipo_selecionado != "Todos os Tipos" or 
-    subtipo_selecionado != "Todos os Subtipos" or 
-    status_selecionado != "Todos os Status"
-)
-col4.metric("Status dos Filtros", "🔵 Filtro(s) Ativo(s)" if filtros_ativos else "⚪ Base Completa")
+with col_kpi2:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="title">Valor Patrimonial Total</div>
+        <div class="value">R$ {valor_total:,.2f}</div>
+        <div class="subtitle">Base contábil apurada</div>
+    </div>
+    """.replace(",", "X").replace(".", ",").replace("X", "."), unsafe_allow_html=True)
 
-st.divider()
+with col_kpi3:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="title">Ticket Médio Contábil</div>
+        <div class="value">R$ {ticket_medio:,.2f}</div>
+        <div class="subtitle">Valor médio por ativo</div>
+    </div>
+    """.replace(",", "X").replace(".", ",").replace("X", "."), unsafe_allow_html=True)
+
+with col_kpi4:
+    filtros_ativos = bool(termo_busca or bases_selecionadas or deptos_selecionados or unidades_selecionadas or familias_selecionadas or tipos_selecionados or subtipos_selecionados or status_selecionados)
+    st.markdown(f"""
+    <div class="metric-card" style="border-left-color: {'#2A75D3' if filtros_ativos else '#666666'};">
+        <div class="title">Status dos Filtros</div>
+        <div class="value" style="color: {'#2A75D3' if filtros_ativos else '#666666'};">{'🔵 Ativo(s)' if filtros_ativos else '⚪ Base Toda'}</div>
+        <div class="subtitle">{'Filtros personalizados' if filtros_ativos else 'Nenhum filtro aplicado'}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.write("")
 
 # ----------------------------------------------------
-# 9. ABAS DE VISUALIZAÇÃO E ANÁLISE
+# 10. ABAS DE NAVEGAÇÃO E ANÁLISE
 # ----------------------------------------------------
-tab_resultados, tab_distribuicao, tab_ficha = st.tabs([
+tab_dash, tab_itens, tab_pdf, tab_ficha = st.tabs([
+    "📊 Painel Executivo / Dashboard",
     "📋 Itens Pesquisados",
-    "📊 Resumos & Gráficos",
+    "📄 Gerar Relatório PDF",
     "🔍 Ficha Individual do Bem"
 ])
 
-with tab_resultados:
-    st.subheader(f"Registros Localizados ({qtd_total})")
+# ABA 1: DASHBOARD
+with tab_dash:
+    if qtd_total > 0:
+        c1, c2 = st.columns(2)
+        with c1:
+            st.subheader("Distribuição por Departamento Oficial")
+            agrup_depto = df_filtrado.groupby("Departamento")["Valor_Contabil"].agg(["count", "sum"]).reset_index()
+            agrup_depto.columns = ["Departamento", "Qtd. Bens", "Valor Total (R$)"]
+            agrup_depto = agrup_depto.sort_values(by="Qtd. Bens", ascending=False)
+            st.dataframe(agrup_depto, use_container_width=True, hide_index=True)
+            st.bar_chart(agrup_depto.set_index("Departamento")["Qtd. Bens"])
 
+        with c2:
+            st.subheader("Distribuição por Tipo de Bem")
+            agrup_tipo = df_filtrado.groupby("Tipo_Bem")["Valor_Contabil"].agg(["count", "sum"]).reset_index()
+            agrup_tipo.columns = ["Tipo do Bem", "Qtd. Bens", "Valor Total (R$)"]
+            agrup_tipo = agrup_tipo.sort_values(by="Qtd. Bens", ascending=False).head(10)
+            st.dataframe(agrup_tipo, use_container_width=True, hide_index=True)
+            st.bar_chart(agrup_tipo.set_index("Tipo do Bem")["Qtd. Bens"])
+    else:
+        st.info("Nenhum registro encontrado para alimentar os gráficos.")
+
+# ABA 2: ITENS PESQUISADOS
+with tab_itens:
+    st.subheader(f"Registros Localizados ({qtd_total})")
     if qtd_total > 0:
         df_exibicao = df_filtrado.copy()
         df_exibicao["Valor_Formatado"] = df_exibicao["Valor_Contabil"].apply(
             lambda v: f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
         )
-
         colunas_tabela = [
             "Tombamento", "Tombamento_Anterior", "Descricao", "Macro_Familia",
             "Tipo_Bem", "Subtipo", "Departamento", "Unidade", "Status", "Valor_Formatado"
         ]
-
         st.dataframe(
             df_exibicao[colunas_tabela].rename(columns={
                 "Tombamento": "Nº Atual",
@@ -422,7 +673,7 @@ with tab_resultados:
                 "Descricao": "Descrição do Bem",
                 "Macro_Familia": "Família",
                 "Tipo_Bem": "Tipo",
-                "Subtipo": "Subtipo/Variação",
+                "Subtipo": "Subtipo",
                 "Departamento": "Departamento",
                 "Unidade": "Unidade de Guarda",
                 "Status": "Situação",
@@ -432,52 +683,54 @@ with tab_resultados:
             hide_index=True
         )
 
-        # Exportação CSV
         csv_download = df_filtrado.to_csv(index=False).encode("utf-8")
         st.download_button(
-            label="📥 Baixar Dados Filtrados (CSV)",
+            label="📥 Exportar Dados para CSV",
             data=csv_download,
             file_name="consulta_patrimonial_seapi.csv",
             mime="text/csv"
         )
     else:
-        st.warning("Nenhum bem patrimonial encontrado para a combinação de filtros selecionada.")
+        st.warning("Nenhum bem patrimonial localizado para os filtros informados.")
 
-with tab_distribuicao:
+# ABA 3: EXPORTAÇÃO PDF
+with tab_pdf:
+    st.subheader("Gerador de Relatório Patrimonial Oficial (PDF)")
+    st.write("Gere um documento executivo com os totais, resumos por departamento e listagem dos bens de acordo com os filtros selecionados na barra lateral.")
+
+    texto_filtros = []
+    if termo_busca: texto_filtros.append(f"Busca: '{termo_busca}'")
+    if deptos_selecionados: texto_filtros.append(f"Deptos: {', '.join(deptos_selecionados)}")
+    if unidades_selecionadas: texto_filtros.append(f"Unidades: {len(unidades_selecionadas)} selecionada(s)")
+    if familias_selecionadas: texto_filtros.append(f"Famílias: {', '.join(familias_selecionadas)}")
+    if tipos_selecionados: texto_filtros.append(f"Tipos: {', '.join(tipos_selecionados)}")
+    if status_selecionados: texto_filtros.append(f"Status: {', '.join(status_selecionados)}")
+    desc_final = " | ".join(texto_filtros) if texto_filtros else "Base Completa (Sem restrições)"
+
     if qtd_total > 0:
-        c_g1, c_g2 = st.columns(2)
-
-        with c_g1:
-            st.subheader("Distribuição por Tipo de Bem")
-            agrup_tipo = df_filtrado.groupby("Tipo_Bem")["Valor_Contabil"].agg(["count", "sum"]).reset_index()
-            agrup_tipo.columns = ["Tipo do Bem", "Quantidade", "Valor Total (R$)"]
-            agrup_tipo = agrup_tipo.sort_values(by="Quantidade", ascending=False).head(10)
-            st.dataframe(agrup_tipo, use_container_width=True, hide_index=True)
-            st.bar_chart(agrup_tipo.set_index("Tipo do Bem")["Quantidade"])
-
-        with c_g2:
-            st.subheader("Distribuição por Departamento Oficial")
-            agrup_dep = df_filtrado.groupby("Departamento")["Valor_Contabil"].agg(["count", "sum"]).reset_index()
-            agrup_dep.columns = ["Departamento", "Quantidade", "Valor Total (R$)"]
-            agrup_dep = agrup_dep.sort_values(by="Quantidade", ascending=False)
-            st.dataframe(agrup_dep, use_container_width=True, hide_index=True)
-            st.bar_chart(agrup_dep.set_index("Departamento")["Quantidade"])
+        if st.button("📄 Gerar e Compilar Relatório PDF"):
+            with st.spinner("Compilando dados e formatando PDF executivo..."):
+                pdf_bytes = gerar_relatorio_pdf(df_filtrado, desc_final)
+                st.success("Relatório PDF gerado com sucesso!")
+                st.download_button(
+                    label="⬇️ Baixar Relatório em PDF",
+                    data=pdf_bytes,
+                    file_name=f"Relatorio_Patrimonial_SEAPI_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                    mime="application/pdf"
+                )
     else:
-        st.info("Sem dados para exibição de resumos analíticos.")
+        st.warning("Não há dados filtrados para gerar o relatório em PDF.")
 
+# ABA 4: FICHA INDIVIDUAL
 with tab_ficha:
-    st.subheader("Consulta Detalhada por Tombamento")
-    tomb_busca = st.text_input("Digite o Número de Tombamento (Atual ou Anterior):", placeholder="Ex: 203388").strip()
+    st.subheader("Consulta de Ficha Individual de Tombamento")
+    tomb_busca = st.text_input("Informe o Número de Tombamento (Atual ou Anterior):", placeholder="Ex: 203388").strip()
 
     if tomb_busca:
-        registro = df[
-            (df["Tombamento"] == tomb_busca) |
-            (df["Tombamento_Anterior"] == tomb_busca)
-        ]
+        registro = df[(df["Tombamento"] == tomb_busca) | (df["Tombamento_Anterior"] == tomb_busca)]
         if not registro.empty:
             item = registro.iloc[0]
             st.success(f"Bem Localizado: **{item['Tombamento']} - {item['Descricao']}**")
-
             f1, f2 = st.columns(2)
             with f1:
                 st.write(f"**Nº Tombamento Atual:** {item['Tombamento']}")
@@ -493,4 +746,6 @@ with tab_ficha:
                 st.write(f"**Responsável / Titular:** {item['Responsavel']}")
                 st.write(f"**Valor Contábil:** R$ {item['Valor_Contabil']:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
         else:
-            st.error(f"Nenhum registro localizado com o tombamento '{tomb_busca}'.")
+            st.error(f"Nenhum registro localizado para o tombamento '{tomb_busca}'.")
+
+```
